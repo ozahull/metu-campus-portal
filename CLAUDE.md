@@ -154,23 +154,30 @@ yoktur).
 ## 5. VERİTABANI ŞEMASI (Supabase / PostgreSQL)
 ================================================================
 
-Tablolar (kod bunları varsayar; RLS politikaları ŞART):
+Şema artık tamamen supabase/migrations altında versiyonlu ve idempotenttir
+(Faz 0). Temiz bir DB'de sırayla uygulanabilir; üretimde IF NOT EXISTS / DROP
+IF EXISTS desenleriyle mevcut yapıyı bozmaz. TS tipleri: src/types/database.ts
+(Database) — client.ts, server.ts ve middleware.ts `createXClient<Database>`
+ile generic'lenmiştir.
 
 **profiles**
 - id (uuid, PK, → auth.users.id)
 - full_name (text, nullable)
-- email (text)
-- role (text, default 'USER' — değerler: 'USER' | 'SUPER_ADMIN')
+- email (text, nullable)
+- role (text, not null, default 'USER' — değerler: 'USER' | 'SUPER_ADMIN')
 
 **clubs**
 - id (uuid, PK)
 - name (text)
 - description (text, nullable)
+- advisor_id (uuid, nullable, → profiles.id)   ← Faz 0: akademik danışman
 
 **club_members**
 - club_id (→ clubs.id)
-- user_id (→ profiles.id)   ← ÖNEMLİ: embed için FK profiles'a bakmalı
-- UNIQUE(club_id, user_id)
+- user_id (→ profiles.id)   ← embed için FK profiles'a bakar (Faz 0'da garanti)
+- role (text, not null, default 'MEMBER' — CHECK in ('MEMBER','ADMIN'))  ← Faz 0
+- created_at (timestamptz, not null, default now())  ← Faz 0
+- PK (club_id, user_id) = doğal unique
 
 **events**
 - id (uuid, PK)
@@ -179,24 +186,43 @@ Tablolar (kod bunları varsayar; RLS politikaları ŞART):
 - description (text, nullable)
 - event_date (timestamptz)
 - location (text, nullable)
-- status (text — 'APPROVED' kullanılıyor)
+- status (text, not null, default 'APPROVED')
+  CHECK in ('PENDING_ADVISOR','PENDING_SCHOOL','APPROVED','REJECTED','CHANGES_REQUESTED')
+  ← Faz 0: yalnızca ŞEMA. Akış mantığı Faz 2'de; şu an her şey 'APPROVED'.
 
 **event_attendees**
 - event_id (→ events.id)
 - user_id (→ profiles.id)
-- UNIQUE(event_id, user_id)
+- created_at (timestamptz, not null, default now())  ← Faz 0
+- PK (event_id, user_id) = doğal unique
 
-GEREKLİ RLS POLİTİKALARI (özet):
-- profiles: kendi satırını SELECT/INSERT/UPDATE (auth.uid() = id)
-- clubs: herkes SELECT; sadece SUPER_ADMIN INSERT
-- club_members: herkes SELECT; kendisi INSERT/DELETE (auth.uid()=user_id)
-- events: status='APPROVED' SELECT herkes; SUPER_ADMIN INSERT
-- event_attendees: herkes SELECT; kendisi INSERT/DELETE
+YARDIMCI FONKSİYON / TRIGGER'LAR (Faz 0):
+- public.is_super_admin() → boolean (SECURITY DEFINER; RLS özyinelemesini önler).
+  Tüm admin politikaları bunu kullanır.
+- handle_new_user trigger (auth.users AFTER INSERT) → profiles satırını otomatik
+  oluşturur (metadata.full_name + email).
+- prevent_role_escalation trigger (profiles BEFORE UPDATE) → normal kullanıcı
+  kendi role'ünü değiştiremez; yalnızca SUPER_ADMIN veya service_role.
+- enforce_metu_domain trigger (auth.users BEFORE INSERT) → domain kısıtı.
+
+RLS POLİTİKALARI (versiyonlu — 20260615120600_rls_policies.sql):
+- profiles: SELECT oturum açmış herkes (üye listesi isimleri için); INSERT/UPDATE
+  yalnızca kendi satırı (role değişimi trigger ile bloklu).
+  NOT: CLAUDE.md'nin eski sürümü "yalnızca kendi satırını SELECT" diyordu;
+  üye listesi özelliğinin çalışması için SELECT authenticated'a genişletildi.
+- clubs: SELECT herkes; INSERT/UPDATE/DELETE yalnızca SUPER_ADMIN
+  (advisor_id değişimi de bu UPDATE ile sınırlı).
+- club_members: SELECT herkes; INSERT kendisi + WITH CHECK role='MEMBER'
+  (escalation koruması); DELETE kendisi; UPDATE (ADMIN atama) SUPER_ADMIN.
+- events: SELECT (status='APPROVED' OR is_super_admin); INSERT/UPDATE/DELETE
+  SUPER_ADMIN.
+- event_attendees: SELECT herkes; INSERT/DELETE kendisi.
 
 NOT: PostgREST embed sorguları (örn. `user_id(id, full_name)`,
 `clubs(name)`, `event_attendees(user_id)`) yalnızca ilgili FK'lar
-tanımlıysa çalışır. FK eksikse server component'lerde
-`console.error("[...] ... hatası:")` logu düşer.
+tanımlıysa çalışır. Faz 0 FK migration'ı (20260615120500) club_members.user_id
+ve event_attendees.user_id'yi profiles(id)'ye bağlar. FK eksikse server
+component'lerde `console.error("[...] ... hatası:")` logu düşer.
 
 ================================================================
 ## 6. SAYFA SAYFA NE YAPIYOR?
@@ -280,14 +306,38 @@ MVP TAMAMLANDI ve Vercel'de CANLI:
 - Kök sayfa /login'e yönlendiriyor
 - GitHub'a push'lu, Vercel auto-deploy aktif
 
+FAZ 0 TAMAMLANDI (şema/RLS/tip sertleştirme — kod tarafı):
+- Tüm şema supabase/migrations altında versiyonlu + idempotent:
+  base_schema, membership_timestamps, club_member_role, club_advisor,
+  events_status_check, foreign_keys, rls_policies (20260615120000..120600).
+- created_at (club_members + event_attendees), club_members.role,
+  clubs.advisor_id, events.status CHECK eklendi.
+- Güvenlik: is_super_admin(), prevent_role_escalation, handle_new_user
+  trigger'ları; club_members INSERT role='MEMBER' zorlaması; advisor_id ve
+  role atamaları yalnızca SUPER_ADMIN.
+- FK'ler profiles(id)'ye bağlandı (embed sorguları için).
+- src/types/database.ts üretildi; client/server/middleware <Database> ile
+  generic'lendi. `npx tsc --noEmit` temiz; öğrenci tarafı (dashboard, /clubs)
+  aynen çalışıyor.
+
+⚠️ FAZ 0 — KULLANICININ ELLE ÇALIŞTIRMASI GEREKENLER (ayrıcalıklı erişim
+   gerektirir; bu ortamda yapılamadı):
+- Migration'ları production'a uygula:
+    npx supabase login
+    npx supabase link --project-ref qxhyxxekaukwksupphzv
+    npx supabase db push
+  (Alternatif: her migration SQL'ini Supabase Dashboard → SQL Editor'da
+   sırayla çalıştır. enforce_metu_domain dahil.)
+- Tipleri uzaktan yeniden üret (opsiyonel, şema değişince):
+    npx supabase gen types typescript --project-id qxhyxxekaukwksupphzv > src/types/database.ts
+- Canlı politika denetimi (push sonrası doğrulama):
+    select * from pg_policies where schemaname='public';
+
 DİKKAT EDİLECEKLER (teknik borç / bekleyenler):
-- Supabase RLS politikalarının ve FK'ların elle kurulması gerekiyor;
-  kod bunları varsayıyor. Eksikse embed sorguları ve insert'ler hata verir.
-- enforce_metu_domain migration'ı henüz `db push` ile production'a
-  uygulanmadı (CLI link + DB şifresi gerekiyordu). Dashboard SQL Editor'dan
-  da çalıştırılabilir.
 - Navbar'daki "Etkinlikler" linki hâlâ PASİF (henüz /events sayfası yok).
 - "Kulübü İncele" dışında kulüp/etkinlik düzenleme-silme UI'ı yok.
+- profiles SELECT politikası authenticated'a açık (üye isimleri için);
+  e-posta gibi alanların gizliliği gerekiyorsa view/maskeleme düşünülmeli.
 
 ================================================================
 ## 10. SIRADA NE VAR? (Yol Haritası / Gelecek İşler)

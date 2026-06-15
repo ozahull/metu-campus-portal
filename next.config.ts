@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Üst dizinde başka bir lockfile bulunduğu için Turbopack'in workspace
+  // kökünü bu projeye sabitliyoruz.
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 export default nextConfig;

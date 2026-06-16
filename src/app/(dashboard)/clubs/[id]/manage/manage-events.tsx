@@ -4,15 +4,20 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   CalendarPlus,
+  Check,
   Clock,
   Loader2,
   MapPin,
+  MessageSquareWarning,
   Pencil,
   Plus,
+  RotateCw,
   Trash2,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { statusMeta } from "@/lib/event-status";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,6 +38,7 @@ export type ManageEvent = {
   event_date: string;
   location: string | null;
   status: string;
+  review_note: string | null;
 };
 
 const dateFormatter = new Intl.DateTimeFormat("tr-TR", {
@@ -40,7 +46,6 @@ const dateFormatter = new Intl.DateTimeFormat("tr-TR", {
   timeStyle: "short",
 });
 
-// ISO → datetime-local input değeri (YYYY-MM-DDTHH:mm), yerel saat.
 function toLocalInput(iso: string): string {
   const d = new Date(iso);
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -50,14 +55,18 @@ function toLocalInput(iso: string): string {
 export function ManageEvents({
   clubId,
   events,
+  canAdvisorDecide,
 }: {
   clubId: string;
   events: ManageEvent[];
+  // Danışman/okul: PENDING_ADVISOR etkinlikleri için karar verebilir.
+  canAdvisorDecide: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ManageEvent | null>(null);
   const [loading, setLoading] = useState(false);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -102,18 +111,45 @@ export function ManageEvents({
       location: location.trim() || null,
     };
 
-    const { error } = editing
-      ? await supabase.from("events").update(payload).eq("id", editing.id)
-      : await supabase
-          .from("events")
-          .insert({ ...payload, club_id: clubId, status: "APPROVED" });
-
-    setLoading(false);
-    if (error) {
-      toast.error(`İşlem başarısız: ${error.message}`);
+    if (editing) {
+      const { error } = await supabase
+        .from("events")
+        .update(payload)
+        .eq("id", editing.id);
+      setLoading(false);
+      if (error) {
+        toast.error(`İşlem başarısız: ${error.message}`);
+        return;
+      }
+      toast.success("Etkinlik güncellendi");
+      setOpen(false);
+      router.refresh();
       return;
     }
-    toast.success(editing ? "Etkinlik güncellendi" : "Etkinlik eklendi");
+
+    // Oluştur: status GÖNDERME (DB default PENDING_SCHOOL; doğrudan yazım
+    // kolon-grant ile zaten engelli). Eklendikten sonra event_submit ile akışa sok.
+    const { data: created, error: insertError } = await supabase
+      .from("events")
+      .insert({ ...payload, club_id: clubId })
+      .select("id")
+      .single();
+
+    if (insertError || !created) {
+      setLoading(false);
+      toast.error(`Eklenemedi: ${insertError?.message ?? "bilinmeyen hata"}`);
+      return;
+    }
+
+    const { error: submitError } = await supabase.rpc("event_submit", {
+      p_event_id: created.id,
+    });
+    setLoading(false);
+    if (submitError) {
+      toast.error(`Onaya gönderilemedi: ${submitError.message}`);
+      return;
+    }
+    toast.success("Etkinlik oluşturuldu ve onaya gönderildi");
     setOpen(false);
     router.refresh();
   }
@@ -129,6 +165,57 @@ export function ManageEvents({
       return;
     }
     toast.success("Etkinlik silindi");
+    router.refresh();
+  }
+
+  async function resubmit(ev: ManageEvent) {
+    setBusyId(ev.id);
+    const supabase = createClient();
+    const { error } = await supabase.rpc("event_submit", { p_event_id: ev.id });
+    setBusyId(null);
+    if (error) {
+      toast.error(`Gönderilemedi: ${error.message}`);
+      return;
+    }
+    toast.success("Etkinlik tekrar onaya gönderildi");
+    router.refresh();
+  }
+
+  async function advisorDecide(
+    ev: ManageEvent,
+    decision: "approve" | "reject" | "changes",
+  ) {
+    let note: string | null = null;
+    if (decision !== "approve") {
+      note = window.prompt(
+        decision === "reject" ? "Reddetme notu (opsiyonel):" : "Revizyon notu:",
+      );
+      if (note === null) return; // iptal
+      if (decision === "changes" && note.trim() === "") {
+        toast.error("Revizyon için bir not girin.");
+        return;
+      }
+    }
+
+    setBusyId(ev.id);
+    const supabase = createClient();
+    const { error } = await supabase.rpc("event_advisor_decision", {
+      p_event_id: ev.id,
+      p_decision: decision,
+      p_note: note?.trim() || undefined,
+    });
+    setBusyId(null);
+    if (error) {
+      toast.error(`İşlem başarısız: ${error.message}`);
+      return;
+    }
+    toast.success(
+      decision === "approve"
+        ? "Onaylandı, okul onayına gönderildi"
+        : decision === "reject"
+          ? "Etkinlik reddedildi"
+          : "Revizyon istendi",
+    );
     router.refresh();
   }
 
@@ -152,53 +239,78 @@ export function ManageEvents({
         </p>
       ) : (
         <ul className="space-y-2">
-          {events.map((ev) => (
-            <li
-              key={ev.id}
-              className="flex items-start justify-between gap-3 rounded-lg border border-white/5 bg-white/[0.02] p-4"
-            >
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h4 className="font-semibold text-white">{ev.title}</h4>
-                  <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium text-zinc-400">
-                    {ev.status}
-                  </span>
+          {events.map((ev) => {
+            const meta = statusMeta(ev.status);
+            const busy = busyId === ev.id;
+            return (
+              <li
+                key={ev.id}
+                className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h4 className="font-semibold text-white">{ev.title}</h4>
+                      <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${meta.cls}`}>
+                        {meta.label}
+                      </span>
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-400">
+                      <span className="inline-flex items-center gap-1.5">
+                        <Clock className="size-3.5 text-[#e7a3a3]" />
+                        {dateFormatter.format(new Date(ev.event_date))}
+                      </span>
+                      {ev.location && (
+                        <span className="inline-flex items-center gap-1.5">
+                          <MapPin className="size-3.5 text-[#e7a3a3]" />
+                          {ev.location}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 gap-1">
+                    <Button onClick={() => openEdit(ev)} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-white" aria-label="Düzenle">
+                      <Pencil className="size-4" />
+                    </Button>
+                    <Button onClick={() => handleDelete(ev)} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-red-500/10 hover:text-red-400" aria-label="Sil">
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-400">
-                  <span className="inline-flex items-center gap-1.5">
-                    <Clock className="size-3.5 text-[#e7a3a3]" />
-                    {dateFormatter.format(new Date(ev.event_date))}
-                  </span>
-                  {ev.location && (
-                    <span className="inline-flex items-center gap-1.5">
-                      <MapPin className="size-3.5 text-[#e7a3a3]" />
-                      {ev.location}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="flex shrink-0 gap-1">
-                <Button
-                  onClick={() => openEdit(ev)}
-                  size="icon-sm"
-                  variant="ghost"
-                  className="text-zinc-400 hover:bg-white/5 hover:text-white"
-                  aria-label="Düzenle"
-                >
-                  <Pencil className="size-4" />
-                </Button>
-                <Button
-                  onClick={() => handleDelete(ev)}
-                  size="icon-sm"
-                  variant="ghost"
-                  className="text-zinc-400 hover:bg-red-500/10 hover:text-red-400"
-                  aria-label="Sil"
-                >
-                  <Trash2 className="size-4" />
-                </Button>
-              </div>
-            </li>
-          ))}
+
+                {/* Revizyon notu + tekrar gönder */}
+                {ev.status === "CHANGES_REQUESTED" && (
+                  <div className="mt-3 rounded-md border border-orange-500/20 bg-orange-500/5 p-3">
+                    {ev.review_note && (
+                      <p className="flex items-start gap-2 text-xs text-orange-200/90">
+                        <MessageSquareWarning className="mt-0.5 size-3.5 shrink-0" />
+                        {ev.review_note}
+                      </p>
+                    )}
+                    <Button onClick={() => resubmit(ev)} disabled={busy} size="sm" variant="outline" className="mt-2 gap-1.5 border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white">
+                      {busy ? <Loader2 className="size-4 animate-spin" /> : <RotateCw className="size-4" />}
+                      Düzenleyip Tekrar Gönder
+                    </Button>
+                  </div>
+                )}
+
+                {/* Danışman kararları */}
+                {canAdvisorDecide && ev.status === "PENDING_ADVISOR" && (
+                  <div className="mt-3 flex flex-wrap gap-2 border-t border-white/5 pt-3">
+                    <Button onClick={() => advisorDecide(ev, "approve")} disabled={busy} size="sm" className="gap-1.5 bg-emerald-600 font-medium text-white hover:bg-emerald-600/90">
+                      <Check className="size-4" /> Onayla
+                    </Button>
+                    <Button onClick={() => advisorDecide(ev, "changes")} disabled={busy} size="sm" variant="outline" className="gap-1.5 border-orange-500/40 bg-transparent text-orange-300 hover:bg-orange-500/10">
+                      <MessageSquareWarning className="size-4" /> Revizyon
+                    </Button>
+                    <Button onClick={() => advisorDecide(ev, "reject")} disabled={busy} size="sm" variant="outline" className="gap-1.5 border-red-500/40 bg-transparent text-red-300 hover:bg-red-500/10">
+                      <X className="size-4" /> Reddet
+                    </Button>
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
 
@@ -210,7 +322,9 @@ export function ManageEvents({
               {editing ? "Etkinliği Düzenle" : "Yeni Etkinlik"}
             </DialogTitle>
             <DialogDescription>
-              {editing ? "Etkinlik bilgilerini güncelleyin." : "Kulüp için yeni bir etkinlik oluşturun."}
+              {editing
+                ? "Etkinlik bilgilerini güncelleyin."
+                : "Etkinlik oluşturulduktan sonra onay akışına girer."}
             </DialogDescription>
           </DialogHeader>
 
@@ -238,7 +352,7 @@ export function ManageEvents({
               </Button>
               <Button type="submit" disabled={loading} className="gap-2 font-medium text-white hover:opacity-90" style={{ backgroundColor: "#841515" }}>
                 {loading && <Loader2 className="size-4 animate-spin" />}
-                {loading ? "Kaydediliyor…" : "Kaydet"}
+                {editing ? "Kaydet" : "Oluştur ve Gönder"}
               </Button>
             </DialogFooter>
           </form>

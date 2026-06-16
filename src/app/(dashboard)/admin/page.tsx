@@ -2,6 +2,11 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NewClubForm } from "./new-club-form";
 import { AdminAssignments, type Option } from "./admin-assignments";
+import {
+  AdminApprovals,
+  type ClubSetting,
+  type PendingEvent,
+} from "./admin-approvals";
 
 // Route Cache'i devre dışı bırak: rol kontrolü her istekte güncel veriyle yapılsın.
 export const dynamic = "force-dynamic";
@@ -38,7 +43,7 @@ export default async function AdminPage() {
   // Atama formları için kulüp ve kullanıcı listeleri (email OKUNMAZ; full_name).
   const { data: clubsRaw } = await supabase
     .from("clubs")
-    .select("id, name")
+    .select("id, name, requires_advisor_approval")
     .order("name", { ascending: true });
   const { data: usersRaw } = await supabase
     .from("profiles")
@@ -53,6 +58,39 @@ export default async function AdminPage() {
     id: u.id,
     label: u.full_name ?? "(İsimsiz kullanıcı)",
   }));
+  const clubSettings: ClubSetting[] = (clubsRaw ?? []).map((c) => ({
+    id: c.id,
+    name: c.name,
+    requires_advisor_approval: c.requires_advisor_approval,
+  }));
+
+  // Okul onayı bekleyen etkinlikler (tüm kulüpler) + kulüp adı.
+  const { data: pendingRaw } = await supabase
+    .from("events")
+    .select("id, title, event_date, location, review_note, clubs(name)")
+    .eq("status", "PENDING_SCHOOL")
+    .order("event_date", { ascending: true });
+
+  const pending: PendingEvent[] = (
+    (pendingRaw ?? []) as unknown as {
+      id: string;
+      title: string;
+      event_date: string;
+      location: string | null;
+      review_note: string | null;
+      clubs: { name: string } | { name: string }[] | null;
+    }[]
+  ).map((e) => {
+    const club = Array.isArray(e.clubs) ? e.clubs[0] : e.clubs;
+    return {
+      id: e.id,
+      title: e.title,
+      event_date: e.event_date,
+      location: e.location,
+      review_note: e.review_note,
+      club_name: club?.name ?? null,
+    };
+  });
 
   return (
     <main className="dark relative min-h-svh overflow-hidden bg-zinc-950 px-4 py-12 text-foreground">
@@ -75,6 +113,8 @@ export default async function AdminPage() {
         </div>
 
         <AdminAssignments clubs={clubOptions} users={userOptions} />
+
+        <AdminApprovals pending={pending} clubs={clubSettings} />
       </div>
     </main>
   );

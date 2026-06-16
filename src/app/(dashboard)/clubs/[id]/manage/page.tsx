@@ -75,7 +75,7 @@ export default async function ClubManagePage({
   // Etkinlikler (tüm statüler — yöneticiler için).
   const { data: eventsRaw } = await supabase
     .from("events")
-    .select("id, title, description, event_date, location, status")
+    .select("id, title, description, event_date, location, status, review_note")
     .eq("club_id", id)
     .order("event_date", { ascending: true });
   const events = (eventsRaw ?? []) as ManageEvent[];
@@ -167,7 +167,7 @@ export default async function ClubManagePage({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ManageEvents clubId={id} events={events} />
+              <ManageEvents clubId={id} events={events} canAdvisorDecide={canAssignAdmin} />
             </CardContent>
           </Card>
 

@@ -60,6 +60,7 @@ export type Database = {
           contact_phone: string | null;
           whatsapp_url: string | null;
           instagram_url: string | null;
+          requires_advisor_approval: boolean;
         };
         Insert: {
           id?: string;
@@ -74,6 +75,7 @@ export type Database = {
           contact_phone?: string | null;
           whatsapp_url?: string | null;
           instagram_url?: string | null;
+          requires_advisor_approval?: boolean;
         };
         Update: {
           id?: string;
@@ -88,6 +90,7 @@ export type Database = {
           contact_phone?: string | null;
           whatsapp_url?: string | null;
           instagram_url?: string | null;
+          requires_advisor_approval?: boolean;
         };
         Relationships: [
           {
@@ -144,6 +147,9 @@ export type Database = {
           event_date: string;
           location: string | null;
           status: string;
+          review_note: string | null;
+          reviewed_by: string | null;
+          reviewed_at: string | null;
         };
         Insert: {
           id?: string;
@@ -153,6 +159,9 @@ export type Database = {
           event_date: string;
           location?: string | null;
           status?: string;
+          review_note?: string | null;
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
         };
         Update: {
           id?: string;
@@ -162,6 +171,9 @@ export type Database = {
           event_date?: string;
           location?: string | null;
           status?: string;
+          review_note?: string | null;
+          reviewed_by?: string | null;
+          reviewed_at?: string | null;
         };
         Relationships: [
           {
@@ -220,6 +232,18 @@ export type Database = {
       is_club_advisor: {
         Args: { p_club_id: string };
         Returns: boolean;
+      };
+      event_submit: {
+        Args: { p_event_id: string };
+        Returns: string;
+      };
+      event_advisor_decision: {
+        Args: { p_event_id: string; p_decision: string; p_note?: string };
+        Returns: string;
+      };
+      event_school_decision: {
+        Args: { p_event_id: string; p_decision: string; p_note?: string };
+        Returns: string;
       };
     };
     Enums: Record<string, never>;

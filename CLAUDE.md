@@ -174,6 +174,8 @@ ile generic'lenmiştir.
 - advisor_id (uuid, nullable, → profiles.id)   ← Faz 0: akademik danışman
 - vision, logo_url, cover_url, category, contact_email, contact_phone,
   whatsapp_url, instagram_url (hepsi text, nullable)   ← Faz 1: zengin alanlar
+- requires_advisor_approval (boolean, not null, default true)   ← Faz 2: onay kapısı
+  (yalnızca SUPER_ADMIN değiştirir — prevent_advisor_change trigger)
 
 **club_members**
 - club_id (→ clubs.id)
@@ -191,7 +193,10 @@ ile generic'lenmiştir.
 - location (text, nullable)
 - status (text, not null, default 'APPROVED')
   CHECK in ('PENDING_ADVISOR','PENDING_SCHOOL','APPROVED','REJECTED','CHANGES_REQUESTED')
-  ← Faz 0: yalnızca ŞEMA. Akış mantığı Faz 2'de; şu an her şey 'APPROVED'.
+  ← Faz 2: akış AKTİF. Yeni etkinlik event_submit ile PENDING_* başlar; APPROVED
+  yalnızca okul kararıyla.
+- review_note (text, nullable), reviewed_by (uuid → profiles.id, nullable),
+  reviewed_at (timestamptz, nullable)   ← Faz 2: inceleme bilgisi
 
 **event_attendees**
 - event_id (→ events.id)
@@ -212,7 +217,17 @@ YARDIMCI FONKSİYON / TRIGGER'LAR:
   SUPER_ADMIN veya kulübün DANIŞMANI yapabilir. Başkan (is_club_admin) üye
   ekler/çıkarır ama BAŞKA başkan atayamaz ("Başkan atamasını yalnızca danışman
   veya okul yapabilir."). Self-join (role='MEMBER') etkilenmez.
-- prevent_advisor_change trigger (clubs BEFORE UPDATE, 20260616120200):
+- Faz 2 onay RPC'leri (SECURITY DEFINER; yetki+durum doğrulaması içeride):
+  - event_submit(p_event_id) → kulüp admin/danışman/super çağırır; clubs
+    requires_advisor_approval + advisor_id'ye göre PENDING_ADVISOR / PENDING_SCHOOL.
+  - event_advisor_decision(p_event_id, p_decision, p_note) → danışman/super;
+    PENDING_ADVISOR iken approve→PENDING_SCHOOL / reject→REJECTED / changes→CHANGES_REQUESTED.
+  - event_school_decision(...) → yalnızca super; PENDING_SCHOOL iken
+    approve→APPROVED / reject→REJECTED / changes→CHANGES_REQUESTED.
+  (review_note/reviewed_by/reviewed_at yazılır. UI tarafı supabase.rpc ile çağırır.)
+- prevent_advisor_change trigger (clubs BEFORE UPDATE, 20260616120200; Faz 2'de
+  genişletildi): advisor_id VE requires_advisor_approval değişimi yalnızca
+  SUPER_ADMIN'e kapalı tutulur.
   clubs UPDATE politikası kulüp başkanına da açık olduğundan, advisor_id
   değişimi DB düzeyinde yalnızca SUPER_ADMIN'e (veya service_role) kilitlidir.
   Kulüp başkanı diğer clubs alanlarını düzenleyebilir ama advisor_id'ye
@@ -242,8 +257,13 @@ RLS POLİTİKALARI (versiyonlu — 20260615120600_rls_policies.sql):
   ANCAK role='ADMIN' (başkan) atama/geri alma prevent_unauthorized_club_admin
   trigger'ıyla yalnızca SUPER_ADMIN + DANIŞMAN'a kilitli. Başkan yalnızca
   MEMBER ekler/çıkarır. (Self-delete korunur.)
-- events: SELECT (status='APPROVED' OR is_super_admin); INSERT/UPDATE/DELETE
-  (is_super_admin() OR is_club_advisor(club_id) OR is_club_admin(club_id)).
+- events: SELECT (status='APPROVED' OR is_super_admin() OR is_club_advisor(club_id)
+  OR is_club_admin(club_id)) ← Faz 2: yöneticiler kendi bekleyen etkinliklerini
+  görür; öğrenci yalnızca APPROVED. INSERT/UPDATE/DELETE RLS (super OR advisor OR
+  club_admin). GÜVENLİK (Faz 2): authenticated için events INSERT/UPDATE KOLON
+  BAZLI — yalnızca (club_id,title,description,event_date,location) yazılabilir;
+  status/review_* DOĞRUDAN yazılamaz. status default 'PENDING_SCHOOL'. Durum
+  geçişleri yalnızca RPC'ler (event_submit/advisor/school) üzerinden. anon yazamaz.
 - event_attendees: SELECT herkes; INSERT/DELETE kendisi.
 
 NOT: PostgREST embed sorguları (örn. `user_id(id, full_name)`,
@@ -279,8 +299,9 @@ component'lerde `console.error("[...] ... hatası:")` logu düşer.
   veya kulüp ADMIN'i) ise "Yönet" butonu (→ /clubs/[id]/manage) + JoinButton
 - "Hakkında" cam efektli kart (tam açıklama)
 - 2 sütun grid:
-  - "Yaklaşan Etkinlikler": SUPER_ADMIN ise "+ Etkinlik Ekle" (AddEventDialog);
-    her etkinlik için tarih/konum + "N Kişi Katılıyor" + RSVPButton
+  - "Yaklaşan Etkinlikler": yalnızca APPROVED etkinlikler; her biri için
+    tarih/konum + "N Kişi Katılıyor" + RSVPButton. (Etkinlik OLUŞTURMA artık
+    burada DEĞİL; yönetim panelinde — eski AddEventDialog kaldırıldı.)
   - "Yönetim & Üyeler": club_members → profiles embed, üye listesi (sayı rozeti)
 
 **/clubs/[id]/manage (Kulüp Yönetim Paneli — Faz 1/1.5):**
@@ -289,7 +310,10 @@ component'lerde `console.error("[...] ... hatası:")` logu düşer.
 - 3 bölüm:
   - ClubInfoForm: name/category/description/vision/logo/cover/iletişim/sosyal
     → clubs update.
-  - ManageEvents: kulübün etkinliklerini ekle/düzenle/sil (Dialog + delete confirm).
+  - ManageEvents: etkinlik ekle/düzenle/sil + Faz 2 onay akışı. Oluşturma
+    event_submit ile PENDING_* yapar (APPROVED değil). Her etkinlikte durum
+    rozeti. CHANGES_REQUESTED'te review_note + "Tekrar Gönder". canAdvisorDecide
+    (danışman/okul) ise PENDING_ADVISOR etkinliklerinde Onayla/Revizyon/Reddet.
   - ManageMembers: roster; üye çıkar (herkes). MEMBER↔ADMIN (başkan ata/geri al)
     kontrolü YALNIZCA danışman+okul'a görünür (canAssignAdmin prop). Başkan bu
     kontrolü görmez (DB'de trigger de bloklar).
@@ -300,6 +324,9 @@ component'lerde `console.error("[...] ... hatası:")` logu düşer.
 - AdminAssignments (Faz 1.5): YALNIZCA "Akademik Danışman Ata" (kulüp + kullanıcı
   → clubs.advisor_id update). Başkan atama OKUL'da YOK — başkanı DANIŞMAN belirler
   (manage panelinden). Listeler full_name ile (email OKUNMAZ — kolon-grant).
+- AdminApprovals (Faz 2): "Okul Onay Kuyruğu" (tüm kulüplerin PENDING_SCHOOL
+  etkinlikleri → event_school_decision: Onayla/Revizyon/Reddet) + "Danışman Onayı
+  Ayarı" (her kulüp için requires_advisor_approval aç/kapat — yalnızca okul).
 
 ================================================================
 ## 7. ETKİLEŞİMLİ BİLEŞENLER (Client)
@@ -308,8 +335,6 @@ component'lerde `console.error("[...] ... hatası:")` logu düşer.
 - **JoinButton:** club_members insert/delete → toast + router.refresh()
 - **RSVPButton:** event_attendees insert/delete; "Katılacağım" (kırmızı border)
   ↔ "Katılıyorsunuz" (yeşil) → toast + router.refresh()
-- **AddEventDialog:** shadcn Dialog (Base UI, kontrollü open state);
-  title/description/datetime-local/location + status:'APPROVED' insert
 - **NewClubForm:** clubs insert
 - **ClubsExplorer:** canlı arama
 - **UserMenu:** Avatar + dropdown (isim/e-posta/rol) + "Çıkış Yap" (signOut)
@@ -391,6 +416,23 @@ FAZ 1.5 TAMAMLANDI (kod tarafı) — Yetki devri (okul → danışman → başka
 - UI: /admin yalnızca danışman atar; manage erişimi danışman+başkan+okul;
   başkan-atama kontrolü yalnızca danışman+okul'a; detayda "Yönet" danışman/başkana.
 - ⚠️ 20260616121000 migration'ı henüz production'a UYGULANMADI (db push gerek).
+
+FAZ 2 TAMAMLANDI (kod tarafı) — Etkinlik onay akışı (iki kapı):
+- Etkinlik artık otomatik APPROVED değil. Oluşturma → event_submit →
+  (requires_advisor_approval && advisor_id) ? PENDING_ADVISOR : PENDING_SCHOOL.
+- Danışman PENDING_ADVISOR'da karar verir (→PENDING_SCHOOL/REJECTED/CHANGES);
+  okul PENDING_SCHOOL'da karar verir (→APPROVED/REJECTED/CHANGES). CHANGES_REQUESTED
+  → başkan düzenleyip "Tekrar Gönder" ile yeniden akışa girer.
+- DB (20260616122000): clubs.requires_advisor_approval; events review_note/
+  reviewed_by/reviewed_at; events SELECT genişletildi; 3 SECURITY DEFINER RPC.
+- UI: ManageEvents (durum rozetleri, danışman kararları, revizyon); /admin okul
+  onay kuyruğu + onay ayarı anahtarı. Öğrenci tarafı değişmedi (yalnızca APPROVED).
+- src/lib/event-status.ts ortak durum etiket/renkleri. database.ts güncellendi.
+- GÜVENLİK SERTLEŞTİRME: events status default 'PENDING_SCHOOL'; authenticated
+  yalnızca içerik kolonlarını insert/update edebilir (status/review_* yalnızca
+  RPC=owner). Eski AddEventDialog (status:'APPROVED' doğrudan insert) KALDIRILDI;
+  oluşturma yalnızca manage panelinden (insert içerik → event_submit).
+- ⚠️ 20260616122000 migration'ı henüz production'a UYGULANMADI (db push gerek).
 
 ⚠️ ÖNEMLİ — profiles.role ENUM'dur (user_role):
 - Production'da profiles.role bir PostgreSQL ENUM tipidir (user_role), text DEĞİL.

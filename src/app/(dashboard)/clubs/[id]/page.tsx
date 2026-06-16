@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/card";
 import { RSVPButton } from "@/components/shared/rsvp-button";
 import { JoinButton } from "./join-button";
-import { AddEventDialog } from "./add-event-dialog";
 
 export const dynamic = "force-dynamic";
 
@@ -238,11 +237,6 @@ export default async function ClubDetailPage({
                   <CardTitle className="flex items-center gap-2 text-base font-semibold text-white">
                     <CalendarDays className="size-4 text-[#e7a3a3]" />
                     Yaklaşan Etkinlikler
-                    {isSuperAdmin && (
-                      <span className="ml-auto">
-                        <AddEventDialog clubId={club.id} />
-                      </span>
-                    )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>

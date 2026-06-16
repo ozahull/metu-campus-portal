@@ -27,6 +27,9 @@ export async function Navbar() {
     return null;
   }
 
+  // GİZLİLİK: profiles tablosundan email SEÇME. email kolonu RLS column-grant
+  // ile kısıtlıdır (kimse başkasının e-postasını okuyamaz). Kendi e-postanı
+  // dahi profiles'tan değil, auth oturumundan (user.email) al.
   const { data: profile } = await supabase
     .from("profiles")
     .select("full_name, role")

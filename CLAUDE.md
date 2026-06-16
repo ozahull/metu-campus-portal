@@ -208,8 +208,12 @@ YARDIMCI FONKSİYON / TRIGGER'LAR (Faz 0):
 RLS POLİTİKALARI (versiyonlu — 20260615120600_rls_policies.sql):
 - profiles: SELECT oturum açmış herkes (üye listesi isimleri için); INSERT/UPDATE
   yalnızca kendi satırı (role değişimi trigger ile bloklu).
-  NOT: CLAUDE.md'nin eski sürümü "yalnızca kendi satırını SELECT" diyordu;
-  üye listesi özelliğinin çalışması için SELECT authenticated'a genişletildi.
+  GİZLİLİK (Faz 0 kapanışı, 20260615120700): email kolonu KOLON SEVİYESİNDE
+  kısıtlı — `revoke select on profiles from authenticated` + `grant select
+  (id, full_name, role)`. Yani hiçbir kullanıcı (kendisi dahil) profiles'tan
+  email OKUYAMAZ; isim/rol açıktır. anon profiles'ı hiç okuyamaz. Kullanıcının
+  kendi e-postası UI'da auth oturumundan (user.email) alınır, profiles'tan DEĞİL.
+  → Yeni sorgu yazarken profiles'tan email SEÇME.
 - clubs: SELECT herkes; INSERT/UPDATE/DELETE yalnızca SUPER_ADMIN
   (advisor_id değişimi de bu UPDATE ile sınırlı).
 - club_members: SELECT herkes; INSERT kendisi + WITH CHECK role='MEMBER'
@@ -319,6 +323,9 @@ FAZ 0 TAMAMLANDI (şema/RLS/tip sertleştirme — kod tarafı):
 - src/types/database.ts üretildi; client/server/middleware <Database> ile
   generic'lendi. `npx tsc --noEmit` temiz; öğrenci tarafı (dashboard, /clubs)
   aynen çalışıyor.
+- KAPANIŞ (20260615120700): profiles.email kolon-seviyesinde kısıtlandı
+  (PII/KVKK). İsim/rol açık; email yalnızca auth oturumundan okunur. Hiçbir
+  kullanıcı başkasının (ya da kendisinin) e-postasını profiles'tan çekemez.
 
 ⚠️ FAZ 0 — KULLANICININ ELLE ÇALIŞTIRMASI GEREKENLER (ayrıcalıklı erişim
    gerektirir; bu ortamda yapılamadı):
@@ -336,8 +343,8 @@ FAZ 0 TAMAMLANDI (şema/RLS/tip sertleştirme — kod tarafı):
 DİKKAT EDİLECEKLER (teknik borç / bekleyenler):
 - Navbar'daki "Etkinlikler" linki hâlâ PASİF (henüz /events sayfası yok).
 - "Kulübü İncele" dışında kulüp/etkinlik düzenleme-silme UI'ı yok.
-- profiles SELECT politikası authenticated'a açık (üye isimleri için);
-  e-posta gibi alanların gizliliği gerekiyorsa view/maskeleme düşünülmeli.
+- (ÇÖZÜLDÜ) profiles.email gizliliği: kolon-seviyesi grant ile kısıtlandı
+  (20260615120700). İsim/rol authenticated'a açık kalır.
 
 ================================================================
 ## 10. SIRADA NE VAR? (Yol Haritası / Gelecek İşler)

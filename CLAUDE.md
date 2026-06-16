@@ -172,6 +172,8 @@ ile generic'lenmiştir.
 - name (text)
 - description (text, nullable)
 - advisor_id (uuid, nullable, → profiles.id)   ← Faz 0: akademik danışman
+- vision, logo_url, cover_url, category, contact_email, contact_phone,
+  whatsapp_url, instagram_url (hepsi text, nullable)   ← Faz 1: zengin alanlar
 
 **club_members**
 - club_id (→ clubs.id)
@@ -197,9 +199,18 @@ ile generic'lenmiştir.
 - created_at (timestamptz, not null, default now())  ← Faz 0
 - PK (event_id, user_id) = doğal unique
 
-YARDIMCI FONKSİYON / TRIGGER'LAR (Faz 0):
+YARDIMCI FONKSİYON / TRIGGER'LAR:
 - public.is_super_admin() → boolean (SECURITY DEFINER; RLS özyinelemesini önler).
-  Tüm admin politikaları bunu kullanır.
+  Tüm admin politikaları bunu kullanır. (role::text ile karşılaştırır — enum.)
+- public.is_club_admin(p_club_id uuid) → boolean (Faz 1, SECURITY DEFINER):
+  club_members'ta user_id=auth.uid(), club_id eşleşir ve role='ADMIN' mi?
+  Kulüp başkanı yetkilendirmesinin temelidir.
+- prevent_advisor_change trigger (clubs BEFORE UPDATE, 20260616120200):
+  clubs UPDATE politikası kulüp başkanına da açık olduğundan, advisor_id
+  değişimi DB düzeyinde yalnızca SUPER_ADMIN'e (veya service_role) kilitlidir.
+  Kulüp başkanı diğer clubs alanlarını düzenleyebilir ama advisor_id'ye
+  dokunamaz (aksi halde "Danışman atamasını yalnızca okul yönetimi
+  değiştirebilir." hatası).
 - handle_new_user trigger (auth.users AFTER INSERT) → profiles satırını otomatik
   oluşturur (metadata.full_name + email).
 - prevent_role_escalation trigger (profiles BEFORE UPDATE) → normal kullanıcı
@@ -215,12 +226,16 @@ RLS POLİTİKALARI (versiyonlu — 20260615120600_rls_policies.sql):
   email OKUYAMAZ; isim/rol açıktır. anon profiles'ı hiç okuyamaz. Kullanıcının
   kendi e-postası UI'da auth oturumundan (user.email) alınır, profiles'tan DEĞİL.
   → Yeni sorgu yazarken profiles'tan email SEÇME.
-- clubs: SELECT herkes; INSERT/UPDATE/DELETE yalnızca SUPER_ADMIN
-  (advisor_id değişimi de bu UPDATE ile sınırlı).
+- clubs: SELECT herkes; INSERT/DELETE SUPER_ADMIN; UPDATE
+  (is_super_admin() OR is_club_admin(id)) ← Faz 1: kulüp başkanı kendi kulübünü
+  düzenler.
 - club_members: SELECT herkes; INSERT kendisi + WITH CHECK role='MEMBER'
-  (escalation koruması); DELETE kendisi; UPDATE (ADMIN atama) SUPER_ADMIN.
+  (escalation koruması). Faz 1 ek yönetim politikaları (is_super_admin() OR
+  is_club_admin(club_id)): INSERT/UPDATE/DELETE → kulüp başkanı KENDİ kulübünün
+  üyelerini ekler/çıkarır, MEMBER↔ADMIN yapar. (Self-delete politikası korunur.)
 - events: SELECT (status='APPROVED' OR is_super_admin); INSERT/UPDATE/DELETE
-  SUPER_ADMIN.
+  (is_super_admin() OR is_club_admin(club_id)) ← Faz 1: kulüp başkanı kendi
+  etkinliklerini yönetir.
 - event_attendees: SELECT herkes; INSERT/DELETE kendisi.
 
 NOT: PostgREST embed sorguları (örn. `user_id(id, full_name)`,
@@ -252,18 +267,30 @@ component'lerde `console.error("[...] ... hatası:")` logu düşer.
 
 **/clubs/[id] (Kulüp Detay):**
 - Sol üstte "← Geri Dön"
-- Büyük başlık (METU kırmızısı textShadow ışıma) + JoinButton (sağda)
+- Büyük başlık (METU kırmızısı textShadow ışıma); sağda canManage (SUPER_ADMIN
+  veya kulüp ADMIN'i) ise "Yönet" butonu (→ /clubs/[id]/manage) + JoinButton
 - "Hakkında" cam efektli kart (tam açıklama)
 - 2 sütun grid:
   - "Yaklaşan Etkinlikler": SUPER_ADMIN ise "+ Etkinlik Ekle" (AddEventDialog);
     her etkinlik için tarih/konum + "N Kişi Katılıyor" + RSVPButton
   - "Yönetim & Üyeler": club_members → profiles embed, üye listesi (sayı rozeti)
 
-**/admin (Yönetici Paneli):**
-- SERVER-SIDE güvenlik: profile.role.trim().toUpperCase() !== 'SUPER_ADMIN'
-  ise redirect("/dashboard")
-- "Yeni Kulüp Ekle" formu (NewClubForm): name + description → clubs insert
-  → toast.success + form temizlenir
+**/clubs/[id]/manage (Kulüp Yönetim Paneli — Faz 1):**
+- SERVER-SIDE erişim: yalnızca SUPER_ADMIN veya bu kulübün ADMIN'i; değilse
+  redirect(/clubs/[id]).
+- 3 bölüm:
+  - ClubInfoForm: name/category/description/vision/logo/cover/iletişim/sosyal
+    → clubs update.
+  - ManageEvents: kulübün etkinliklerini ekle/düzenle/sil (Dialog + delete confirm).
+  - ManageMembers: roster; üye çıkar (delete), MEMBER↔ADMIN yap (club_members update).
+
+**/admin (Yönetici Paneli — yalnızca SUPER_ADMIN):**
+- SERVER-SIDE güvenlik: role::text != 'SUPER_ADMIN' ise redirect("/dashboard")
+- NewClubForm: name + description → clubs insert
+- AdminAssignments (Faz 1):
+  - Kulüp yöneticisi ata: kulüp + kullanıcı seç → club_members upsert role='ADMIN'
+  - Akademik danışman ata: kulüp + kullanıcı seç → clubs.advisor_id update
+  - Listeler full_name ile gösterilir (email OKUNMAZ — kolon-grant kısıtı).
 
 ================================================================
 ## 7. ETKİLEŞİMLİ BİLEŞENLER (Client)
@@ -277,6 +304,8 @@ component'lerde `console.error("[...] ... hatası:")` logu düşer.
 - **NewClubForm:** clubs insert
 - **ClubsExplorer:** canlı arama
 - **UserMenu:** Avatar + dropdown (isim/e-posta/rol) + "Çıkış Yap" (signOut)
+- **ClubInfoForm / ManageEvents / ManageMembers:** kulüp yönetim paneli (Faz 1)
+- **AdminAssignments:** /admin kulüp-yöneticisi & danışman atama (native select)
 
 Hepsi: lib/supabase/client.ts kullanır, hata toleranslıdır (toast.error),
 loading state'i (Loader2 spinner) gösterir.
@@ -328,6 +357,19 @@ FAZ 0 TAMAMLANDI ve PRODUCTION'A UYGULANDI (2026-06-16):
 - KAPANIŞ (20260615120700): profiles.email kolon-seviyesinde kısıtlandı
   (PII/KVKK). İsim/rol açık; email yalnızca auth oturumundan okunur. Hiçbir
   kullanıcı başkasının (ya da kendisinin) e-postasını profiles'tan çekemez.
+
+FAZ 1 TAMAMLANDI (kod tarafı) — CLUB_ADMIN + topluluk yönetim paneli:
+- DB: is_club_admin(club_id); clubs zengin alanları; RLS genişletme (clubs UPDATE,
+  events INSERT/UPDATE/DELETE, club_members yönetim politikaları) →
+  20260616120000_clubs_rich_fields, 20260616120100_club_admin_rls.
+- UI: /clubs/[id]/manage (3 bölüm: bilgi/etkinlik/üye), detayda "Yönet" butonu,
+  /admin'de kulüp-yöneticisi + danışman atama formları.
+- src/types/database.ts güncellendi (yeni kolonlar + is_club_admin). tsc temiz.
+- Kulüp admini SADECE kendi kulübünü yönetir (is_club_admin RLS); başka kulüpte
+  /manage → redirect. Global profiles.role hâlâ trigger korumalı.
+- ⚠️ Bu fazın migration'ları (20260616*) henüz production'a UYGULANMADI —
+  `npx supabase db push` ile uygulanmalı (aksi halde yeni kolonlar/politikalar
+  canlıda yok; manage paneli RLS/kolon hatası verir).
 
 ⚠️ ÖNEMLİ — profiles.role ENUM'dur (user_role):
 - Production'da profiles.role bir PostgreSQL ENUM tipidir (user_role), text DEĞİL.

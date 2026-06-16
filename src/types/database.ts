@@ -52,18 +52,42 @@ export type Database = {
           name: string;
           description: string | null;
           advisor_id: string | null;
+          vision: string | null;
+          logo_url: string | null;
+          cover_url: string | null;
+          category: string | null;
+          contact_email: string | null;
+          contact_phone: string | null;
+          whatsapp_url: string | null;
+          instagram_url: string | null;
         };
         Insert: {
           id?: string;
           name: string;
           description?: string | null;
           advisor_id?: string | null;
+          vision?: string | null;
+          logo_url?: string | null;
+          cover_url?: string | null;
+          category?: string | null;
+          contact_email?: string | null;
+          contact_phone?: string | null;
+          whatsapp_url?: string | null;
+          instagram_url?: string | null;
         };
         Update: {
           id?: string;
           name?: string;
           description?: string | null;
           advisor_id?: string | null;
+          vision?: string | null;
+          logo_url?: string | null;
+          cover_url?: string | null;
+          category?: string | null;
+          contact_email?: string | null;
+          contact_phone?: string | null;
+          whatsapp_url?: string | null;
+          instagram_url?: string | null;
         };
         Relationships: [
           {
@@ -187,6 +211,10 @@ export type Database = {
     Functions: {
       is_super_admin: {
         Args: Record<PropertyKey, never>;
+        Returns: boolean;
+      };
+      is_club_admin: {
+        Args: { p_club_id: string };
         Returns: boolean;
       };
     };

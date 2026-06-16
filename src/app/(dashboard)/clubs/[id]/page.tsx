@@ -8,6 +8,7 @@ import {
   Inbox,
   MapPin,
   SearchX,
+  Settings,
   UserRound,
   Users,
 } from "lucide-react";
@@ -107,6 +108,16 @@ export default async function ClubDetailPage({
   const isSuperAdmin =
     profile?.role?.toString().trim().toUpperCase() === "SUPER_ADMIN";
 
+  // Kullanıcı bu kulübün yöneticisi mi? (Yönet butonu + yetki için)
+  const { data: myMembership } = await supabase
+    .from("club_members")
+    .select("role")
+    .eq("club_id", id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const isClubAdmin = myMembership?.role?.toString().toUpperCase() === "ADMIN";
+  const canManage = isSuperAdmin || isClubAdmin;
+
   // Onaylanmış etkinlikleri tarihe göre artan sırada çek.
   const { data: eventsRaw, error: eventsError } = await supabase
     .from("events")
@@ -185,7 +196,19 @@ export default async function ClubDetailPage({
                 <div className="mt-4 h-px w-24 bg-gradient-to-r from-[#841515] to-transparent" />
               </div>
 
-              <div className="shrink-0">
+              <div className="flex shrink-0 items-center gap-2">
+                {canManage && (
+                  <Link
+                    href={`/clubs/${club.id}/manage`}
+                    className={cn(
+                      buttonVariants({ variant: "outline", size: "lg" }),
+                      "gap-2 border-white/15 bg-transparent text-zinc-200 hover:border-[#841515] hover:bg-[#841515] hover:text-white",
+                    )}
+                  >
+                    <Settings className="size-4" />
+                    Yönet
+                  </Link>
+                )}
                 <JoinButton clubId={club.id} userId={user.id} isMember={isMember} />
               </div>
             </header>

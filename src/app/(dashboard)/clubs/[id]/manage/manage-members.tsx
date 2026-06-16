@@ -16,9 +16,12 @@ export type RosterMember = {
 export function ManageMembers({
   clubId,
   members,
+  canAssignAdmin,
 }: {
   clubId: string;
   members: RosterMember[];
+  // Başkan (ADMIN) atama/geri alma yalnızca danışman ve okula görünür.
+  canAssignAdmin: boolean;
 }) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -96,15 +99,16 @@ export function ManageMembers({
               )}
             </div>
             <div className="flex shrink-0 gap-1">
-              {isAdmin ? (
-                <Button onClick={() => setRole(m, "MEMBER")} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-white" aria-label="Yöneticiliği geri al">
-                  <ShieldMinus className="size-4" />
-                </Button>
-              ) : (
-                <Button onClick={() => setRole(m, "ADMIN")} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-[#e7a3a3]" aria-label="Yönetici yap">
-                  <ShieldCheck className="size-4" />
-                </Button>
-              )}
+              {canAssignAdmin &&
+                (isAdmin ? (
+                  <Button onClick={() => setRole(m, "MEMBER")} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-white" aria-label="Başkanlığı geri al">
+                    <ShieldMinus className="size-4" />
+                  </Button>
+                ) : (
+                  <Button onClick={() => setRole(m, "ADMIN")} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-[#e7a3a3]" aria-label="Başkan yap">
+                    <ShieldCheck className="size-4" />
+                  </Button>
+                ))}
               <Button onClick={() => removeMember(m)} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-red-500/10 hover:text-red-400" aria-label="Üyeyi çıkar">
                 <UserX className="size-4" />
               </Button>

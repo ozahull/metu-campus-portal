@@ -205,6 +205,13 @@ YARDIMCI FONKSİYON / TRIGGER'LAR:
 - public.is_club_admin(p_club_id uuid) → boolean (Faz 1, SECURITY DEFINER):
   club_members'ta user_id=auth.uid(), club_id eşleşir ve role='ADMIN' mi?
   Kulüp başkanı yetkilendirmesinin temelidir.
+- public.is_club_advisor(p_club_id uuid) → boolean (Faz 1.5, SECURITY DEFINER):
+  clubs'ta id=p_club_id ve advisor_id=auth.uid() mi? Danışman yetkilendirmesi.
+- prevent_unauthorized_club_admin trigger (club_members BEFORE INSERT/UPDATE,
+  20260616121000): club_members.role 'ADMIN' olurken/çıkarken yalnızca
+  SUPER_ADMIN veya kulübün DANIŞMANI yapabilir. Başkan (is_club_admin) üye
+  ekler/çıkarır ama BAŞKA başkan atayamaz ("Başkan atamasını yalnızca danışman
+  veya okul yapabilir."). Self-join (role='MEMBER') etkilenmez.
 - prevent_advisor_change trigger (clubs BEFORE UPDATE, 20260616120200):
   clubs UPDATE politikası kulüp başkanına da açık olduğundan, advisor_id
   değişimi DB düzeyinde yalnızca SUPER_ADMIN'e (veya service_role) kilitlidir.
@@ -227,15 +234,16 @@ RLS POLİTİKALARI (versiyonlu — 20260615120600_rls_policies.sql):
   kendi e-postası UI'da auth oturumundan (user.email) alınır, profiles'tan DEĞİL.
   → Yeni sorgu yazarken profiles'tan email SEÇME.
 - clubs: SELECT herkes; INSERT/DELETE SUPER_ADMIN; UPDATE
-  (is_super_admin() OR is_club_admin(id)) ← Faz 1: kulüp başkanı kendi kulübünü
-  düzenler.
+  (is_super_admin() OR is_club_advisor(id) OR is_club_admin(id)) ← Faz 1/1.5.
+  advisor_id değişimi prevent_advisor_change ile yalnızca SUPER_ADMIN.
 - club_members: SELECT herkes; INSERT kendisi + WITH CHECK role='MEMBER'
-  (escalation koruması). Faz 1 ek yönetim politikaları (is_super_admin() OR
-  is_club_admin(club_id)): INSERT/UPDATE/DELETE → kulüp başkanı KENDİ kulübünün
-  üyelerini ekler/çıkarır, MEMBER↔ADMIN yapar. (Self-delete politikası korunur.)
+  (escalation koruması). Yönetim politikaları (is_super_admin() OR
+  is_club_advisor(club_id) OR is_club_admin(club_id)): INSERT/UPDATE/DELETE.
+  ANCAK role='ADMIN' (başkan) atama/geri alma prevent_unauthorized_club_admin
+  trigger'ıyla yalnızca SUPER_ADMIN + DANIŞMAN'a kilitli. Başkan yalnızca
+  MEMBER ekler/çıkarır. (Self-delete korunur.)
 - events: SELECT (status='APPROVED' OR is_super_admin); INSERT/UPDATE/DELETE
-  (is_super_admin() OR is_club_admin(club_id)) ← Faz 1: kulüp başkanı kendi
-  etkinliklerini yönetir.
+  (is_super_admin() OR is_club_advisor(club_id) OR is_club_admin(club_id)).
 - event_attendees: SELECT herkes; INSERT/DELETE kendisi.
 
 NOT: PostgREST embed sorguları (örn. `user_id(id, full_name)`,
@@ -275,22 +283,23 @@ component'lerde `console.error("[...] ... hatası:")` logu düşer.
     her etkinlik için tarih/konum + "N Kişi Katılıyor" + RSVPButton
   - "Yönetim & Üyeler": club_members → profiles embed, üye listesi (sayı rozeti)
 
-**/clubs/[id]/manage (Kulüp Yönetim Paneli — Faz 1):**
-- SERVER-SIDE erişim: yalnızca SUPER_ADMIN veya bu kulübün ADMIN'i; değilse
-  redirect(/clubs/[id]).
+**/clubs/[id]/manage (Kulüp Yönetim Paneli — Faz 1/1.5):**
+- SERVER-SIDE erişim: SUPER_ADMIN veya kulübün DANIŞMANI veya BAŞKANI (ADMIN);
+  değilse redirect(/clubs/[id]).
 - 3 bölüm:
   - ClubInfoForm: name/category/description/vision/logo/cover/iletişim/sosyal
     → clubs update.
   - ManageEvents: kulübün etkinliklerini ekle/düzenle/sil (Dialog + delete confirm).
-  - ManageMembers: roster; üye çıkar (delete), MEMBER↔ADMIN yap (club_members update).
+  - ManageMembers: roster; üye çıkar (herkes). MEMBER↔ADMIN (başkan ata/geri al)
+    kontrolü YALNIZCA danışman+okul'a görünür (canAssignAdmin prop). Başkan bu
+    kontrolü görmez (DB'de trigger de bloklar).
 
 **/admin (Yönetici Paneli — yalnızca SUPER_ADMIN):**
 - SERVER-SIDE güvenlik: role::text != 'SUPER_ADMIN' ise redirect("/dashboard")
 - NewClubForm: name + description → clubs insert
-- AdminAssignments (Faz 1):
-  - Kulüp yöneticisi ata: kulüp + kullanıcı seç → club_members upsert role='ADMIN'
-  - Akademik danışman ata: kulüp + kullanıcı seç → clubs.advisor_id update
-  - Listeler full_name ile gösterilir (email OKUNMAZ — kolon-grant kısıtı).
+- AdminAssignments (Faz 1.5): YALNIZCA "Akademik Danışman Ata" (kulüp + kullanıcı
+  → clubs.advisor_id update). Başkan atama OKUL'da YOK — başkanı DANIŞMAN belirler
+  (manage panelinden). Listeler full_name ile (email OKUNMAZ — kolon-grant).
 
 ================================================================
 ## 7. ETKİLEŞİMLİ BİLEŞENLER (Client)
@@ -370,6 +379,18 @@ FAZ 1 TAMAMLANDI (kod tarafı) — CLUB_ADMIN + topluluk yönetim paneli:
 - ⚠️ Bu fazın migration'ları (20260616*) henüz production'a UYGULANMADI —
   `npx supabase db push` ile uygulanmalı (aksi halde yeni kolonlar/politikalar
   canlıda yok; manage paneli RLS/kolon hatası verir).
+
+FAZ 1.5 TAMAMLANDI (kod tarafı) — Yetki devri (okul → danışman → başkan):
+- Model: SUPER_ADMIN yalnızca DANIŞMAN atar; danışman kulübün BAŞKANINI
+  (club_members.role='ADMIN') atar/geri alır ve kulübü yönetir; başkan
+  kulübü/etkinlikleri/üyeleri yönetir ama BAŞKAN ATAYAMAZ. Kulübün ayrı
+  hesabı/maili yok; kimlik gerçek kişiler üzerinden.
+- DB (20260616121000): is_club_advisor(); RLS'e danışman eklendi (clubs/events/
+  club_members yönetimi); prevent_unauthorized_club_admin trigger ile ADMIN
+  ataması SUPER_ADMIN+DANIŞMAN'a kilitli.
+- UI: /admin yalnızca danışman atar; manage erişimi danışman+başkan+okul;
+  başkan-atama kontrolü yalnızca danışman+okul'a; detayda "Yönet" danışman/başkana.
+- ⚠️ 20260616121000 migration'ı henüz production'a UYGULANMADI (db push gerek).
 
 ⚠️ ÖNEMLİ — profiles.role ENUM'dur (user_role):
 - Production'da profiles.role bir PostgreSQL ENUM tipidir (user_role), text DEĞİL.

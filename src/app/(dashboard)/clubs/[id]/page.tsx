@@ -31,6 +31,7 @@ type Club = {
   id: string;
   name: string;
   description: string | null;
+  advisor_id: string | null;
 };
 
 type MemberProfile = {
@@ -70,7 +71,7 @@ export default async function ClubDetailPage({
 
   const { data: club, error } = await supabase
     .from("clubs")
-    .select("id, name, description")
+    .select("id, name, description, advisor_id")
     .eq("id", id)
     .maybeSingle<Club>();
 
@@ -116,7 +117,8 @@ export default async function ClubDetailPage({
     .eq("user_id", user.id)
     .maybeSingle();
   const isClubAdmin = myMembership?.role?.toString().toUpperCase() === "ADMIN";
-  const canManage = isSuperAdmin || isClubAdmin;
+  const isClubAdvisor = club?.advisor_id === user.id;
+  const canManage = isSuperAdmin || isClubAdvisor || isClubAdmin;
 
   // Onaylanmış etkinlikleri tarihe göre artan sırada çek.
   const { data: eventsRaw, error: eventsError } = await supabase

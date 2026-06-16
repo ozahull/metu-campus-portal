@@ -39,14 +39,14 @@ export default async function ClubManagePage({
   const { data: club } = await supabase
     .from("clubs")
     .select(
-      "id, name, category, description, vision, logo_url, cover_url, contact_email, contact_phone, whatsapp_url, instagram_url",
+      "id, name, category, description, vision, logo_url, cover_url, contact_email, contact_phone, whatsapp_url, instagram_url, advisor_id",
     )
     .eq("id", id)
-    .maybeSingle<ClubInfo>();
+    .maybeSingle<ClubInfo & { advisor_id: string | null }>();
 
   if (!club) redirect("/dashboard");
 
-  // Erişim: SUPER_ADMIN veya bu kulübün ADMIN'i.
+  // Erişim: SUPER_ADMIN veya bu kulübün danışmanı veya başkanı (ADMIN).
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
@@ -54,6 +54,8 @@ export default async function ClubManagePage({
     .maybeSingle();
   const isSuperAdmin =
     profile?.role?.toString().trim().toUpperCase() === "SUPER_ADMIN";
+
+  const isClubAdvisor = club.advisor_id === user.id;
 
   const { data: myMembership } = await supabase
     .from("club_members")
@@ -63,9 +65,12 @@ export default async function ClubManagePage({
     .maybeSingle();
   const isClubAdmin = myMembership?.role?.toString().toUpperCase() === "ADMIN";
 
-  if (!isSuperAdmin && !isClubAdmin) {
+  if (!isSuperAdmin && !isClubAdvisor && !isClubAdmin) {
     redirect(`/clubs/${id}`);
   }
+
+  // Başkan (ADMIN) atama/geri alma yalnızca okul ve danışmana açıktır.
+  const canAssignAdmin = isSuperAdmin || isClubAdvisor;
 
   // Etkinlikler (tüm statüler — yöneticiler için).
   const { data: eventsRaw } = await supabase
@@ -124,7 +129,12 @@ export default async function ClubManagePage({
               {club.name} · Yönetim
             </h1>
             <p className="text-sm text-zinc-400">
-              {isSuperAdmin ? "Süper yönetici" : "Kulüp yöneticisi"} erişimi
+              {isSuperAdmin
+                ? "Süper yönetici"
+                : isClubAdvisor
+                  ? "Danışman"
+                  : "Kulüp başkanı"}{" "}
+              erişimi
             </p>
           </div>
         </header>
@@ -173,7 +183,7 @@ export default async function ClubManagePage({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ManageMembers clubId={id} members={members} />
+              <ManageMembers clubId={id} members={members} canAssignAdmin={canAssignAdmin} />
             </CardContent>
           </Card>
         </div>

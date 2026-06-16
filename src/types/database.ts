@@ -217,6 +217,10 @@ export type Database = {
         Args: { p_club_id: string };
         Returns: boolean;
       };
+      is_club_advisor: {
+        Args: { p_club_id: string };
+        Returns: boolean;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

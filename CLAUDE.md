@@ -164,7 +164,8 @@ ile generic'lenmiştir.
 - id (uuid, PK, → auth.users.id)
 - full_name (text, nullable)
 - email (text, nullable)
-- role (text, not null, default 'USER' — değerler: 'USER' | 'SUPER_ADMIN')
+- role (ENUM user_role, not null, default 'USER' — değerler: 'USER' | 'SUPER_ADMIN')
+  ↑ Production'da ENUM. SQL karşılaştırmalarında role::text kullan.
 
 **clubs**
 - id (uuid, PK)
@@ -310,7 +311,8 @@ MVP TAMAMLANDI ve Vercel'de CANLI:
 - Kök sayfa /login'e yönlendiriyor
 - GitHub'a push'lu, Vercel auto-deploy aktif
 
-FAZ 0 TAMAMLANDI (şema/RLS/tip sertleştirme — kod tarafı):
+FAZ 0 TAMAMLANDI ve PRODUCTION'A UYGULANDI (2026-06-16):
+- 9 migration (enforce_metu_domain + 8 Faz 0) production veritabanına uygulandı.
 - Tüm şema supabase/migrations altında versiyonlu + idempotent:
   base_schema, membership_timestamps, club_member_role, club_advisor,
   events_status_check, foreign_keys, rls_policies (20260615120000..120600).
@@ -327,17 +329,20 @@ FAZ 0 TAMAMLANDI (şema/RLS/tip sertleştirme — kod tarafı):
   (PII/KVKK). İsim/rol açık; email yalnızca auth oturumundan okunur. Hiçbir
   kullanıcı başkasının (ya da kendisinin) e-postasını profiles'tan çekemez.
 
-⚠️ FAZ 0 — KULLANICININ ELLE ÇALIŞTIRMASI GEREKENLER (ayrıcalıklı erişim
-   gerektirir; bu ortamda yapılamadı):
-- Migration'ları production'a uygula:
-    npx supabase login
-    npx supabase link --project-ref qxhyxxekaukwksupphzv
-    npx supabase db push
-  (Alternatif: her migration SQL'ini Supabase Dashboard → SQL Editor'da
-   sırayla çalıştır. enforce_metu_domain dahil.)
-- Tipleri uzaktan yeniden üret (opsiyonel, şema değişince):
+⚠️ ÖNEMLİ — profiles.role ENUM'dur (user_role):
+- Production'da profiles.role bir PostgreSQL ENUM tipidir (user_role), text DEĞİL.
+- SQL'de metinle karşılaştırırken/işlerken role::text kullan
+  (örn. upper(btrim(role::text)) = 'SUPER_ADMIN'). Enum üzerinde btrim/upper/like
+  doğrudan çalışmaz. is_super_admin() bu yüzden role::text ile yazıldı.
+- TS tarafı: PostgREST enum'u string döndürür; mevcut kod
+  profile?.role?.toString().trim().toUpperCase() ile zaten güvenli.
+- NOT: base_schema.sql temiz DB'de role'ü 'text' olarak oluşturur (prod'da enum).
+  Bu fark karşılaştırmalarda role::text kullanıldığı sürece sorun yaratmaz.
+
+İLERİSİ İÇİN (opsiyonel bakım):
+- Tipleri uzaktan yeniden üret (şema değişince):
     npx supabase gen types typescript --project-id qxhyxxekaukwksupphzv > src/types/database.ts
-- Canlı politika denetimi (push sonrası doğrulama):
+- Canlı politika denetimi:
     select * from pg_policies where schemaname='public';
 
 DİKKAT EDİLECEKLER (teknik borç / bekleyenler):

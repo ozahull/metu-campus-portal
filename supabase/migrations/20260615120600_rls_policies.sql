@@ -5,6 +5,8 @@
 -- ----------------------------------------------------------------------------
 -- Yardımcı: oturum açan kullanıcı SUPER_ADMIN mi? (RLS özyinelemesini önlemek
 -- için SECURITY DEFINER; profiles'ı RLS'siz okur.)
+-- NOT: production'da profiles.role bir ENUM (user_role) tipindedir; bu yüzden
+-- metin işlemleri için role::text kullanılır (enum'da btrim/upper doğrudan çalışmaz).
 -- ----------------------------------------------------------------------------
 create or replace function public.is_super_admin()
 returns boolean
@@ -16,7 +18,7 @@ as $$
   select exists (
     select 1 from public.profiles
     where id = auth.uid()
-      and upper(btrim(role)) = 'SUPER_ADMIN'
+      and upper(btrim(role::text)) = 'SUPER_ADMIN'
   );
 $$;
 

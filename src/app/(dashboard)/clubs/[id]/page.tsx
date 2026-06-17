@@ -5,10 +5,15 @@ import {
   CalendarDays,
   Clock,
   Flame,
+  AtSign,
   Inbox,
+  Mail,
   MapPin,
+  MessageCircle,
+  Phone,
   SearchX,
   Settings,
+  Target,
   UserRound,
   Users,
 } from "lucide-react";
@@ -31,6 +36,14 @@ type Club = {
   name: string;
   description: string | null;
   advisor_id: string | null;
+  vision: string | null;
+  logo_url: string | null;
+  cover_url: string | null;
+  category: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  whatsapp_url: string | null;
+  instagram_url: string | null;
 };
 
 type MemberProfile = {
@@ -70,7 +83,9 @@ export default async function ClubDetailPage({
 
   const { data: club, error } = await supabase
     .from("clubs")
-    .select("id, name, description, advisor_id")
+    .select(
+      "id, name, description, advisor_id, vision, logo_url, cover_url, category, contact_email, contact_phone, whatsapp_url, instagram_url",
+    )
     .eq("id", id)
     .maybeSingle<Club>();
 
@@ -181,20 +196,40 @@ export default async function ClubDetailPage({
           </div>
         ) : (
           <>
+            {/* Kapak görseli */}
+            {club.cover_url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={club.cover_url}
+                alt={`${club.name} kapak görseli`}
+                className="mt-6 h-44 w-full rounded-2xl border border-white/10 object-cover sm:h-56"
+              />
+            )}
+
             {/* Başlık */}
             <header className="mt-8 mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#841515]/30 bg-[#841515]/10 px-3 py-1 text-xs font-medium text-[#e7a3a3]">
-                  <Users className="size-3.5" />
-                  Kampüs Topluluğu
-                </span>
-                <h1
-                  className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl"
-                  style={{ textShadow: "0 0 40px rgba(132,21,21,0.45)" }}
-                >
-                  {club.name}
-                </h1>
-                <div className="mt-4 h-px w-24 bg-gradient-to-r from-[#841515] to-transparent" />
+              <div className="flex items-end gap-4">
+                {club.logo_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={club.logo_url}
+                    alt={`${club.name} logosu`}
+                    className="size-16 shrink-0 rounded-2xl border border-white/10 object-cover"
+                  />
+                )}
+                <div>
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[#841515]/30 bg-[#841515]/10 px-3 py-1 text-xs font-medium text-[#e7a3a3]">
+                    <Users className="size-3.5" />
+                    {club.category ?? "Kampüs Topluluğu"}
+                  </span>
+                  <h1
+                    className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl"
+                    style={{ textShadow: "0 0 40px rgba(132,21,21,0.45)" }}
+                  >
+                    {club.name}
+                  </h1>
+                  <div className="mt-4 h-px w-24 bg-gradient-to-r from-[#841515] to-transparent" />
+                </div>
               </div>
 
               <div className="flex shrink-0 items-center gap-2">
@@ -229,6 +264,56 @@ export default async function ClubDetailPage({
                 </p>
               </CardContent>
             </Card>
+
+            {/* Vizyon */}
+            {club.vision?.trim() && (
+              <Card className="mt-6 border-white/5 bg-zinc-900/50 backdrop-blur">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
+                    <Target className="size-4 text-[#e7a3a3]" />
+                    Vizyonumuz
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-base leading-relaxed text-zinc-300 whitespace-pre-line">
+                    {club.vision}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* İletişim & sosyal */}
+            {(club.contact_email ||
+              club.contact_phone ||
+              club.whatsapp_url ||
+              club.instagram_url) && (
+              <div className="mt-6 flex flex-wrap gap-2">
+                {club.contact_email && (
+                  <a href={`mailto:${club.contact_email}`} className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/50 px-3 text-sm text-zinc-200 transition-colors hover:border-[#841515] hover:text-white">
+                    <Mail className="size-4 text-[#e7a3a3]" />
+                    {club.contact_email}
+                  </a>
+                )}
+                {club.contact_phone && (
+                  <a href={`tel:${club.contact_phone}`} className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/50 px-3 text-sm text-zinc-200 transition-colors hover:border-[#841515] hover:text-white">
+                    <Phone className="size-4 text-[#e7a3a3]" />
+                    {club.contact_phone}
+                  </a>
+                )}
+                {club.whatsapp_url && (
+                  <a href={club.whatsapp_url} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/50 px-3 text-sm text-zinc-200 transition-colors hover:border-[#841515] hover:text-white">
+                    <MessageCircle className="size-4 text-[#e7a3a3]" />
+                    WhatsApp
+                  </a>
+                )}
+                {club.instagram_url && (
+                  <a href={club.instagram_url} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/50 px-3 text-sm text-zinc-200 transition-colors hover:border-[#841515] hover:text-white">
+                    <AtSign className="size-4 text-[#e7a3a3]" />
+                    Instagram
+                  </a>
+                )}
+              </div>
+            )}
 
             {/* Etkinlikler + üyeler bölümleri */}
             <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">

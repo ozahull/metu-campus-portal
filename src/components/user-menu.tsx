@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -56,6 +57,17 @@ export function UserMenu({ fullName, email, role, initials }: UserMenuProps) {
             </span>
           </div>
         </DropdownMenuLabel>
+
+        <DropdownMenuSeparator className="bg-white/10" />
+
+        <DropdownMenuItem
+          render={
+            <Link href="/profile" className="gap-2">
+              <UserRound className="size-4" />
+              Profilim
+            </Link>
+          }
+        />
 
         <DropdownMenuSeparator className="bg-white/10" />
 

@@ -295,14 +295,34 @@ component'lerde `console.error("[...] ... hatası:")` logu düşer.
 
 **/clubs/[id] (Kulüp Detay):**
 - Sol üstte "← Geri Dön"
-- Büyük başlık (METU kırmızısı textShadow ışıma); sağda canManage (SUPER_ADMIN
-  veya kulüp ADMIN'i) ise "Yönet" butonu (→ /clubs/[id]/manage) + JoinButton
+- Faz 3 zengin sunum: cover_url banner, logo_url, category rozeti, "Vizyonumuz"
+  bölümü (vision), iletişim/sosyal linkleri (contact_email/phone, whatsapp_url,
+  instagram_url — ikonlu; alan boşsa gösterilmez).
+- Büyük başlık (METU kırmızısı textShadow ışıma); sağda canManage (SUPER_ADMIN,
+  danışman veya başkan) ise "Yönet" butonu (→ /clubs/[id]/manage) + JoinButton
 - "Hakkında" cam efektli kart (tam açıklama)
 - 2 sütun grid:
   - "Yaklaşan Etkinlikler": yalnızca APPROVED etkinlikler; her biri için
     tarih/konum + "N Kişi Katılıyor" + RSVPButton. (Etkinlik OLUŞTURMA artık
     burada DEĞİL; yönetim panelinde — eski AddEventDialog kaldırıldı.)
   - "Yönetim & Üyeler": club_members → profiles embed, üye listesi (sayı rozeti)
+
+**/events (Etkinlik Keşfi — Faz 3, öğrenci):**
+- Yalnızca status='APPROVED' & event_date>=now, tarihe göre sıralı.
+- EventsExplorer (client): başlık araması + kulüp + kategori filtresi (useMemo,
+  canlı). Kart: kulüp/kategori, başlık, tarih/konum, "N katılıyor", detay linki.
+
+**/events/[id] (Etkinlik Detay — Faz 3):**
+- APPROVED değilse redirect(/events) (RLS de korur). Düzenleyen kulüp linkli,
+  tarih/konum, tam açıklama, katılımcı sayısı + RSVPButton.
+- AddToCalendar (client, kütüphanesiz): Google Takvim linki + .ics indir
+  (Blob; bitiş = başlangıç + 2 saat varsayımı).
+
+**/profile (Profil — Faz 3):**
+- ProfileForm (client): full_name güncelle (profiles update) + şifre değiştir
+  (auth.updateUser). Kulüplerim (club_members→clubs, BAŞKAN rozeti) +
+  Katılacağım Etkinlikler (event_attendees→events, APPROVED & gelecek).
+- UserMenu dropdown'una "Profilim" linki eklendi.
 
 **/clubs/[id]/manage (Kulüp Yönetim Paneli — Faz 1/1.5):**
 - SERVER-SIDE erişim: SUPER_ADMIN veya kulübün DANIŞMANI veya BAŞKANI (ADMIN);
@@ -450,9 +470,17 @@ FAZ 2 TAMAMLANDI (kod tarafı) — Etkinlik onay akışı (iki kapı):
 - Canlı politika denetimi:
     select * from pg_policies where schemaname='public';
 
+FAZ 3 TAMAMLANDI (kod tarafı) — Öğrenci tarafı: etkinlik keşfi + zengin kulüpler:
+- DB DEĞİŞİKLİĞİ YOK. /events (liste + EventsExplorer canlı arama/kulüp/kategori
+  filtresi), /events/[id] (detay + RSVP + AddToCalendar Google/.ics),
+  /clubs/[id] zenginleştirildi (cover/logo/kategori/vizyon/iletişim/sosyal),
+  Navbar "Etkinlikler" → /events aktif, /profile (kulüpler + RSVP'ler + isim/şifre).
+- src/lib yok; ortak event-status.ts mevcut. tsc temiz. Öğrenci yalnızca APPROVED.
+
 DİKKAT EDİLECEKLER (teknik borç / bekleyenler):
-- Navbar'daki "Etkinlikler" linki hâlâ PASİF (henüz /events sayfası yok).
-- "Kulübü İncele" dışında kulüp/etkinlik düzenleme-silme UI'ı yok.
+- Görseller URL ile (logo/cover) — Supabase Storage yükleme UI'ı yok (ileride).
+- lucide'de Instagram ikonu yok; AtSign kullanıldı.
+- (ÇÖZÜLDÜ) Navbar "Etkinlikler" artık /events'e bağlı.
 - (ÇÖZÜLDÜ) profiles.email gizliliği: kolon-seviyesi grant ile kısıtlandı
   (20260615120700). İsim/rol authenticated'a açık kalır.
 

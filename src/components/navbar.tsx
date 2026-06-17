@@ -70,10 +70,13 @@ export async function Navbar() {
               <Users className="size-4" />
               Topluluklar
             </Link>
-            <span className="flex cursor-default items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:text-zinc-200">
+            <Link
+              href="/events"
+              className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:text-zinc-200"
+            >
               <CalendarDays className="size-4" />
               Etkinlikler
-            </span>
+            </Link>
           </nav>
         </div>
 

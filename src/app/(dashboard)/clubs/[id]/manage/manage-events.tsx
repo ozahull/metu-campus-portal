@@ -12,6 +12,7 @@ import {
   Pencil,
   Plus,
   RotateCw,
+  Ticket,
   Trash2,
   X,
 } from "lucide-react";
@@ -39,6 +40,9 @@ export type ManageEvent = {
   location: string | null;
   status: string;
   review_note: string | null;
+  ticket_price: number | null;
+  ticket_capacity: number | null;
+  ticket_deadline: string | null;
 };
 
 const dateFormatter = new Intl.DateTimeFormat("tr-TR", {
@@ -56,11 +60,14 @@ export function ManageEvents({
   clubId,
   events,
   canAdvisorDecide,
+  ticketEnabled,
 }: {
   clubId: string;
   events: ManageEvent[];
   // Danışman/okul: PENDING_ADVISOR etkinlikleri için karar verebilir.
   canAdvisorDecide: boolean;
+  // Kulübün bilet sistemi açıksa etkinlik formunda bilet alanları görünür.
+  ticketEnabled: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -72,6 +79,9 @@ export function ManageEvents({
   const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [location, setLocation] = useState("");
+  const [ticketPrice, setTicketPrice] = useState("");
+  const [ticketCapacity, setTicketCapacity] = useState("");
+  const [ticketDeadline, setTicketDeadline] = useState("");
 
   function openCreate() {
     setEditing(null);
@@ -79,6 +89,9 @@ export function ManageEvents({
     setDescription("");
     setEventDate("");
     setLocation("");
+    setTicketPrice("");
+    setTicketCapacity("");
+    setTicketDeadline("");
     setOpen(true);
   }
 
@@ -88,6 +101,11 @@ export function ManageEvents({
     setDescription(ev.description ?? "");
     setEventDate(toLocalInput(ev.event_date));
     setLocation(ev.location ?? "");
+    setTicketPrice(ev.ticket_price !== null ? String(ev.ticket_price) : "");
+    setTicketCapacity(
+      ev.ticket_capacity !== null ? String(ev.ticket_capacity) : "",
+    );
+    setTicketDeadline(ev.ticket_deadline ? toLocalInput(ev.ticket_deadline) : "");
     setOpen(true);
   }
 
@@ -102,6 +120,38 @@ export function ManageEvents({
       return;
     }
 
+    // Bilet alanları (yalnızca kulüp bilet sistemi açıkken yazılır).
+    let ticketFields: {
+      ticket_price: number | null;
+      ticket_capacity: number | null;
+      ticket_deadline: string | null;
+    } | null = null;
+    if (ticketEnabled) {
+      let price: number | null = null;
+      if (ticketPrice.trim() !== "") {
+        price = Number(ticketPrice);
+        if (!Number.isFinite(price) || price < 0) {
+          toast.error("Geçerli bir bilet ücreti girin.");
+          return;
+        }
+      }
+      let capacity: number | null = null;
+      if (ticketCapacity.trim() !== "") {
+        capacity = Number.parseInt(ticketCapacity, 10);
+        if (!Number.isInteger(capacity) || capacity <= 0) {
+          toast.error("Kapasite pozitif bir tam sayı olmalı.");
+          return;
+        }
+      }
+      ticketFields = {
+        ticket_price: price,
+        ticket_capacity: capacity,
+        ticket_deadline: ticketDeadline
+          ? new Date(ticketDeadline).toISOString()
+          : null,
+      };
+    }
+
     setLoading(true);
     const supabase = createClient();
     const payload = {
@@ -109,6 +159,7 @@ export function ManageEvents({
       description: description.trim() || null,
       event_date: new Date(eventDate).toISOString(),
       location: location.trim() || null,
+      ...(ticketFields ?? {}),
     };
 
     if (editing) {
@@ -345,6 +396,29 @@ export function ManageEvents({
               <Label htmlFor="ev-loc">Konum</Label>
               <Input id="ev-loc" value={location} onChange={(e) => setLocation(e.target.value)} disabled={loading} />
             </div>
+
+            {ticketEnabled && (
+              <div className="space-y-4 rounded-lg border border-white/5 bg-white/[0.02] p-4">
+                <p className="inline-flex items-center gap-2 text-sm font-medium text-white">
+                  <Ticket className="size-4 text-[#e7a3a3]" />
+                  Bilet Ayarları
+                </p>
+                <div className="space-y-2">
+                  <Label htmlFor="ev-price">Bilet Ücreti (₺)</Label>
+                  <Input id="ev-price" type="number" min="0" step="0.01" inputMode="decimal" placeholder="Boş = ücretsiz" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} disabled={loading} />
+                  <p className="text-xs text-zinc-500">Boş bırakılırsa etkinlik ücretsizdir (bilet akışı gösterilmez).</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ev-capacity">Kapasite</Label>
+                  <Input id="ev-capacity" type="number" min="1" step="1" inputMode="numeric" placeholder="Boş = sınırsız" value={ticketCapacity} onChange={(e) => setTicketCapacity(e.target.value)} disabled={loading} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ev-deadline">Bilet Son Tarihi</Label>
+                  <Input id="ev-deadline" type="datetime-local" className="[color-scheme:dark]" value={ticketDeadline} onChange={(e) => setTicketDeadline(e.target.value)} disabled={loading} />
+                  <p className="text-xs text-zinc-500">Boş bırakılırsa etkinlik saatine kadar satış açıktır.</p>
+                </div>
+              </div>
+            )}
 
             <DialogFooter className="gap-2 sm:gap-2">
               <Button type="button" variant="outline" disabled={loading} onClick={() => setOpen(false)} className="border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white">

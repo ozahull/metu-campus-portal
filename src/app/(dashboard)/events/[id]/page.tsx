@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowLeft, CalendarClock, Flame, MapPin, Ticket, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { buttonVariants } from "@/components/ui/button";
@@ -38,17 +39,18 @@ type EventDetail = {
   event_attendees: { user_id: string }[] | null;
 };
 
-const dateFormatter = new Intl.DateTimeFormat("tr-TR", {
-  dateStyle: "full",
-  timeStyle: "short",
-});
-
 export default async function EventDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const t = await getTranslations("events");
+  const locale = await getLocale();
+  const dateFormatter = new Intl.DateTimeFormat(locale, {
+    dateStyle: "full",
+    timeStyle: "short",
+  });
   const supabase = await createClient();
 
   const {
@@ -114,7 +116,7 @@ export default async function EventDetailPage({
           )}
         >
           <ArrowLeft className="size-4" />
-          Etkinlikler
+          {t("backToList")}
         </Link>
 
         <header className="mt-6 mb-8">
@@ -139,12 +141,12 @@ export default async function EventDetailPage({
             {isPaid ? (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-[#841515]/50 bg-[#841515]/15 px-3.5 py-1.5 text-sm font-semibold text-white">
                 <Ticket className="size-4 text-[#e7a3a3]" />
-                Ücret: {formatPrice(priceNum)}
+                {t("priceBadge", { price: formatPrice(priceNum, locale) ?? t("free") })}
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm font-medium text-zinc-300">
                 <Ticket className="size-4 text-zinc-500" />
-                Ücretsiz
+                {t("free")}
               </span>
             )}
           </div>
@@ -167,7 +169,7 @@ export default async function EventDetailPage({
           <Card className="mt-6 border-white/5 bg-zinc-900/50 backdrop-blur">
             <CardHeader>
               <CardTitle className="text-lg font-semibold text-white">
-                Hakkında
+                {t("about")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -193,14 +195,14 @@ export default async function EventDetailPage({
           <div className="mt-6 flex flex-col gap-4 rounded-xl border border-white/5 bg-zinc-900/50 p-5 sm:flex-row sm:items-center sm:justify-between">
             <span className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-300">
               <Flame className="size-4 text-orange-400" />
-              {attendees.length} kişi katılıyor
+              {t("attendingCount", { count: attendees.length })}
             </span>
             <RSVPButton eventId={data.id} userId={user.id} isAttending={isAttending} />
           </div>
         )}
 
         <div className="mt-6">
-          <p className="mb-2 text-sm font-medium text-zinc-400">Takvime ekle</p>
+          <p className="mb-2 text-sm font-medium text-zinc-400">{t("addToCalendar")}</p>
           <AddToCalendar
             title={data.title}
             description={data.description}

@@ -48,5 +48,108 @@
       "passwordUpdated": "Şifre güncellendi",
       "passwordError": "Şifre güncellenemedi: {message}"
     }
+  },
+  "auth": {
+    "showPassword": "Şifreyi göster",
+    "hidePassword": "Şifreyi gizle",
+    "login": {
+      "title": "Tekrar Hoş Geldiniz",
+      "subtitle": "ODTÜ KKK Topluluk ve Etkinlik Portalı",
+      "errorTitle": "Giriş yapılamadı",
+      "invalidCredentials": "E-posta veya şifre hatalı.",
+      "domainError": "Sadece ODTÜ uzantılı maillerle giriş yapılabilir",
+      "emailLabel": "E-posta",
+      "passwordLabel": "Şifre",
+      "forgotPassword": "Şifremi Unuttum",
+      "submit": "Giriş Yap",
+      "submitting": "Giriş yapılıyor…",
+      "noAccount": "Hesabınız yok mu?",
+      "registerLink": "Kayıt olun"
+    },
+    "register": {
+      "title": "Hesap Oluştur",
+      "subtitle": "ODTÜ KKK Topluluk ve Etkinlik Portalı'na katılın",
+      "errorTitle": "Kayıt yapılamadı",
+      "domainError": "Sadece @metu.edu.tr veya @ncc.metu.edu.tr uzantılı mail kullanılabilir.",
+      "passwordShort": "Şifre en az 6 karakter olmalıdır.",
+      "profileError": "Profil kaydedilemedi: {message}",
+      "confirmTitle": "Onay maili gönderildi",
+      "confirmBody": "E-postanıza gelen onay linkine tıklayarak hesabınızı etkinleştirin. (Spam klasörünü de kontrol edin.)",
+      "firstNameLabel": "Adınız",
+      "lastNameLabel": "Soyadınız",
+      "emailLabel": "METU E-posta",
+      "passwordLabel": "Şifre",
+      "passwordPlaceholder": "En az 6 karakter",
+      "submit": "Hesap Oluştur",
+      "submitting": "Hesap oluşturuluyor…",
+      "haveAccount": "Zaten hesabınız var mı?",
+      "loginLink": "Giriş yapın"
+    }
+  },
+  "home": {
+    "welcome": "Hoş Geldiniz, {name}",
+    "subtitle": "Kampüsteki aktif kulüpleri keşfedin ve topluluklara katılın.",
+    "upcomingTitle": "Yaklaşan Kampüs Etkinlikleri",
+    "noUpcoming": "Şu an planlanan bir etkinlik yok.",
+    "organizer": "düzenleyen: {name}",
+    "attendeeCount": "{count} Kişi Katılıyor",
+    "activeClubs": "Aktif Kulüpler"
+  },
+  "events": {
+    "title": "Etkinlikler",
+    "subtitle": "Kampüsteki yaklaşan etkinlikleri keşfedin ve katılın.",
+    "searchPlaceholder": "Etkinlik adında ara…",
+    "allClubs": "Tüm kulüpler",
+    "allCategories": "Tüm kategoriler",
+    "clubFilter": "Kulüp filtresi",
+    "categoryFilter": "Kategori filtresi",
+    "attendees": "{count} katılıyor",
+    "viewDetail": "Detayı gör",
+    "emptyTitle": "Uygun etkinlik bulunamadı",
+    "emptyBody": "Filtreleri değiştirip tekrar deneyin.",
+    "backToList": "Etkinlikler",
+    "free": "Ücretsiz",
+    "priceBadge": "Ücret: {price}",
+    "about": "Hakkında",
+    "attendingCount": "{count} kişi katılıyor",
+    "addToCalendar": "Takvime ekle",
+    "googleCalendar": "Google Takvim",
+    "downloadIcs": ".ics indir",
+    "ticket": {
+      "label": "Bilet",
+      "yourTicket": "Biletiniz",
+      "buy": "Bilet Al",
+      "salesClosed": "Bilet satışı kapandı",
+      "rejectedNote": "Dekontunuz reddedildi. Lütfen ödemenizi kontrol edip yeniden yükleyin.",
+      "amountDue": "Ödenecek tutar",
+      "iban": "IBAN",
+      "noIban": "Kulüp IBAN bilgisi tanımlı değil",
+      "copyIban": "IBAN kopyala",
+      "uploadReceipt": "Dekontu Yükle",
+      "cancelRequest": "Talebi İptal Et",
+      "uploadHint": "Görsel (JPG/PNG) veya PDF yükleyebilirsiniz.",
+      "submittedNote": "Dekontunuz alındı. Kulüp yetkilisinin onayı bekleniyor.",
+      "qrHint": "Bu QR kodu girişte gösterin.",
+      "checkedInNote": "Girişiniz yapıldı. İyi eğlenceler!",
+      "status": {
+        "PENDING_PAYMENT": "Ödeme bekliyor",
+        "SUBMITTED": "Onay bekliyor",
+        "APPROVED": "Onaylandı",
+        "REJECTED": "Reddedildi",
+        "CHECKED_IN": "Giriş yapıldı"
+      },
+      "toasts": {
+        "buyError": "Bilet alınamadı: {message}",
+        "buyCreated": "Bilet talebiniz oluşturuldu. Ödeme yapıp dekontu yükleyin.",
+        "cancelConfirm": "Bilet talebinizi iptal etmek istiyor musunuz?",
+        "cancelError": "İptal edilemedi: {message}",
+        "cancelDone": "Bilet talebiniz iptal edildi.",
+        "uploadError": "Dekont yüklenemedi: {message}",
+        "receiptSaveError": "Dekont kaydedilemedi: {message}",
+        "receiptUploaded": "Dekontunuz yüklendi, onay bekleniyor.",
+        "ibanCopied": "IBAN kopyalandı.",
+        "copyFailed": "Kopyalanamadı."
+      }
+    }
   }
 }

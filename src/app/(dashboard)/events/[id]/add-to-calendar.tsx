@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { CalendarPlus, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -18,6 +19,7 @@ function toCalendar(iso: string): string {
 }
 
 export function AddToCalendar({ title, description, location, startISO, endISO }: Props) {
+  const t = useTranslations("events");
   const start = toCalendar(startISO);
   const end = toCalendar(
     endISO ?? new Date(new Date(startISO).getTime() + 2 * 60 * 60 * 1000).toISOString(),
@@ -67,7 +69,7 @@ export function AddToCalendar({ title, description, location, startISO, endISO }
         className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/15 bg-transparent px-3 text-sm font-medium text-zinc-200 transition-colors hover:border-[#841515] hover:bg-[#841515] hover:text-white"
       >
         <CalendarPlus className="size-4" />
-        Google Takvim
+        {t("googleCalendar")}
       </a>
       <Button
         onClick={downloadIcs}
@@ -76,7 +78,7 @@ export function AddToCalendar({ title, description, location, startISO, endISO }
         className="gap-2 border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white"
       >
         <Download className="size-4" />
-        .ics indir
+        {t("downloadIcs")}
       </Button>
     </div>
   );

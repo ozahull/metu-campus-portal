@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   AlertCircle,
   CheckCircle2,
@@ -28,6 +29,7 @@ import {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const t = useTranslations("auth");
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -51,11 +53,11 @@ export default function RegisterPage() {
     setError(null);
 
     if (!isAllowedEmail(email)) {
-      setError("Sadece @metu.edu.tr veya @ncc.metu.edu.tr uzantılı mail kullanılabilir.");
+      setError(t("register.domainError"));
       return;
     }
     if (password.length < 6) {
-      setError("Şifre en az 6 karakter olmalıdır.");
+      setError(t("register.passwordShort"));
       return;
     }
 
@@ -94,7 +96,7 @@ export default function RegisterPage() {
 
       if (profileError) {
         setLoading(false);
-        setError(`Profil kaydedilemedi: ${profileError.message}`);
+        setError(t("register.profileError", { message: profileError.message }));
         return;
       }
 
@@ -121,10 +123,10 @@ export default function RegisterPage() {
             <span className="text-lg font-semibold tracking-tight">KKK</span>
           </div>
           <CardTitle className="text-xl font-semibold tracking-tight text-balance">
-            Hesap Oluştur
+            {t("register.title")}
           </CardTitle>
           <CardDescription className="text-pretty">
-            ODTÜ KKK Topluluk ve Etkinlik Portalı&apos;na katılın
+            {t("register.subtitle")}
           </CardDescription>
         </CardHeader>
 
@@ -132,10 +134,9 @@ export default function RegisterPage() {
           {confirmSent ? (
             <Alert className="border-emerald-500/40 bg-emerald-950/40 text-emerald-200 [&>svg]:text-emerald-400">
               <CheckCircle2 className="size-4" />
-              <AlertTitle>Onay maili gönderildi</AlertTitle>
+              <AlertTitle>{t("register.confirmTitle")}</AlertTitle>
               <AlertDescription className="text-emerald-300/90">
-                E-postanıza gelen onay linkine tıklayarak hesabınızı
-                etkinleştirin. (Spam klasörünü de kontrol edin.)
+                {t("register.confirmBody")}
               </AlertDescription>
             </Alert>
           ) : (
@@ -143,14 +144,14 @@ export default function RegisterPage() {
               {error && (
                 <Alert variant="destructive">
                   <AlertCircle className="size-4" />
-                  <AlertTitle>Kayıt yapılamadı</AlertTitle>
+                  <AlertTitle>{t("register.errorTitle")}</AlertTitle>
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">Adınız</Label>
+                  <Label htmlFor="firstName">{t("register.firstNameLabel")}</Label>
                   <Input
                     id="firstName"
                     autoComplete="given-name"
@@ -162,7 +163,7 @@ export default function RegisterPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Soyadınız</Label>
+                  <Label htmlFor="lastName">{t("register.lastNameLabel")}</Label>
                   <Input
                     id="lastName"
                     autoComplete="family-name"
@@ -176,7 +177,7 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">METU E-posta</Label>
+                <Label htmlFor="email">{t("register.emailLabel")}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -191,20 +192,19 @@ export default function RegisterPage() {
                 />
                 {!emailValid && (
                   <p className="text-xs text-destructive">
-                    Sadece @metu.edu.tr veya @ncc.metu.edu.tr uzantılı mail
-                    kullanılabilir.
+                    {t("register.domainError")}
                   </p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Şifre</Label>
+                <Label htmlFor="password">{t("register.passwordLabel")}</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete="new-password"
-                    placeholder="En az 6 karakter"
+                    placeholder={t("register.passwordPlaceholder")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
@@ -215,7 +215,7 @@ export default function RegisterPage() {
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground transition-colors hover:text-foreground"
-                    aria-label={showPassword ? "Şifreyi gizle" : "Şifreyi göster"}
+                    aria-label={showPassword ? t("hidePassword") : t("showPassword")}
                   >
                     {showPassword ? (
                       <EyeOff className="size-4" />
@@ -234,7 +234,7 @@ export default function RegisterPage() {
                 style={{ backgroundColor: "#841515" }}
               >
                 {loading && <Loader2 className="size-4 animate-spin" />}
-                {loading ? "Hesap oluşturuluyor…" : "Hesap Oluştur"}
+                {loading ? t("register.submitting") : t("register.submit")}
               </Button>
             </form>
           )}
@@ -242,12 +242,12 @@ export default function RegisterPage() {
 
         <CardFooter className="justify-center">
           <p className="text-sm text-muted-foreground">
-            Zaten hesabınız var mı?{" "}
+            {t("register.haveAccount")}{" "}
             <Link
               href="/login"
               className="font-medium text-foreground underline-offset-4 hover:underline"
             >
-              Giriş yapın
+              {t("register.loginLink")}
             </Link>
           </p>
         </CardFooter>

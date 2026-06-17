@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { CalendarDays } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { EventsExplorer, type EventRow } from "./events-explorer";
@@ -16,6 +17,7 @@ type EventQueryRow = {
 };
 
 export default async function EventsPage() {
+  const t = await getTranslations("events");
   const supabase = await createClient();
 
   const {
@@ -66,10 +68,10 @@ export default async function EventsPage() {
           </span>
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              Etkinlikler
+              {t("title")}
             </h1>
             <p className="mt-1 text-sm text-zinc-400">
-              Kampüsteki yaklaşan etkinlikleri keşfedin ve katılın.
+              {t("subtitle")}
             </p>
           </div>
         </header>

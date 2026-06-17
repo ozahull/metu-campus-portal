@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Compass } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { ClubsGrid } from "./clubs-grid";
@@ -10,6 +11,7 @@ import { UpcomingEvents } from "./upcoming-events";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
+  const t = await getTranslations("home");
   const supabase = await createClient();
 
   const {
@@ -47,10 +49,10 @@ export default async function DashboardPage() {
         {/* Karşılama alanı */}
         <header className="mb-10">
           <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Hoş Geldiniz, {displayName}
+            {t("welcome", { name: displayName ?? "" })}
           </h1>
           <p className="mt-2 text-base text-zinc-400">
-            Kampüsteki aktif kulüpleri keşfedin ve topluluklara katılın.
+            {t("subtitle")}
           </p>
         </header>
 
@@ -63,7 +65,7 @@ export default async function DashboardPage() {
             <Compass className="size-4" />
           </span>
           <h2 className="text-xl font-semibold tracking-tight text-white">
-            Aktif Kulüpler
+            {t("activeClubs")}
           </h2>
         </div>
 

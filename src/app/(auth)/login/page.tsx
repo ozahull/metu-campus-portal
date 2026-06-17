@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { AuthShell } from "@/components/shared/auth-shell";
@@ -21,6 +22,7 @@ import {
 
 function LoginCard() {
   const router = useRouter();
+  const t = useTranslations("auth");
   const searchParams = useSearchParams();
   const callbackDomainError = searchParams.get("error") === "invalid_domain";
 
@@ -43,7 +45,7 @@ function LoginCard() {
 
     if (signInError) {
       setLoading(false);
-      setError("E-posta veya şifre hatalı.");
+      setError(t("login.invalidCredentials"));
       return;
     }
 
@@ -61,10 +63,10 @@ function LoginCard() {
           <span className="text-lg font-semibold tracking-tight">KKK</span>
         </div>
         <CardTitle className="text-xl font-semibold tracking-tight text-balance">
-          Tekrar Hoş Geldiniz
+          {t("login.title")}
         </CardTitle>
         <CardDescription className="text-pretty">
-          ODTÜ KKK Topluluk ve Etkinlik Portalı
+          {t("login.subtitle")}
         </CardDescription>
       </CardHeader>
 
@@ -73,16 +75,15 @@ function LoginCard() {
           {(error || callbackDomainError) && (
             <Alert variant="destructive">
               <AlertCircle className="size-4" />
-              <AlertTitle>Giriş yapılamadı</AlertTitle>
+              <AlertTitle>{t("login.errorTitle")}</AlertTitle>
               <AlertDescription>
-                {error ??
-                  "Sadece ODTÜ uzantılı maillerle giriş yapılabilir"}
+                {error ?? t("login.domainError")}
               </AlertDescription>
             </Alert>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">E-posta</Label>
+            <Label htmlFor="email">{t("login.emailLabel")}</Label>
             <Input
               id="email"
               type="email"
@@ -98,12 +99,12 @@ function LoginCard() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Şifre</Label>
+              <Label htmlFor="password">{t("login.passwordLabel")}</Label>
               <Link
                 href="/forgot-password"
                 className="text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
               >
-                Şifremi Unuttum
+                {t("login.forgotPassword")}
               </Link>
             </div>
             <div className="relative">
@@ -122,7 +123,7 @@ function LoginCard() {
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground transition-colors hover:text-foreground"
-                aria-label={showPassword ? "Şifreyi gizle" : "Şifreyi göster"}
+                aria-label={showPassword ? t("hidePassword") : t("showPassword")}
               >
                 {showPassword ? (
                   <EyeOff className="size-4" />
@@ -141,19 +142,19 @@ function LoginCard() {
             style={{ backgroundColor: "#841515" }}
           >
             {loading && <Loader2 className="size-4 animate-spin" />}
-            {loading ? "Giriş yapılıyor…" : "Giriş Yap"}
+            {loading ? t("login.submitting") : t("login.submit")}
           </Button>
         </form>
       </CardContent>
 
       <CardFooter className="justify-center">
         <p className="text-sm text-muted-foreground">
-          Hesabınız yok mu?{" "}
+          {t("login.noAccount")}{" "}
           <Link
             href="/register"
             className="font-medium text-foreground underline-offset-4 hover:underline"
           >
-            Kayıt olun
+            {t("login.registerLink")}
           </Link>
         </p>
       </CardFooter>

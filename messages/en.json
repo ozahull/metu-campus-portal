@@ -48,5 +48,108 @@
       "passwordUpdated": "Password updated",
       "passwordError": "Could not update password: {message}"
     }
+  },
+  "auth": {
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "METU NCC Community & Event Portal",
+      "errorTitle": "Sign-in failed",
+      "invalidCredentials": "Incorrect email or password.",
+      "domainError": "Only METU email addresses can sign in",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "forgotPassword": "Forgot Password",
+      "submit": "Sign In",
+      "submitting": "Signing in…",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Register"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join the METU NCC Community & Event Portal",
+      "errorTitle": "Registration failed",
+      "domainError": "Only @metu.edu.tr or @ncc.metu.edu.tr email addresses are allowed.",
+      "passwordShort": "Password must be at least 6 characters.",
+      "profileError": "Could not save profile: {message}",
+      "confirmTitle": "Confirmation email sent",
+      "confirmBody": "Activate your account by clicking the confirmation link sent to your email. (Also check your spam folder.)",
+      "firstNameLabel": "First Name",
+      "lastNameLabel": "Last Name",
+      "emailLabel": "METU Email",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "At least 6 characters",
+      "submit": "Create Account",
+      "submitting": "Creating account…",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    }
+  },
+  "home": {
+    "welcome": "Welcome, {name}",
+    "subtitle": "Discover active campus clubs and join communities.",
+    "upcomingTitle": "Upcoming Campus Events",
+    "noUpcoming": "No events are currently scheduled.",
+    "organizer": "organized by: {name}",
+    "attendeeCount": "{count} attending",
+    "activeClubs": "Active Clubs"
+  },
+  "events": {
+    "title": "Events",
+    "subtitle": "Discover and join upcoming campus events.",
+    "searchPlaceholder": "Search by event name…",
+    "allClubs": "All clubs",
+    "allCategories": "All categories",
+    "clubFilter": "Club filter",
+    "categoryFilter": "Category filter",
+    "attendees": "{count} attending",
+    "viewDetail": "View details",
+    "emptyTitle": "No matching events found",
+    "emptyBody": "Try changing the filters.",
+    "backToList": "Events",
+    "free": "Free",
+    "priceBadge": "Price: {price}",
+    "about": "About",
+    "attendingCount": "{count} attending",
+    "addToCalendar": "Add to calendar",
+    "googleCalendar": "Google Calendar",
+    "downloadIcs": "Download .ics",
+    "ticket": {
+      "label": "Ticket",
+      "yourTicket": "Your Ticket",
+      "buy": "Buy Ticket",
+      "salesClosed": "Ticket sales closed",
+      "rejectedNote": "Your receipt was rejected. Please check your payment and re-upload.",
+      "amountDue": "Amount due",
+      "iban": "IBAN",
+      "noIban": "Club IBAN is not set",
+      "copyIban": "Copy IBAN",
+      "uploadReceipt": "Upload Receipt",
+      "cancelRequest": "Cancel Request",
+      "uploadHint": "You can upload an image (JPG/PNG) or PDF.",
+      "submittedNote": "Your receipt has been received. Awaiting club approval.",
+      "qrHint": "Show this QR code at the entrance.",
+      "checkedInNote": "You're checked in. Enjoy!",
+      "status": {
+        "PENDING_PAYMENT": "Payment pending",
+        "SUBMITTED": "Awaiting approval",
+        "APPROVED": "Approved",
+        "REJECTED": "Rejected",
+        "CHECKED_IN": "Checked in"
+      },
+      "toasts": {
+        "buyError": "Could not buy ticket: {message}",
+        "buyCreated": "Your ticket request has been created. Make the payment and upload the receipt.",
+        "cancelConfirm": "Do you want to cancel your ticket request?",
+        "cancelError": "Could not cancel: {message}",
+        "cancelDone": "Your ticket request has been cancelled.",
+        "uploadError": "Could not upload receipt: {message}",
+        "receiptSaveError": "Could not save receipt: {message}",
+        "receiptUploaded": "Your receipt has been uploaded, awaiting approval.",
+        "ibanCopied": "IBAN copied.",
+        "copyFailed": "Could not copy."
+      }
+    }
   }
 }

@@ -1,3 +1,4 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import { CalendarDays, Clock, Flame, MapPin } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { RSVPButton } from "@/components/shared/rsvp-button";
@@ -20,17 +21,18 @@ type UpcomingEvent = {
   event_attendees: Attendee[] | null;
 };
 
-const dateFormatter = new Intl.DateTimeFormat("tr-TR", {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
-
 function clubName(clubs: UpcomingEvent["clubs"]): string | null {
   if (!clubs) return null;
   return Array.isArray(clubs) ? (clubs[0]?.name ?? null) : clubs.name;
 }
 
 export async function UpcomingEvents() {
+  const t = await getTranslations("home");
+  const locale = await getLocale();
+  const dateFormatter = new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
   const supabase = await createClient();
 
   const {
@@ -58,13 +60,13 @@ export async function UpcomingEvents() {
           <CalendarDays className="size-4" />
         </span>
         <h2 className="text-xl font-semibold tracking-tight text-white">
-          Yaklaşan Kampüs Etkinlikleri
+          {t("upcomingTitle")}
         </h2>
       </div>
 
       {events.length === 0 ? (
         <p className="rounded-xl border border-dashed border-white/10 bg-zinc-900/30 px-5 py-6 text-sm text-zinc-500">
-          Şu an planlanan bir etkinlik yok.
+          {t("noUpcoming")}
         </p>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -84,7 +86,7 @@ export async function UpcomingEvents() {
                 <CardHeader>
                   {name && (
                     <p className="text-xs lowercase tracking-wide text-zinc-500">
-                      düzenleyen: {name}
+                      {t("organizer", { name })}
                     </p>
                   )}
                   <CardTitle className="text-base font-semibold text-white">
@@ -108,7 +110,7 @@ export async function UpcomingEvents() {
                 <CardFooter className="flex items-center justify-between gap-2">
                   <span className="flex items-center gap-1.5 text-xs font-medium text-zinc-300">
                     <Flame className="size-3.5 text-orange-400" />
-                    {attendeeCount} Kişi Katılıyor
+                    {t("attendeeCount", { count: attendeeCount })}
                   </span>
                   {user && (
                     <RSVPButton

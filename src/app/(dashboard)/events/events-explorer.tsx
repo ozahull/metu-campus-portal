@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { ArrowRight, Clock, Flame, MapPin, Search, SearchX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,15 +24,20 @@ export type EventRow = {
   attendees: number;
 };
 
-const dateFormatter = new Intl.DateTimeFormat("tr-TR", {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
-
 const selectClass =
   "h-11 rounded-lg border border-white/10 bg-zinc-900/60 px-3 text-sm text-white outline-none focus-visible:border-[#841515] [&>option]:bg-zinc-900";
 
 export function EventsExplorer({ events }: { events: EventRow[] }) {
+  const t = useTranslations("events");
+  const locale = useLocale();
+  const dateFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }),
+    [locale],
+  );
   const [query, setQuery] = useState("");
   const [club, setClub] = useState("");
   const [category, setCategory] = useState("");
@@ -67,21 +73,21 @@ export function EventsExplorer({ events }: { events: EventRow[] }) {
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" />
           <Input
             type="search"
-            placeholder="Etkinlik adında ara…"
+            placeholder={t("searchPlaceholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="h-11 border-white/10 bg-zinc-900/60 pl-10 text-base text-white placeholder:text-zinc-500"
           />
         </div>
-        <select className={selectClass} value={club} onChange={(e) => setClub(e.target.value)} aria-label="Kulüp filtresi">
-          <option value="">Tüm kulüpler</option>
+        <select className={selectClass} value={club} onChange={(e) => setClub(e.target.value)} aria-label={t("clubFilter")}>
+          <option value="">{t("allClubs")}</option>
           {clubs.map(([id, name]) => (
             <option key={id} value={id}>{name}</option>
           ))}
         </select>
         {categories.length > 0 && (
-          <select className={selectClass} value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Kategori filtresi">
-            <option value="">Tüm kategoriler</option>
+          <select className={selectClass} value={category} onChange={(e) => setCategory(e.target.value)} aria-label={t("categoryFilter")}>
+            <option value="">{t("allCategories")}</option>
             {categories.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
@@ -95,10 +101,10 @@ export function EventsExplorer({ events }: { events: EventRow[] }) {
             <SearchX className="size-6" />
           </div>
           <p className="mt-4 text-sm font-medium text-zinc-300">
-            Uygun etkinlik bulunamadı
+            {t("emptyTitle")}
           </p>
           <p className="mt-1 text-sm text-zinc-500">
-            Filtreleri değiştirip tekrar deneyin.
+            {t("emptyBody")}
           </p>
         </div>
       ) : (
@@ -131,7 +137,7 @@ export function EventsExplorer({ events }: { events: EventRow[] }) {
                   )}
                   <span className="flex items-center gap-1.5">
                     <Flame className="size-3.5 text-orange-400" />
-                    {e.attendees} katılıyor
+                    {t("attendees", { count: e.attendees })}
                   </span>
                 </div>
               </CardContent>
@@ -140,7 +146,7 @@ export function EventsExplorer({ events }: { events: EventRow[] }) {
                   href={`/events/${e.id}`}
                   className="inline-flex items-center gap-1 text-sm font-medium text-[#e7a3a3] transition-colors hover:text-white"
                 >
-                  Detayı gör
+                  {t("viewDetail")}
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </CardFooter>

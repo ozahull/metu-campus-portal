@@ -40,11 +40,16 @@ export function ticketStatusMeta(status: string) {
 }
 
 // Bilet tutarını TRY olarak biçimlendirir (numeric string/number toleranslı).
-export function formatPrice(price: number | string | null): string {
-  if (price === null) return "Ücretsiz";
+// locale aktif dile göre sayı/sembol biçimini belirler (varsayılan tr-TR).
+// Geçersiz/boş tutarda null döner; "ücretsiz" etiketini çağıran taraf çevirir.
+export function formatPrice(
+  price: number | string | null,
+  locale: string = "tr-TR",
+): string | null {
+  if (price === null) return null;
   const n = typeof price === "string" ? Number(price) : price;
-  if (!Number.isFinite(n)) return "Ücretsiz";
-  return new Intl.NumberFormat("tr-TR", {
+  if (!Number.isFinite(n)) return null;
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "TRY",
   }).format(n);

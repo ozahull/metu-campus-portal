@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import {
   BadgeCheck,
@@ -45,10 +46,13 @@ export function TicketFlow({
   ticket,
 }: TicketFlowProps) {
   const router = useRouter();
+  const t = useTranslations("events.ticket");
+  const locale = useLocale();
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const closed = new Date(closesAtISO).getTime() <= Date.now();
+  const priceLabel = formatPrice(price, locale) ?? "";
 
   async function buyTicket() {
     setLoading(true);
@@ -59,25 +63,25 @@ export function TicketFlow({
       .insert({ event_id: eventId, user_id: userId });
     setLoading(false);
     if (error) {
-      toast.error(`Bilet alınamadı: ${error.message}`);
+      toast.error(t("toasts.buyError", { message: error.message }));
       return;
     }
-    toast.success("Bilet talebiniz oluşturuldu. Ödeme yapıp dekontu yükleyin.");
+    toast.success(t("toasts.buyCreated"));
     router.refresh();
   }
 
   async function cancelTicket() {
     if (!ticket) return;
-    if (!window.confirm("Bilet talebinizi iptal etmek istiyor musunuz?")) return;
+    if (!window.confirm(t("toasts.cancelConfirm"))) return;
     setLoading(true);
     const supabase = createClient();
     const { error } = await supabase.from("tickets").delete().eq("id", ticket.id);
     setLoading(false);
     if (error) {
-      toast.error(`İptal edilemedi: ${error.message}`);
+      toast.error(t("toasts.cancelError", { message: error.message }));
       return;
     }
-    toast.success("Bilet talebiniz iptal edildi.");
+    toast.success(t("toasts.cancelDone"));
     router.refresh();
   }
 
@@ -98,7 +102,7 @@ export function TicketFlow({
     if (uploadError) {
       setLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      toast.error(`Dekont yüklenemedi: ${uploadError.message}`);
+      toast.error(t("toasts.uploadError", { message: uploadError.message }));
       return;
     }
 
@@ -111,10 +115,10 @@ export function TicketFlow({
     setLoading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (rpcError) {
-      toast.error(`Dekont kaydedilemedi: ${rpcError.message}`);
+      toast.error(t("toasts.receiptSaveError", { message: rpcError.message }));
       return;
     }
-    toast.success("Dekontunuz yüklendi, onay bekleniyor.");
+    toast.success(t("toasts.receiptUploaded"));
     router.refresh();
   }
 
@@ -122,8 +126,8 @@ export function TicketFlow({
     if (!clubIban) return;
     navigator.clipboard
       .writeText(clubIban)
-      .then(() => toast.success("IBAN kopyalandı."))
-      .catch(() => toast.error("Kopyalanamadı."));
+      .then(() => toast.success(t("toasts.ibanCopied")))
+      .catch(() => toast.error(t("toasts.copyFailed")));
   }
 
   const meta = ticket ? ticketStatusMeta(ticket.status) : null;
@@ -134,15 +138,15 @@ export function TicketFlow({
       <div className="rounded-xl border border-white/5 bg-zinc-900/50 p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-sm text-zinc-400">Bilet</p>
+            <p className="text-sm text-zinc-400">{t("label")}</p>
             <p className="text-2xl font-bold tracking-tight text-white">
-              {formatPrice(price)}
+              {priceLabel}
             </p>
           </div>
           {closed ? (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-zinc-400">
               <Ban className="size-4" />
-              Bilet satışı kapandı
+              {t("salesClosed")}
             </span>
           ) : (
             <Button
@@ -156,7 +160,7 @@ export function TicketFlow({
               ) : (
                 <TicketIcon className="size-4" />
               )}
-              Bilet Al
+              {t("buy")}
             </Button>
           )}
         </div>
@@ -170,13 +174,13 @@ export function TicketFlow({
       <div className="flex items-center justify-between gap-3">
         <p className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
           <TicketIcon className="size-4 text-[#e7a3a3]" />
-          Biletiniz
+          {t("yourTicket")}
         </p>
         {meta && (
           <span
             className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${meta.cls}`}
           >
-            {meta.label}
+            {t(`status.${ticket.status}`)}
           </span>
         )}
       </div>
@@ -186,21 +190,20 @@ export function TicketFlow({
         <div className="mt-4 space-y-4">
           {ticket.status === "REJECTED" && (
             <p className="rounded-md border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs text-red-200/90">
-              Dekontunuz reddedildi. Lütfen ödemenizi kontrol edip yeniden
-              yükleyin.
+              {t("rejectedNote")}
             </p>
           )}
 
           <div className="rounded-lg border border-white/5 bg-white/[0.02] p-4">
-            <p className="text-xs text-zinc-400">Ödenecek tutar</p>
+            <p className="text-xs text-zinc-400">{t("amountDue")}</p>
             <p className="text-lg font-semibold text-white">
-              {formatPrice(price)}
+              {priceLabel}
             </p>
             <div className="mt-3 flex items-center justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-xs text-zinc-400">IBAN</p>
+                <p className="text-xs text-zinc-400">{t("iban")}</p>
                 <p className="truncate font-mono text-sm text-zinc-200">
-                  {clubIban ?? "Kulüp IBAN bilgisi tanımlı değil"}
+                  {clubIban ?? t("noIban")}
                 </p>
               </div>
               {clubIban && (
@@ -209,7 +212,7 @@ export function TicketFlow({
                   size="icon-sm"
                   variant="ghost"
                   className="shrink-0 text-zinc-400 hover:bg-white/5 hover:text-white"
-                  aria-label="IBAN kopyala"
+                  aria-label={t("copyIban")}
                 >
                   <Copy className="size-4" />
                 </Button>
@@ -238,7 +241,7 @@ export function TicketFlow({
                 ) : (
                   <Upload className="size-4" />
                 )}
-                Dekontu Yükle
+                {t("uploadReceipt")}
               </Button>
               {ticket.status === "PENDING_PAYMENT" && (
                 <Button
@@ -248,12 +251,12 @@ export function TicketFlow({
                   className="gap-1.5 border-white/15 bg-transparent text-zinc-300 hover:bg-white/5 hover:text-white"
                 >
                   <X className="size-4" />
-                  Talebi İptal Et
+                  {t("cancelRequest")}
                 </Button>
               )}
             </div>
             <p className="mt-2 text-xs text-zinc-500">
-              Görsel (JPG/PNG) veya PDF yükleyebilirsiniz.
+              {t("uploadHint")}
             </p>
           </div>
         </div>
@@ -262,7 +265,7 @@ export function TicketFlow({
       {/* Onay bekliyor */}
       {ticket.status === "SUBMITTED" && (
         <p className="mt-4 text-sm text-zinc-400">
-          Dekontunuz alındı. Kulüp yetkilisinin onayı bekleniyor.
+          {t("submittedNote")}
         </p>
       )}
 
@@ -277,7 +280,7 @@ export function TicketFlow({
           </p>
           <p className="inline-flex items-center gap-1.5 text-sm text-emerald-300">
             <BadgeCheck className="size-4" />
-            Bu QR kodu girişte gösterin.
+            {t("qrHint")}
           </p>
         </div>
       )}
@@ -286,7 +289,7 @@ export function TicketFlow({
       {ticket.status === "CHECKED_IN" && (
         <p className="mt-4 inline-flex items-center gap-1.5 text-sm text-violet-300">
           <BadgeCheck className="size-4" />
-          Girişiniz yapıldı. İyi eğlenceler!
+          {t("checkedInNote")}
         </p>
       )}
     </div>

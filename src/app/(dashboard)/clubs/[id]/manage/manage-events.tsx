@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import {
   CalendarPlus,
   Check,
@@ -47,11 +48,6 @@ export type ManageEvent = {
   ticket_deadline: string | null;
 };
 
-const dateFormatter = new Intl.DateTimeFormat("tr-TR", {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
-
 function toLocalInput(iso: string): string {
   const d = new Date(iso);
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -81,6 +77,12 @@ export function ManageEvents({
   documentsByEvent: Record<string, EventDocument[]>;
 }) {
   const router = useRouter();
+  const t = useTranslations("manage.events");
+  const locale = useLocale();
+  const dateFormatter = new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ManageEvent | null>(null);
   const [loading, setLoading] = useState(false);
@@ -126,11 +128,11 @@ export function ManageEvents({
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (title.trim().length === 0) {
-      toast.error("Etkinlik adı boş olamaz.");
+      toast.error(t("toasts.titleRequired"));
       return;
     }
     if (!eventDate) {
-      toast.error("Lütfen tarih/saat seçin.");
+      toast.error(t("toasts.dateRequired"));
       return;
     }
 
@@ -152,14 +154,14 @@ export function ManageEvents({
         // Ücretli: fiyat zorunlu ve > 0.
         const price = Number(ticketPrice);
         if (ticketPrice.trim() === "" || !Number.isFinite(price) || price <= 0) {
-          toast.error("Ücretli etkinlik için 0'dan büyük bir fiyat girin.");
+          toast.error(t("toasts.priceInvalid"));
           return;
         }
         let capacity: number | null = null;
         if (ticketCapacity.trim() !== "") {
           capacity = Number.parseInt(ticketCapacity, 10);
           if (!Number.isInteger(capacity) || capacity <= 0) {
-            toast.error("Kapasite pozitif bir tam sayı olmalı.");
+            toast.error(t("toasts.capacityInvalid"));
             return;
           }
         }
@@ -190,10 +192,10 @@ export function ManageEvents({
         .eq("id", editing.id);
       setLoading(false);
       if (error) {
-        toast.error(`İşlem başarısız: ${error.message}`);
+        toast.error(t("toasts.updateError", { message: error.message }));
         return;
       }
-      toast.success("Etkinlik güncellendi");
+      toast.success(t("toasts.updated"));
       setOpen(false);
       router.refresh();
       return;
@@ -209,7 +211,11 @@ export function ManageEvents({
 
     if (insertError || !created) {
       setLoading(false);
-      toast.error(`Eklenemedi: ${insertError?.message ?? "bilinmeyen hata"}`);
+      toast.error(
+        t("toasts.createError", {
+          message: insertError?.message ?? "unknown error",
+        }),
+      );
       return;
     }
 
@@ -218,25 +224,25 @@ export function ManageEvents({
     });
     setLoading(false);
     if (submitError) {
-      toast.error(`Onaya gönderilemedi: ${submitError.message}`);
+      toast.error(t("toasts.submitError", { message: submitError.message }));
       return;
     }
-    toast.success("Etkinlik oluşturuldu ve onaya gönderildi");
+    toast.success(t("toasts.created"));
     setOpen(false);
     router.refresh();
   }
 
   async function handleDelete(ev: ManageEvent) {
-    if (!window.confirm(`"${ev.title}" etkinliğini silmek istediğinize emin misiniz?`)) {
+    if (!window.confirm(t("toasts.deleteConfirm", { title: ev.title }))) {
       return;
     }
     const supabase = createClient();
     const { error } = await supabase.from("events").delete().eq("id", ev.id);
     if (error) {
-      toast.error(`Silinemedi: ${error.message}`);
+      toast.error(t("toasts.deleteError", { message: error.message }));
       return;
     }
-    toast.success("Etkinlik silindi");
+    toast.success(t("toasts.deleted"));
     router.refresh();
   }
 
@@ -246,10 +252,10 @@ export function ManageEvents({
     const { error } = await supabase.rpc("event_submit", { p_event_id: ev.id });
     setBusyId(null);
     if (error) {
-      toast.error(`Gönderilemedi: ${error.message}`);
+      toast.error(t("toasts.resubmitError", { message: error.message }));
       return;
     }
-    toast.success("Etkinlik tekrar onaya gönderildi");
+    toast.success(t("toasts.resubmitted"));
     router.refresh();
   }
 
@@ -260,11 +266,11 @@ export function ManageEvents({
     let note: string | null = null;
     if (decision !== "approve") {
       note = window.prompt(
-        decision === "reject" ? "Reddetme notu (opsiyonel):" : "Revizyon notu:",
+        decision === "reject" ? t("rejectPrompt") : t("changesPrompt"),
       );
       if (note === null) return; // iptal
       if (decision === "changes" && note.trim() === "") {
-        toast.error("Revizyon için bir not girin.");
+        toast.error(t("toasts.changesNoteRequired"));
         return;
       }
     }
@@ -278,15 +284,15 @@ export function ManageEvents({
     });
     setBusyId(null);
     if (error) {
-      toast.error(`İşlem başarısız: ${error.message}`);
+      toast.error(t("toasts.decideError", { message: error.message }));
       return;
     }
     toast.success(
       decision === "approve"
-        ? "Onaylandı, okul onayına gönderildi"
+        ? t("toasts.approved")
         : decision === "reject"
-          ? "Etkinlik reddedildi"
-          : "Revizyon istendi",
+          ? t("toasts.rejected")
+          : t("toasts.changes"),
     );
     router.refresh();
   }
@@ -301,13 +307,13 @@ export function ManageEvents({
           style={{ backgroundColor: "#841515" }}
         >
           <Plus className="size-4" />
-          Etkinlik Ekle
+          {t("add")}
         </Button>
       </div>
 
       {events.length === 0 ? (
         <p className="rounded-lg border border-dashed border-white/10 bg-white/[0.02] px-5 py-8 text-center text-sm text-zinc-500">
-          Henüz etkinlik yok. İlk etkinliği ekleyin.
+          {t("empty")}
         </p>
       ) : (
         <ul className="space-y-2">
@@ -324,7 +330,7 @@ export function ManageEvents({
                     <div className="flex flex-wrap items-center gap-2">
                       <h4 className="font-semibold text-white">{ev.title}</h4>
                       <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${meta.cls}`}>
-                        {meta.label}
+                        {t(`status.${ev.status}`)}
                       </span>
                     </div>
                     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-400">
@@ -341,10 +347,10 @@ export function ManageEvents({
                     </div>
                   </div>
                   <div className="flex shrink-0 gap-1">
-                    <Button onClick={() => openEdit(ev)} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-white" aria-label="Düzenle">
+                    <Button onClick={() => openEdit(ev)} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-white" aria-label={t("editAria")}>
                       <Pencil className="size-4" />
                     </Button>
-                    <Button onClick={() => handleDelete(ev)} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-red-500/10 hover:text-red-400" aria-label="Sil">
+                    <Button onClick={() => handleDelete(ev)} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-red-500/10 hover:text-red-400" aria-label={t("deleteAria")}>
                       <Trash2 className="size-4" />
                     </Button>
                   </div>
@@ -361,7 +367,7 @@ export function ManageEvents({
                     )}
                     <Button onClick={() => resubmit(ev)} disabled={busy} size="sm" variant="outline" className="mt-2 gap-1.5 border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white">
                       {busy ? <Loader2 className="size-4 animate-spin" /> : <RotateCw className="size-4" />}
-                      Düzenleyip Tekrar Gönder
+                      {t("resubmit")}
                     </Button>
                   </div>
                 )}
@@ -370,13 +376,13 @@ export function ManageEvents({
                 {canAdvisorDecide && ev.status === "PENDING_ADVISOR" && (
                   <div className="mt-3 flex flex-wrap gap-2 border-t border-white/5 pt-3">
                     <Button onClick={() => advisorDecide(ev, "approve")} disabled={busy} size="sm" className="gap-1.5 bg-emerald-600 font-medium text-white hover:bg-emerald-600/90">
-                      <Check className="size-4" /> Onayla
+                      <Check className="size-4" /> {t("approve")}
                     </Button>
                     <Button onClick={() => advisorDecide(ev, "changes")} disabled={busy} size="sm" variant="outline" className="gap-1.5 border-orange-500/40 bg-transparent text-orange-300 hover:bg-orange-500/10">
-                      <MessageSquareWarning className="size-4" /> Revizyon
+                      <MessageSquareWarning className="size-4" /> {t("requestChanges")}
                     </Button>
                     <Button onClick={() => advisorDecide(ev, "reject")} disabled={busy} size="sm" variant="outline" className="gap-1.5 border-red-500/40 bg-transparent text-red-300 hover:bg-red-500/10">
-                      <X className="size-4" /> Reddet
+                      <X className="size-4" /> {t("reject")}
                     </Button>
                   </div>
                 )}
@@ -400,30 +406,28 @@ export function ManageEvents({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-white">
               <CalendarPlus className="size-5 text-[#e7a3a3]" />
-              {editing ? "Etkinliği Düzenle" : "Yeni Etkinlik"}
+              {editing ? t("dialogEditTitle") : t("dialogCreateTitle")}
             </DialogTitle>
             <DialogDescription>
-              {editing
-                ? "Etkinlik bilgilerini güncelleyin."
-                : "Etkinlik oluşturulduktan sonra onay akışına girer."}
+              {editing ? t("dialogEditDesc") : t("dialogCreateDesc")}
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="ev-title">Etkinlik Adı</Label>
+              <Label htmlFor="ev-title">{t("fieldTitle")}</Label>
               <Input id="ev-title" value={title} onChange={(e) => setTitle(e.target.value)} disabled={loading} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ev-desc">Açıklama</Label>
+              <Label htmlFor="ev-desc">{t("fieldDesc")}</Label>
               <Textarea id="ev-desc" rows={3} className="resize-none" value={description} onChange={(e) => setDescription(e.target.value)} disabled={loading} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ev-date">Tarih / Saat</Label>
+              <Label htmlFor="ev-date">{t("fieldDate")}</Label>
               <Input id="ev-date" type="datetime-local" className="[color-scheme:dark]" value={eventDate} onChange={(e) => setEventDate(e.target.value)} disabled={loading} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ev-loc">Konum</Label>
+              <Label htmlFor="ev-loc">{t("fieldLocation")}</Label>
               <Input id="ev-loc" value={location} onChange={(e) => setLocation(e.target.value)} disabled={loading} />
             </div>
 
@@ -431,7 +435,7 @@ export function ManageEvents({
               <div className="space-y-4 rounded-lg border border-white/5 bg-white/[0.02] p-4">
                 <p className="inline-flex items-center gap-2 text-sm font-medium text-white">
                   <Ticket className="size-4 text-[#e7a3a3]" />
-                  Bilet Ayarları
+                  {t("ticketSettings")}
                 </p>
 
                 {/* Ücretsiz / Ücretli seçimi (varsayılan: Ücretsiz) */}
@@ -448,7 +452,7 @@ export function ManageEvents({
                         : "border-white/10 bg-transparent text-zinc-400 hover:bg-white/5",
                     )}
                   >
-                    Ücretsiz
+                    {t("free")}
                   </button>
                   <button
                     type="button"
@@ -462,7 +466,7 @@ export function ManageEvents({
                         : "border-white/10 bg-transparent text-zinc-400 hover:bg-white/5",
                     )}
                   >
-                    Ücretli
+                    {t("paid")}
                   </button>
                 </div>
 
@@ -470,18 +474,18 @@ export function ManageEvents({
                   <>
                     <div className="space-y-2">
                       <Label htmlFor="ev-price">
-                        Bilet Ücreti (₺) <span className="text-[#e7a3a3]">*</span>
+                        {t("price")} <span className="text-[#e7a3a3]">*</span>
                       </Label>
-                      <Input id="ev-price" type="number" min="0" step="0.01" inputMode="decimal" placeholder="Örn. 150" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} disabled={loading} />
+                      <Input id="ev-price" type="number" min="0" step="0.01" inputMode="decimal" placeholder={t("pricePlaceholder")} value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} disabled={loading} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="ev-capacity">Kapasite</Label>
-                      <Input id="ev-capacity" type="number" min="1" step="1" inputMode="numeric" placeholder="Boş = sınırsız" value={ticketCapacity} onChange={(e) => setTicketCapacity(e.target.value)} disabled={loading} />
+                      <Label htmlFor="ev-capacity">{t("capacity")}</Label>
+                      <Input id="ev-capacity" type="number" min="1" step="1" inputMode="numeric" placeholder={t("capacityPlaceholder")} value={ticketCapacity} onChange={(e) => setTicketCapacity(e.target.value)} disabled={loading} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="ev-deadline">Bilet Son Tarihi</Label>
+                      <Label htmlFor="ev-deadline">{t("deadline")}</Label>
                       <Input id="ev-deadline" type="datetime-local" className="[color-scheme:dark]" value={ticketDeadline} onChange={(e) => setTicketDeadline(e.target.value)} disabled={loading} />
-                      <p className="text-xs text-zinc-500">Boş bırakılırsa etkinlik saatine kadar satış açıktır.</p>
+                      <p className="text-xs text-zinc-500">{t("deadlineHint")}</p>
                     </div>
                   </>
                 )}
@@ -490,11 +494,11 @@ export function ManageEvents({
 
             <DialogFooter className="gap-2 sm:gap-2">
               <Button type="button" variant="outline" disabled={loading} onClick={() => setOpen(false)} className="border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white">
-                İptal
+                {t("cancel")}
               </Button>
               <Button type="submit" disabled={loading} className="gap-2 font-medium text-white hover:opacity-90" style={{ backgroundColor: "#841515" }}>
                 {loading && <Loader2 className="size-4 animate-spin" />}
-                {editing ? "Kaydet" : "Oluştur ve Gönder"}
+                {editing ? t("saveEdit") : t("create")}
               </Button>
             </DialogFooter>
           </form>

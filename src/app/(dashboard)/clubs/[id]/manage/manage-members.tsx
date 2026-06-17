@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ShieldCheck, ShieldMinus, UserRound, UserX } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -24,6 +25,7 @@ export function ManageMembers({
   canAssignAdmin: boolean;
 }) {
   const router = useRouter();
+  const t = useTranslations("manage.members");
   const [busyId, setBusyId] = useState<string | null>(null);
 
   async function setRole(member: RosterMember, role: "ADMIN" | "MEMBER") {
@@ -37,17 +39,21 @@ export function ManageMembers({
 
     setBusyId(null);
     if (error) {
-      toast.error(`İşlem başarısız: ${error.message}`);
+      toast.error(t("toasts.roleError", { message: error.message }));
       return;
     }
-    toast.success(
-      role === "ADMIN" ? "Üye yönetici yapıldı" : "Yöneticilik geri alındı",
-    );
+    toast.success(role === "ADMIN" ? t("toasts.promoted") : t("toasts.demoted"));
     router.refresh();
   }
 
   async function removeMember(member: RosterMember) {
-    if (!window.confirm(`${member.full_name ?? "Bu üye"} kulüpten çıkarılsın mı?`)) {
+    if (
+      !window.confirm(
+        t("removeConfirm", {
+          name: member.full_name ?? t("removeConfirmFallback"),
+        }),
+      )
+    ) {
       return;
     }
     setBusyId(member.user_id);
@@ -60,17 +66,17 @@ export function ManageMembers({
 
     setBusyId(null);
     if (error) {
-      toast.error(`Çıkarılamadı: ${error.message}`);
+      toast.error(t("toasts.removeError", { message: error.message }));
       return;
     }
-    toast.success("Üye çıkarıldı");
+    toast.success(t("toasts.removed"));
     router.refresh();
   }
 
   if (members.length === 0) {
     return (
       <p className="rounded-lg border border-dashed border-white/10 bg-white/[0.02] px-5 py-8 text-center text-sm text-zinc-500">
-        Bu kulübün henüz üyesi yok.
+        {t("empty")}
       </p>
     );
   }
@@ -90,26 +96,26 @@ export function ManageMembers({
                 <UserRound className="size-4" />
               </span>
               <span className="truncate text-sm font-medium text-zinc-200">
-                {m.full_name ?? "İsimsiz Üye"}
+                {m.full_name ?? t("unnamed")}
               </span>
               {isAdmin && (
                 <span className="rounded-full border border-[#841515]/30 bg-[#841515]/10 px-2 py-0.5 text-[10px] font-medium text-[#e7a3a3]">
-                  YÖNETİCİ
+                  {t("adminBadge")}
                 </span>
               )}
             </div>
             <div className="flex shrink-0 gap-1">
               {canAssignAdmin &&
                 (isAdmin ? (
-                  <Button onClick={() => setRole(m, "MEMBER")} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-white" aria-label="Başkanlığı geri al">
+                  <Button onClick={() => setRole(m, "MEMBER")} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-white" aria-label={t("demoteAria")}>
                     <ShieldMinus className="size-4" />
                   </Button>
                 ) : (
-                  <Button onClick={() => setRole(m, "ADMIN")} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-[#e7a3a3]" aria-label="Başkan yap">
+                  <Button onClick={() => setRole(m, "ADMIN")} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-[#e7a3a3]" aria-label={t("promoteAria")}>
                     <ShieldCheck className="size-4" />
                   </Button>
                 ))}
-              <Button onClick={() => removeMember(m)} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-red-500/10 hover:text-red-400" aria-label="Üyeyi çıkar">
+              <Button onClick={() => removeMember(m)} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-red-500/10 hover:text-red-400" aria-label={t("removeAria")}>
                 <UserX className="size-4" />
               </Button>
             </div>

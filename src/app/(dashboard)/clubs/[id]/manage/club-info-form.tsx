@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ImageIcon, Loader2, Save, Ticket, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -39,6 +40,7 @@ export type ClubInfo = {
 
 export function ClubInfoForm({ club }: { club: ClubInfo }) {
   const router = useRouter();
+  const t = useTranslations("manage.info");
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: club.name ?? "",
@@ -66,12 +68,12 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (form.name.trim().length === 0) {
-      toast.error("Kulüp adı boş olamaz.");
+      toast.error(t("toasts.nameRequired"));
       return;
     }
     // Bilet sistemi açıkken IBAN zorunlu (ödeme yapılacak hesap olmadan satış anlamsız).
     if (ticketEnabled && orNull(form.iban) === null) {
-      toast.error("Bilet sistemi açıkken IBAN zorunludur.");
+      toast.error(t("toasts.ibanRequired"));
       return;
     }
 
@@ -97,10 +99,10 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
 
     setLoading(false);
     if (error) {
-      toast.error(`Kaydedilemedi: ${error.message}`);
+      toast.error(t("toasts.saveError", { message: error.message }));
       return;
     }
-    toast.success("Kulüp bilgileri güncellendi");
+    toast.success(t("toasts.saveSuccess"));
     router.refresh();
   }
 
@@ -108,22 +110,22 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="name">Kulüp Adı</Label>
+          <Label htmlFor="name">{t("clubName")}</Label>
           <Input id="name" value={form.name} onChange={(e) => set("name", e.target.value)} disabled={loading} required />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="category">Kategori</Label>
-          <Input id="category" placeholder="Örn. Teknoloji" value={form.category} onChange={(e) => set("category", e.target.value)} disabled={loading} />
+          <Label htmlFor="category">{t("category")}</Label>
+          <Input id="category" placeholder={t("categoryPlaceholder")} value={form.category} onChange={(e) => set("category", e.target.value)} disabled={loading} />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Açıklama</Label>
+        <Label htmlFor="description">{t("description")}</Label>
         <Textarea id="description" rows={4} className="resize-none" value={form.description} onChange={(e) => set("description", e.target.value)} disabled={loading} />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="vision">Vizyon</Label>
+        <Label htmlFor="vision">{t("vision")}</Label>
         <Textarea id="vision" rows={3} className="resize-none" value={form.vision} onChange={(e) => set("vision", e.target.value)} disabled={loading} />
       </div>
 
@@ -132,7 +134,7 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
         <ImageUploadField
           clubId={club.id}
           kind="logo"
-          label="Logo"
+          label={t("logo")}
           value={form.logo_url}
           onChange={(url) => set("logo_url", url)}
           disabled={loading}
@@ -140,7 +142,7 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
         <ImageUploadField
           clubId={club.id}
           kind="cover"
-          label="Kapak Görseli"
+          label={t("cover")}
           value={form.cover_url}
           onChange={(url) => set("cover_url", url)}
           disabled={loading}
@@ -149,19 +151,19 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="contact_email">İletişim E-posta</Label>
+          <Label htmlFor="contact_email">{t("contactEmail")}</Label>
           <Input id="contact_email" type="email" value={form.contact_email} onChange={(e) => set("contact_email", e.target.value)} disabled={loading} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="contact_phone">İletişim Telefon</Label>
+          <Label htmlFor="contact_phone">{t("contactPhone")}</Label>
           <Input id="contact_phone" value={form.contact_phone} onChange={(e) => set("contact_phone", e.target.value)} disabled={loading} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="whatsapp_url">WhatsApp Linki</Label>
+          <Label htmlFor="whatsapp_url">{t("whatsapp")}</Label>
           <Input id="whatsapp_url" value={form.whatsapp_url} onChange={(e) => set("whatsapp_url", e.target.value)} disabled={loading} />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="instagram_url">Instagram Linki</Label>
+          <Label htmlFor="instagram_url">{t("instagram")}</Label>
           <Input id="instagram_url" value={form.instagram_url} onChange={(e) => set("instagram_url", e.target.value)} disabled={loading} />
         </div>
       </div>
@@ -172,18 +174,17 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
           <div>
             <p className="inline-flex items-center gap-2 text-sm font-medium text-white">
               <Ticket className="size-4 text-[#e7a3a3]" />
-              Bilet Sistemi
+              {t("ticketSystem")}
             </p>
             <p className="mt-1 text-xs text-zinc-400">
-              Açıldığında ücretli etkinliklerde IBAN'a dekont yüklemeli bilet
-              akışı devreye girer.
+              {t("ticketSystemDesc")}
             </p>
           </div>
           <button
             type="button"
             role="switch"
             aria-checked={ticketEnabled}
-            aria-label="Bilet sistemi aktif"
+            aria-label={t("ticketSystemAria")}
             disabled={loading}
             onClick={() => setTicketEnabled((v) => !v)}
             className={cn(
@@ -202,7 +203,7 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
 
         <div className="space-y-2">
           <Label htmlFor="iban">
-            IBAN {ticketEnabled && <span className="text-[#e7a3a3]">*</span>}
+            {t("iban")} {ticketEnabled && <span className="text-[#e7a3a3]">*</span>}
           </Label>
           <Input
             id="iban"
@@ -222,7 +223,7 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
         style={{ backgroundColor: "#841515" }}
       >
         {loading ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-        {loading ? "Kaydediliyor…" : "Bilgileri Kaydet"}
+        {loading ? t("saving") : t("save")}
       </Button>
     </form>
   );
@@ -245,6 +246,7 @@ function ImageUploadField({
   disabled: boolean;
 }) {
   const router = useRouter();
+  const t = useTranslations("manage.info");
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -266,7 +268,7 @@ function ImageUploadField({
     if (uploadError) {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
-      toast.error(`Görsel yüklenemedi: ${uploadError.message}`);
+      toast.error(t("toasts.imageUploadError", { message: uploadError.message }));
       return;
     }
 
@@ -285,7 +287,7 @@ function ImageUploadField({
     if (updateError) {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
-      toast.error(`Kaydedilemedi: ${updateError.message}`);
+      toast.error(t("toasts.imageSaveError", { message: updateError.message }));
       return;
     }
 
@@ -298,7 +300,7 @@ function ImageUploadField({
     onChange(publicUrl);
     setUploading(false);
     if (inputRef.current) inputRef.current.value = "";
-    toast.success(`${label} güncellendi`);
+    toast.success(t("toasts.imageUpdated", { label }));
     router.refresh();
   }
 
@@ -315,13 +317,13 @@ function ImageUploadField({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={value}
-            alt={`${label} önizleme`}
+            alt={label}
             className="size-full object-cover"
           />
         ) : (
           <span className="inline-flex flex-col items-center gap-1 text-zinc-600">
             <ImageIcon className="size-6" />
-            <span className="text-xs">Görsel yok</span>
+            <span className="text-xs">{t("imageNone")}</span>
           </span>
         )}
       </div>
@@ -347,7 +349,7 @@ function ImageUploadField({
         ) : (
           <Upload className="size-4" />
         )}
-        {value ? "Değiştir" : "Görsel Yükle"}
+        {value ? t("imageChange") : t("imageUpload")}
       </Button>
     </div>
   );

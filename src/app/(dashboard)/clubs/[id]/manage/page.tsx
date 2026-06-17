@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ArrowLeft, CalendarDays, QrCode, Settings, Ticket, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { buttonVariants } from "@/components/ui/button";
@@ -61,6 +62,7 @@ export default async function ClubManagePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const t = await getTranslations("manage.shell");
   const supabase = await createClient();
 
   const {
@@ -229,7 +231,7 @@ export default async function ClubManagePage({
           )}
         >
           <ArrowLeft className="size-4" />
-          Kulübe Dön
+          {t("back")}
         </Link>
 
         <header className="mt-6 mb-8 flex items-center gap-3">
@@ -241,15 +243,16 @@ export default async function ClubManagePage({
           </span>
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-white">
-              {club.name} · Yönetim
+              {t("title", { name: club.name })}
             </h1>
             <p className="text-sm text-zinc-400">
-              {isSuperAdmin
-                ? "Süper yönetici"
-                : isClubAdvisor
-                  ? "Danışman"
-                  : "Kulüp başkanı"}{" "}
-              erişimi
+              {t("access", {
+                role: isSuperAdmin
+                  ? t("roleSuper")
+                  : isClubAdvisor
+                    ? t("roleAdvisor")
+                    : t("rolePresident"),
+              })}
             </p>
           </div>
         </header>
@@ -259,10 +262,10 @@ export default async function ClubManagePage({
           <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
             <CardHeader>
               <CardTitle className="text-lg font-semibold text-white">
-                Kulüp Bilgileri
+                {t("infoTitle")}
               </CardTitle>
               <CardDescription>
-                Topluluğun genel bilgilerini ve iletişim kanallarını düzenleyin.
+                {t("infoDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -275,10 +278,10 @@ export default async function ClubManagePage({
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
                 <CalendarDays className="size-4 text-[#e7a3a3]" />
-                Etkinlikler
+                {t("eventsTitle")}
               </CardTitle>
               <CardDescription>
-                Kulübünüzün etkinliklerini oluşturun, düzenleyin veya silin.
+                {t("eventsDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -301,10 +304,10 @@ export default async function ClubManagePage({
                 <div>
                   <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
                     <Ticket className="size-4 text-[#e7a3a3]" />
-                    Biletler
+                    {t("ticketsTitle")}
                   </CardTitle>
                   <CardDescription>
-                    Dekontları inceleyip onaylayın veya reddedin.
+                    {t("ticketsDesc")}
                   </CardDescription>
                 </div>
                 <Link
@@ -315,7 +318,7 @@ export default async function ClubManagePage({
                   )}
                 >
                   <QrCode className="size-4" />
-                  Kapı Kontrol
+                  {t("checkin")}
                 </Link>
               </CardHeader>
               <CardContent>
@@ -329,10 +332,10 @@ export default async function ClubManagePage({
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
                 <Users className="size-4 text-[#e7a3a3]" />
-                Üyeler ({members.length})
+                {t("membersTitle", { count: members.length })}
               </CardTitle>
               <CardDescription>
-                Üyeleri yönetin; yönetici atayın veya kulüpten çıkarın.
+                {t("membersDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>

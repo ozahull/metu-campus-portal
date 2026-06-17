@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { ClubsExplorer } from "./clubs-explorer";
 import type { Club } from "@/components/shared/club-card";
@@ -6,6 +7,7 @@ import type { Club } from "@/components/shared/club-card";
 export const dynamic = "force-dynamic";
 
 export default async function ClubsPage() {
+  const t = await getTranslations("clubs");
   const supabase = await createClient();
 
   const {
@@ -37,11 +39,10 @@ export default async function ClubsPage() {
       <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <header className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Kampüs Toplulukları
+            {t("listTitle")}
           </h1>
           <p className="mt-2 text-base text-zinc-400">
-            İlginizi çeken kulüpleri arayın, keşfedin ve topluluğun bir parçası
-            olun.
+            {t("listSubtitle")}
           </p>
         </header>
 

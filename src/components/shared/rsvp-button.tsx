@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Check, CalendarCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -22,6 +23,7 @@ export function RSVPButton({
   className,
 }: RSVPButtonProps) {
   const router = useRouter();
+  const t = useTranslations("rsvp");
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
@@ -39,11 +41,11 @@ export function RSVPButton({
       setLoading(false);
 
       if (error) {
-        toast.error(`İşlem başarısız: ${error.message}`);
+        toast.error(t("cancelError", { message: error.message }));
         return;
       }
 
-      toast.success("Katılımınız geri alındı.");
+      toast.success(t("cancelSuccess"));
       router.refresh();
       return;
     }
@@ -56,11 +58,11 @@ export function RSVPButton({
     setLoading(false);
 
     if (error) {
-      toast.error(`Katılma başarısız: ${error.message}`);
+      toast.error(t("attendError", { message: error.message }));
       return;
     }
 
-    toast.success("Etkinliğe katılıyorsunuz!");
+    toast.success(t("attendSuccess"));
     router.refresh();
   }
 
@@ -81,7 +83,7 @@ export function RSVPButton({
         ) : (
           <Check className="size-4" />
         )}
-        {loading ? "İşleniyor…" : "Katılıyorsunuz"}
+        {loading ? t("processing") : t("attending")}
       </Button>
     );
   }
@@ -102,7 +104,7 @@ export function RSVPButton({
       ) : (
         <CalendarCheck className="size-4" />
       )}
-      {loading ? "İşleniyor…" : "Katılacağım"}
+      {loading ? t("processing") : t("attend")}
     </Button>
   );
 }

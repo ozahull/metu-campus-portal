@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Check, ExternalLink, Loader2, User, X } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -24,12 +25,13 @@ export type EventTicketGroup = {
 
 export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
   const router = useRouter();
+  const t = useTranslations("manage.tickets");
   const [busyId, setBusyId] = useState<string | null>(null);
 
   async function decide(ticketId: string, decision: "approve" | "reject") {
     let note: string | null = null;
     if (decision === "reject") {
-      note = window.prompt("Reddetme notu (opsiyonel):");
+      note = window.prompt(t("rejectPrompt"));
       if (note === null) return; // iptal
     }
 
@@ -42,10 +44,10 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
     });
     setBusyId(null);
     if (error) {
-      toast.error(`İşlem başarısız: ${error.message}`);
+      toast.error(t("toasts.decideError", { message: error.message }));
       return;
     }
-    toast.success(decision === "approve" ? "Bilet onaylandı" : "Bilet reddedildi");
+    toast.success(decision === "approve" ? t("toasts.approved") : t("toasts.rejected"));
     router.refresh();
   }
 
@@ -59,46 +61,46 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h4 className="font-semibold text-white">{g.title}</h4>
             <span className="text-xs text-zinc-400">
-              {g.approvedCount} onaylı
-              {g.capacity !== null && ` / ${g.capacity} kapasite`}
+              {t("approved", { count: g.approvedCount })}
+              {g.capacity !== null && t("capacity", { count: g.capacity })}
               {" · "}
-              {g.checkedInCount} giriş
+              {t("checkedIn", { count: g.checkedInCount })}
             </span>
           </div>
 
           {g.pending.length === 0 ? (
             <p className="mt-3 text-xs text-zinc-500">
-              Onay bekleyen dekont yok.
+              {t("noPending")}
             </p>
           ) : (
             <ul className="mt-3 space-y-2">
-              {g.pending.map((t) => {
-                const busy = busyId === t.id;
+              {g.pending.map((ticket) => {
+                const busy = busyId === ticket.id;
                 return (
                   <li
-                    key={t.id}
+                    key={ticket.id}
                     className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-white/5 bg-zinc-900/40 px-3 py-2.5"
                   >
                     <span className="inline-flex items-center gap-2 text-sm text-zinc-200">
                       <User className="size-4 text-zinc-500" />
-                      {t.full_name ?? "İsimsiz kullanıcı"}
+                      {ticket.full_name ?? t("unnamedUser")}
                     </span>
                     <div className="flex items-center gap-1.5">
-                      {t.receiptSignedUrl ? (
+                      {ticket.receiptSignedUrl ? (
                         <a
-                          href={t.receiptSignedUrl}
+                          href={ticket.receiptSignedUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2.5 py-1 text-xs text-zinc-300 hover:bg-white/5 hover:text-white"
                         >
                           <ExternalLink className="size-3.5" />
-                          Dekont
+                          {t("receipt")}
                         </a>
                       ) : (
-                        <span className="text-xs text-zinc-600">Dekont yok</span>
+                        <span className="text-xs text-zinc-600">{t("noReceipt")}</span>
                       )}
                       <Button
-                        onClick={() => decide(t.id, "approve")}
+                        onClick={() => decide(ticket.id, "approve")}
                         disabled={busy}
                         size="sm"
                         className="gap-1.5 bg-emerald-600 font-medium text-white hover:bg-emerald-600/90"
@@ -108,17 +110,17 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
                         ) : (
                           <Check className="size-4" />
                         )}
-                        Onayla
+                        {t("approve")}
                       </Button>
                       <Button
-                        onClick={() => decide(t.id, "reject")}
+                        onClick={() => decide(ticket.id, "reject")}
                         disabled={busy}
                         size="sm"
                         variant="outline"
                         className="gap-1.5 border-red-500/40 bg-transparent text-red-300 hover:bg-red-500/10"
                       >
                         <X className="size-4" />
-                        Reddet
+                        {t("reject")}
                       </Button>
                     </div>
                   </li>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Loader2, LogOut, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -15,6 +16,7 @@ type JoinButtonProps = {
 
 export function JoinButton({ clubId, userId, isMember }: JoinButtonProps) {
   const router = useRouter();
+  const t = useTranslations("membership");
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
@@ -32,11 +34,11 @@ export function JoinButton({ clubId, userId, isMember }: JoinButtonProps) {
       setLoading(false);
 
       if (error) {
-        toast.error(`Ayrılma başarısız: ${error.message}`);
+        toast.error(t("leaveError", { message: error.message }));
         return;
       }
 
-      toast.info("Kulüpten ayrıldınız.");
+      toast.info(t("leaveInfo"));
       router.refresh();
       return;
     }
@@ -49,11 +51,11 @@ export function JoinButton({ clubId, userId, isMember }: JoinButtonProps) {
     setLoading(false);
 
     if (error) {
-      toast.error(`Katılma başarısız: ${error.message}`);
+      toast.error(t("joinError", { message: error.message }));
       return;
     }
 
-    toast.success("Kulübe katıldınız!");
+    toast.success(t("joinSuccess"));
     router.refresh();
   }
 
@@ -71,7 +73,7 @@ export function JoinButton({ clubId, userId, isMember }: JoinButtonProps) {
         ) : (
           <LogOut className="size-4" />
         )}
-        {loading ? "İşleniyor…" : "Kulüpten Ayrıl"}
+        {loading ? t("processing") : t("leave")}
       </Button>
     );
   }
@@ -89,7 +91,7 @@ export function JoinButton({ clubId, userId, isMember }: JoinButtonProps) {
       ) : (
         <UserPlus className="size-4" />
       )}
-      {loading ? "İşleniyor…" : "Kulübe Katıl"}
+      {loading ? t("processing") : t("join")}
     </Button>
   );
 }

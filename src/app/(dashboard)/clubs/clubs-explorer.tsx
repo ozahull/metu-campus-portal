@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Search, SearchX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ClubCard, type Club } from "@/components/shared/club-card";
 
 export function ClubsExplorer({ clubs }: { clubs: Club[] }) {
+  const t = useTranslations("clubs");
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
@@ -25,7 +27,7 @@ export function ClubsExplorer({ clubs }: { clubs: Club[] }) {
         <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" />
         <Input
           type="search"
-          placeholder="Kulüp adı veya açıklamasında ara…"
+          placeholder={t("searchPlaceholder")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="h-11 border-white/10 bg-zinc-900/60 pl-10 text-base text-white placeholder:text-zinc-500"
@@ -44,10 +46,10 @@ export function ClubsExplorer({ clubs }: { clubs: Club[] }) {
             <SearchX className="size-6" />
           </div>
           <p className="mt-4 text-sm font-medium text-zinc-300">
-            Aradığınız kriterlere uygun kulüp bulunamadı
+            {t("emptyTitle")}
           </p>
           <p className="mt-1 text-sm text-zinc-500">
-            Farklı bir anahtar kelimeyle tekrar deneyin.
+            {t("emptyBody")}
           </p>
         </div>
       )}

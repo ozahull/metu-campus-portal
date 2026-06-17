@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ExternalLink, FileText, Loader2, Paperclip, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -36,6 +37,7 @@ export function EventDocuments({
   emphasize?: boolean;
 }) {
   const router = useRouter();
+  const t = useTranslations("manage.documents");
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,7 +60,7 @@ export function EventDocuments({
     if (uploadError) {
       setLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      toast.error(`Belge yüklenemedi: ${uploadError.message}`);
+      toast.error(t("toasts.uploadError", { message: uploadError.message }));
       return;
     }
 
@@ -74,16 +76,16 @@ export function EventDocuments({
     setLoading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (insertError) {
-      toast.error(`Belge kaydedilemedi: ${insertError.message}`);
+      toast.error(t("toasts.saveError", { message: insertError.message }));
       return;
     }
     setNote("");
-    toast.success("Belge yüklendi.");
+    toast.success(t("toasts.uploaded"));
     router.refresh();
   }
 
   async function handleDelete(doc: EventDocument) {
-    if (!window.confirm(`"${doc.file_name}" belgesini silmek istiyor musunuz?`)) {
+    if (!window.confirm(t("toasts.deleteConfirm", { name: doc.file_name }))) {
       return;
     }
     setLoading(true);
@@ -94,10 +96,10 @@ export function EventDocuments({
       .eq("id", doc.id);
     setLoading(false);
     if (error) {
-      toast.error(`Silinemedi: ${error.message}`);
+      toast.error(t("toasts.deleteError", { message: error.message }));
       return;
     }
-    toast.success("Belge silindi.");
+    toast.success(t("toasts.deleted"));
     router.refresh();
   }
 
@@ -115,9 +117,9 @@ export function EventDocuments({
     >
       <p className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-300">
         <Paperclip className="size-3.5 text-[#e7a3a3]" />
-        Belgeler
+        {t("title")}
         {emphasize && (
-          <span className="text-[#e7a3a3]">— revizyon için belge ekleyin</span>
+          <span className="text-[#e7a3a3]">{t("emphasizeNote")}</span>
         )}
       </p>
 
@@ -146,10 +148,10 @@ export function EventDocuments({
                     className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2.5 py-1 text-xs text-zinc-300 hover:bg-white/5 hover:text-white"
                   >
                     <ExternalLink className="size-3.5" />
-                    Aç
+                    {t("open")}
                   </a>
                 ) : (
-                  <span className="text-xs text-zinc-600">Bağlantı yok</span>
+                  <span className="text-xs text-zinc-600">{t("noLink")}</span>
                 )}
                 {doc.canDelete && (
                   <Button
@@ -158,7 +160,7 @@ export function EventDocuments({
                     size="icon-sm"
                     variant="ghost"
                     className="text-zinc-400 hover:bg-red-500/10 hover:text-red-400"
-                    aria-label="Belgeyi sil"
+                    aria-label={t("deleteAria")}
                   >
                     <Trash2 className="size-4" />
                   </Button>
@@ -175,7 +177,7 @@ export function EventDocuments({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             disabled={loading}
-            placeholder="Açıklama (opsiyonel)"
+            placeholder={t("notePlaceholder")}
             className="h-9 text-sm"
           />
           <input
@@ -198,9 +200,9 @@ export function EventDocuments({
             ) : (
               <Upload className="size-4" />
             )}
-            Belge Yükle
+            {t("upload")}
           </Button>
-          <p className="text-xs text-zinc-500">Görsel (JPG/PNG) veya PDF.</p>
+          <p className="text-xs text-zinc-500">{t("hint")}</p>
         </div>
       )}
     </div>

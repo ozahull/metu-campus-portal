@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ArrowRight, Users } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -21,6 +22,7 @@ export type Club = {
  * Hem dashboard ızgarasında hem de keşif sayfasında kullanılır.
  */
 export function ClubCard({ club }: { club: Club }) {
+  const t = useTranslations("clubs");
   return (
     <Card className="group flex flex-col border-white/5 bg-zinc-900/50 transition-all duration-300 hover:-translate-y-1 hover:border-[#841515]/50 hover:shadow-[0_8px_30px_-8px_rgba(132,21,21,0.45)]">
       <CardHeader>
@@ -39,7 +41,7 @@ export function ClubCard({ club }: { club: Club }) {
           {club.description
             ? club.description.slice(0, 100) +
               (club.description.length > 100 ? "…" : "")
-            : "Bu kulüp için henüz bir açıklama eklenmemiş."}
+            : t("noDescription")}
         </p>
       </CardContent>
 
@@ -51,7 +53,7 @@ export function ClubCard({ club }: { club: Club }) {
             "w-full justify-between border-white/10 bg-transparent text-zinc-200 transition-colors hover:border-[#841515] hover:bg-[#841515] hover:text-white",
           )}
         >
-          Kulübü İncele
+          {t("cardExplore")}
           <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
         </Link>
       </CardFooter>

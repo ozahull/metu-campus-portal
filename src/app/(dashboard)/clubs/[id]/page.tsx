@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   ArrowLeft,
   CalendarDays,
@@ -60,17 +61,18 @@ type ClubEvent = {
   event_attendees: { user_id: string }[] | null;
 };
 
-const dateFormatter = new Intl.DateTimeFormat("tr-TR", {
-  dateStyle: "long",
-  timeStyle: "short",
-});
-
 export default async function ClubDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const t = await getTranslations("clubs");
+  const locale = await getLocale();
+  const dateFormatter = new Intl.DateTimeFormat(locale, {
+    dateStyle: "long",
+    timeStyle: "short",
+  });
   const supabase = await createClient();
 
   const {
@@ -167,7 +169,7 @@ export default async function ClubDetailPage({
           )}
         >
           <ArrowLeft className="size-4" />
-          Geri Dön
+          {t("back")}
         </Link>
 
         {!club ? (
@@ -177,10 +179,10 @@ export default async function ClubDetailPage({
               <SearchX className="size-7" />
             </div>
             <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">
-              Kulüp bulunamadı
+              {t("notFoundTitle")}
             </h1>
             <p className="mt-2 max-w-sm text-sm text-zinc-400">
-              Aradığınız kulüp mevcut değil veya kaldırılmış olabilir.
+              {t("notFoundBody")}
             </p>
             <Link
               href="/dashboard"
@@ -191,7 +193,7 @@ export default async function ClubDetailPage({
               style={{ backgroundColor: "#841515" }}
             >
               <ArrowLeft className="size-4" />
-              Dashboard&apos;a Dön
+              {t("backToDashboard")}
             </Link>
           </div>
         ) : (
@@ -201,7 +203,7 @@ export default async function ClubDetailPage({
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={club.cover_url}
-                alt={`${club.name} kapak görseli`}
+                alt={t("coverAlt", { name: club.name })}
                 className="mt-6 h-44 w-full rounded-2xl border border-white/10 object-cover sm:h-56"
               />
             )}
@@ -213,14 +215,14 @@ export default async function ClubDetailPage({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={club.logo_url}
-                    alt={`${club.name} logosu`}
+                    alt={t("logoAlt", { name: club.name })}
                     className="size-16 shrink-0 rounded-2xl border border-white/10 object-cover"
                   />
                 )}
                 <div>
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-[#841515]/30 bg-[#841515]/10 px-3 py-1 text-xs font-medium text-[#e7a3a3]">
                     <Users className="size-3.5" />
-                    {club.category ?? "Kampüs Topluluğu"}
+                    {club.category ?? t("defaultCategory")}
                   </span>
                   <h1
                     className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl"
@@ -242,7 +244,7 @@ export default async function ClubDetailPage({
                     )}
                   >
                     <Settings className="size-4" />
-                    Yönet
+                    {t("manage")}
                   </Link>
                 )}
                 <JoinButton clubId={club.id} userId={user.id} isMember={isMember} />
@@ -253,14 +255,14 @@ export default async function ClubDetailPage({
             <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-white">
-                  Hakkında
+                  {t("about")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-base leading-relaxed text-zinc-300 whitespace-pre-line">
                   {club.description?.trim()
                     ? club.description
-                    : "Bu kulüp için henüz bir açıklama eklenmemiş."}
+                    : t("noDescription")}
                 </p>
               </CardContent>
             </Card>
@@ -271,7 +273,7 @@ export default async function ClubDetailPage({
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
                     <Target className="size-4 text-[#e7a3a3]" />
-                    Vizyonumuz
+                    {t("vision")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -303,13 +305,13 @@ export default async function ClubDetailPage({
                 {club.whatsapp_url && (
                   <a href={club.whatsapp_url} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/50 px-3 text-sm text-zinc-200 transition-colors hover:border-[#841515] hover:text-white">
                     <MessageCircle className="size-4 text-[#e7a3a3]" />
-                    WhatsApp
+                    {t("whatsapp")}
                   </a>
                 )}
                 {club.instagram_url && (
                   <a href={club.instagram_url} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/50 px-3 text-sm text-zinc-200 transition-colors hover:border-[#841515] hover:text-white">
                     <AtSign className="size-4 text-[#e7a3a3]" />
-                    Instagram
+                    {t("instagram")}
                   </a>
                 )}
               </div>
@@ -321,7 +323,7 @@ export default async function ClubDetailPage({
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base font-semibold text-white">
                     <CalendarDays className="size-4 text-[#e7a3a3]" />
-                    Yaklaşan Etkinlikler
+                    {t("upcomingEvents")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -360,7 +362,7 @@ export default async function ClubDetailPage({
                             <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/5 pt-3">
                               <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-300">
                                 <Flame className="size-3.5 text-orange-400" />
-                                {attendees.length} Kişi Katılıyor
+                                {t("attendeeCount", { count: attendees.length })}
                               </span>
                               <RSVPButton
                                 eventId={ev.id}
@@ -378,7 +380,7 @@ export default async function ClubDetailPage({
                         <Inbox className="size-5" />
                       </div>
                       <p className="mt-3 text-sm text-zinc-500">
-                        Henüz etkinlik bulunmuyor
+                        {t("noEvents")}
                       </p>
                     </div>
                   )}
@@ -389,7 +391,7 @@ export default async function ClubDetailPage({
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base font-semibold text-white">
                     <Users className="size-4 text-[#e7a3a3]" />
-                    Yönetim &amp; Üyeler
+                    {t("membersTitle")}
                     <span className="ml-auto rounded-full bg-white/5 px-2 py-0.5 text-xs font-medium text-zinc-400">
                       {members.length}
                     </span>
@@ -407,7 +409,7 @@ export default async function ClubDetailPage({
                             <UserRound className="size-4" />
                           </span>
                           <span className="text-sm font-medium text-zinc-200">
-                            {m.full_name ?? "İsimsiz Üye"}
+                            {m.full_name ?? t("unnamedMember")}
                           </span>
                         </li>
                       ))}
@@ -418,7 +420,7 @@ export default async function ClubDetailPage({
                         <Inbox className="size-5" />
                       </div>
                       <p className="mt-3 text-sm text-zinc-500">
-                        Bu kulübe ilk katılan siz olun!
+                        {t("noMembers")}
                       </p>
                     </div>
                   )}

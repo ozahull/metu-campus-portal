@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, CalendarClock, Flame, MapPin, Users } from "lucide-react";
+import { ArrowLeft, CalendarClock, Flame, MapPin, Ticket, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ import {
 import { RSVPButton } from "@/components/shared/rsvp-button";
 import { AddToCalendar } from "./add-to-calendar";
 import { TicketFlow, type MyTicket } from "./ticket-flow";
+import { formatPrice } from "@/lib/ticket-status";
 
 export const dynamic = "force-dynamic";
 
@@ -76,8 +77,14 @@ export default async function EventDetailPage({
   const attendees = data.event_attendees ?? [];
   const isAttending = attendees.some((a) => a.user_id === user.id);
 
-  // Biletleme açık mı? (kulüp etkinleştirmiş + etkinliğin ücreti tanımlı)
-  const ticketingOn = Boolean(club?.ticket_enabled) && data.ticket_price !== null;
+  // Ücret rozeti için: fiyat tanımlı ve > 0 ise ücretli.
+  const priceNum = data.ticket_price !== null ? Number(data.ticket_price) : null;
+  const isPaid = priceNum !== null && priceNum > 0;
+
+  // Bilet akışı yalnızca kulüp bilet sistemini açtıysa VE etkinlik ücretliyse
+  // (ticket_price tanımlı ve > 0) gösterilir. Ücretsiz etkinlikte klasik RSVP
+  // korunur — aksi halde ücretsizde gereksiz dekont akışı tetikleniyor.
+  const ticketingOn = Boolean(club?.ticket_enabled) && isPaid;
 
   // Kullanıcının bu etkinlik için biletini çek (varsa).
   let myTicket: MyTicket | null = null;
@@ -126,6 +133,21 @@ export default async function EventDetailPage({
           >
             {data.title}
           </h1>
+
+          {/* Ücret rozeti — açıklamadan ayrı, belirgin */}
+          <div className="mt-4">
+            {isPaid ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#841515]/50 bg-[#841515]/15 px-3.5 py-1.5 text-sm font-semibold text-white">
+                <Ticket className="size-4 text-[#e7a3a3]" />
+                Ücret: {formatPrice(priceNum)}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm font-medium text-zinc-300">
+                <Ticket className="size-4 text-zinc-500" />
+                Ücretsiz
+              </span>
+            )}
+          </div>
         </header>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

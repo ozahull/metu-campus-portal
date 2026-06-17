@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 import { statusMeta } from "@/lib/event-status";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,6 +80,7 @@ export function ManageEvents({
   const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [location, setLocation] = useState("");
+  const [isPaid, setIsPaid] = useState(false);
   const [ticketPrice, setTicketPrice] = useState("");
   const [ticketCapacity, setTicketCapacity] = useState("");
   const [ticketDeadline, setTicketDeadline] = useState("");
@@ -89,6 +91,7 @@ export function ManageEvents({
     setDescription("");
     setEventDate("");
     setLocation("");
+    setIsPaid(false);
     setTicketPrice("");
     setTicketCapacity("");
     setTicketDeadline("");
@@ -101,6 +104,7 @@ export function ManageEvents({
     setDescription(ev.description ?? "");
     setEventDate(toLocalInput(ev.event_date));
     setLocation(ev.location ?? "");
+    setIsPaid(ev.ticket_price !== null && Number(ev.ticket_price) > 0);
     setTicketPrice(ev.ticket_price !== null ? String(ev.ticket_price) : "");
     setTicketCapacity(
       ev.ticket_capacity !== null ? String(ev.ticket_capacity) : "",
@@ -127,29 +131,36 @@ export function ManageEvents({
       ticket_deadline: string | null;
     } | null = null;
     if (ticketEnabled) {
-      let price: number | null = null;
-      if (ticketPrice.trim() !== "") {
-        price = Number(ticketPrice);
-        if (!Number.isFinite(price) || price < 0) {
-          toast.error("Geçerli bir bilet ücreti girin.");
+      if (!isPaid) {
+        // Ücretsiz: tüm bilet alanları temizlenir.
+        ticketFields = {
+          ticket_price: null,
+          ticket_capacity: null,
+          ticket_deadline: null,
+        };
+      } else {
+        // Ücretli: fiyat zorunlu ve > 0.
+        const price = Number(ticketPrice);
+        if (ticketPrice.trim() === "" || !Number.isFinite(price) || price <= 0) {
+          toast.error("Ücretli etkinlik için 0'dan büyük bir fiyat girin.");
           return;
         }
-      }
-      let capacity: number | null = null;
-      if (ticketCapacity.trim() !== "") {
-        capacity = Number.parseInt(ticketCapacity, 10);
-        if (!Number.isInteger(capacity) || capacity <= 0) {
-          toast.error("Kapasite pozitif bir tam sayı olmalı.");
-          return;
+        let capacity: number | null = null;
+        if (ticketCapacity.trim() !== "") {
+          capacity = Number.parseInt(ticketCapacity, 10);
+          if (!Number.isInteger(capacity) || capacity <= 0) {
+            toast.error("Kapasite pozitif bir tam sayı olmalı.");
+            return;
+          }
         }
+        ticketFields = {
+          ticket_price: price,
+          ticket_capacity: capacity,
+          ticket_deadline: ticketDeadline
+            ? new Date(ticketDeadline).toISOString()
+            : null,
+        };
       }
-      ticketFields = {
-        ticket_price: price,
-        ticket_capacity: capacity,
-        ticket_deadline: ticketDeadline
-          ? new Date(ticketDeadline).toISOString()
-          : null,
-      };
     }
 
     setLoading(true);
@@ -403,20 +414,58 @@ export function ManageEvents({
                   <Ticket className="size-4 text-[#e7a3a3]" />
                   Bilet Ayarları
                 </p>
-                <div className="space-y-2">
-                  <Label htmlFor="ev-price">Bilet Ücreti (₺)</Label>
-                  <Input id="ev-price" type="number" min="0" step="0.01" inputMode="decimal" placeholder="Boş = ücretsiz" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} disabled={loading} />
-                  <p className="text-xs text-zinc-500">Boş bırakılırsa etkinlik ücretsizdir (bilet akışı gösterilmez).</p>
+
+                {/* Ücretsiz / Ücretli seçimi (varsayılan: Ücretsiz) */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsPaid(false)}
+                    disabled={loading}
+                    aria-pressed={!isPaid}
+                    className={cn(
+                      "rounded-lg border px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50",
+                      !isPaid
+                        ? "border-[#841515]/60 bg-[#841515]/15 text-white"
+                        : "border-white/10 bg-transparent text-zinc-400 hover:bg-white/5",
+                    )}
+                  >
+                    Ücretsiz
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsPaid(true)}
+                    disabled={loading}
+                    aria-pressed={isPaid}
+                    className={cn(
+                      "rounded-lg border px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50",
+                      isPaid
+                        ? "border-[#841515]/60 bg-[#841515]/15 text-white"
+                        : "border-white/10 bg-transparent text-zinc-400 hover:bg-white/5",
+                    )}
+                  >
+                    Ücretli
+                  </button>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ev-capacity">Kapasite</Label>
-                  <Input id="ev-capacity" type="number" min="1" step="1" inputMode="numeric" placeholder="Boş = sınırsız" value={ticketCapacity} onChange={(e) => setTicketCapacity(e.target.value)} disabled={loading} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ev-deadline">Bilet Son Tarihi</Label>
-                  <Input id="ev-deadline" type="datetime-local" className="[color-scheme:dark]" value={ticketDeadline} onChange={(e) => setTicketDeadline(e.target.value)} disabled={loading} />
-                  <p className="text-xs text-zinc-500">Boş bırakılırsa etkinlik saatine kadar satış açıktır.</p>
-                </div>
+
+                {isPaid && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="ev-price">
+                        Bilet Ücreti (₺) <span className="text-[#e7a3a3]">*</span>
+                      </Label>
+                      <Input id="ev-price" type="number" min="0" step="0.01" inputMode="decimal" placeholder="Örn. 150" value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} disabled={loading} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="ev-capacity">Kapasite</Label>
+                      <Input id="ev-capacity" type="number" min="1" step="1" inputMode="numeric" placeholder="Boş = sınırsız" value={ticketCapacity} onChange={(e) => setTicketCapacity(e.target.value)} disabled={loading} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="ev-deadline">Bilet Son Tarihi</Label>
+                      <Input id="ev-deadline" type="datetime-local" className="[color-scheme:dark]" value={ticketDeadline} onChange={(e) => setTicketDeadline(e.target.value)} disabled={loading} />
+                      <p className="text-xs text-zinc-500">Boş bırakılırsa etkinlik saatine kadar satış açıktır.</p>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 

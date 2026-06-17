@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { CalendarDays, ShieldCheck, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { UserMenu } from "@/components/user-menu";
@@ -15,6 +16,7 @@ function getInitials(name: string, email: string): string {
 }
 
 export async function Navbar() {
+  const t = await getTranslations("nav");
   const supabase = await createClient();
 
   const {
@@ -59,7 +61,7 @@ export async function Navbar() {
             >
               KKK
             </span>
-            <span className="hidden sm:inline">ODTÜ Kampüs Portalı</span>
+            <span className="hidden sm:inline">{t("brand")}</span>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
@@ -68,14 +70,14 @@ export async function Navbar() {
               className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:text-zinc-200"
             >
               <Users className="size-4" />
-              Topluluklar
+              {t("communities")}
             </Link>
             <Link
               href="/events"
               className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:text-zinc-200"
             >
               <CalendarDays className="size-4" />
-              Etkinlikler
+              {t("events")}
             </Link>
           </nav>
         </div>
@@ -88,7 +90,7 @@ export async function Navbar() {
               className="hidden items-center gap-1.5 rounded-lg border border-[#841515] bg-[#841515]/10 px-3 py-1.5 text-sm font-medium text-[#e7a3a3] transition-colors hover:bg-[#841515] hover:text-white sm:flex"
             >
               <ShieldCheck className="size-4" />
-              Yönetim Paneli
+              {t("adminPanel")}
             </Link>
           )}
 

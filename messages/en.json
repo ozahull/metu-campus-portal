@@ -1,0 +1,52 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "upload": "Upload",
+    "back": "Back",
+    "loading": "Loading…"
+  },
+  "nav": {
+    "brand": "METU Campus Portal",
+    "communities": "Communities",
+    "events": "Events",
+    "adminPanel": "Admin Panel"
+  },
+  "userMenu": {
+    "profile": "My Profile",
+    "signOut": "Sign Out",
+    "signingOut": "Signing out…",
+    "language": "Language"
+  },
+  "profile": {
+    "title": "My Profile",
+    "nameCard": {
+      "title": "Full Name",
+      "description": "Update your display name.",
+      "label": "Full Name"
+    },
+    "passwordCard": {
+      "title": "Change Password",
+      "description": "Set a new password (at least 6 characters).",
+      "label": "New Password",
+      "submit": "Update Password",
+      "show": "Show password",
+      "hide": "Hide password"
+    },
+    "myClubs": "My Clubs ({count})",
+    "noClubs": "You are not a member of any club yet.",
+    "presidentBadge": "PRESIDENT",
+    "myEvents": "My Upcoming Events ({count})",
+    "noEvents": "You have no upcoming attendance.",
+    "toasts": {
+      "nameTooShort": "Please enter your full name.",
+      "nameUpdated": "Name updated",
+      "nameError": "Could not update: {message}",
+      "passwordShort": "Password must be at least 6 characters.",
+      "passwordUpdated": "Password updated",
+      "passwordError": "Could not update password: {message}"
+    }
+  }
+}

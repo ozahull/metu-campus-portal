@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowRight, CalendarClock, Inbox, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -24,12 +25,13 @@ type RsvpRow = {
     | null;
 };
 
-const dateFormatter = new Intl.DateTimeFormat("tr-TR", {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
-
 export default async function ProfilePage() {
+  const t = await getTranslations("profile");
+  const locale = await getLocale();
+  const dateFormatter = new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
   const supabase = await createClient();
 
   const {
@@ -86,7 +88,7 @@ export default async function ProfilePage() {
 
       <div className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-white">Profilim</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-white">{t("title")}</h1>
           <p className="mt-1 text-sm text-zinc-400">{displayName}</p>
         </header>
 
@@ -98,12 +100,12 @@ export default async function ProfilePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
                 <Users className="size-4 text-[#e7a3a3]" />
-                Kulüplerim ({memberships.length})
+                {t("myClubs", { count: memberships.length })}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {memberships.length === 0 ? (
-                <p className="text-sm text-zinc-500">Henüz bir kulübe üye değilsiniz.</p>
+                <p className="text-sm text-zinc-500">{t("noClubs")}</p>
               ) : (
                 <ul className="space-y-2">
                   {memberships.map((m) => (
@@ -112,7 +114,7 @@ export default async function ProfilePage() {
                         <span className="truncate text-sm font-medium text-zinc-200">{m.name}</span>
                         <span className="flex items-center gap-2">
                           {m.role.toUpperCase() === "ADMIN" && (
-                            <span className="rounded-full border border-[#841515]/30 bg-[#841515]/10 px-2 py-0.5 text-[10px] font-medium text-[#e7a3a3]">BAŞKAN</span>
+                            <span className="rounded-full border border-[#841515]/30 bg-[#841515]/10 px-2 py-0.5 text-[10px] font-medium text-[#e7a3a3]">{t("presidentBadge")}</span>
                           )}
                           <ArrowRight className="size-4 text-zinc-500" />
                         </span>
@@ -129,7 +131,7 @@ export default async function ProfilePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
                 <CalendarClock className="size-4 text-[#e7a3a3]" />
-                Katılacağım Etkinlikler ({rsvps.length})
+                {t("myEvents", { count: rsvps.length })}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -138,7 +140,7 @@ export default async function ProfilePage() {
                   <div className="flex size-10 items-center justify-center rounded-xl bg-white/5 text-zinc-400">
                     <Inbox className="size-5" />
                   </div>
-                  <p className="mt-3 text-sm text-zinc-500">Yaklaşan katılımınız yok.</p>
+                  <p className="mt-3 text-sm text-zinc-500">{t("noEvents")}</p>
                 </div>
               ) : (
                 <ul className="space-y-2">

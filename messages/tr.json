@@ -1,0 +1,52 @@
+{
+  "common": {
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "upload": "Yükle",
+    "back": "Geri",
+    "loading": "Yükleniyor…"
+  },
+  "nav": {
+    "brand": "ODTÜ Kampüs Portalı",
+    "communities": "Topluluklar",
+    "events": "Etkinlikler",
+    "adminPanel": "Yönetim Paneli"
+  },
+  "userMenu": {
+    "profile": "Profilim",
+    "signOut": "Çıkış Yap",
+    "signingOut": "Çıkış yapılıyor…",
+    "language": "Dil"
+  },
+  "profile": {
+    "title": "Profilim",
+    "nameCard": {
+      "title": "Ad Soyad",
+      "description": "Görünen adınızı güncelleyin.",
+      "label": "Ad Soyad"
+    },
+    "passwordCard": {
+      "title": "Şifre Değiştir",
+      "description": "Yeni bir şifre belirleyin (en az 6 karakter).",
+      "label": "Yeni Şifre",
+      "submit": "Şifreyi Güncelle",
+      "show": "Şifreyi göster",
+      "hide": "Şifreyi gizle"
+    },
+    "myClubs": "Kulüplerim ({count})",
+    "noClubs": "Henüz bir kulübe üye değilsiniz.",
+    "presidentBadge": "BAŞKAN",
+    "myEvents": "Katılacağım Etkinlikler ({count})",
+    "noEvents": "Yaklaşan katılımınız yok.",
+    "toasts": {
+      "nameTooShort": "Lütfen ad ve soyadınızı eksiksiz girin.",
+      "nameUpdated": "İsim güncellendi",
+      "nameError": "Güncellenemedi: {message}",
+      "passwordShort": "Şifre en az 6 karakter olmalıdır.",
+      "passwordUpdated": "Şifre güncellendi",
+      "passwordError": "Şifre güncellenemedi: {message}"
+    }
+  }
+}

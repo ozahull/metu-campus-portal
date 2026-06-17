@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Eye, EyeOff, KeyRound, Loader2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -24,6 +25,8 @@ export function ProfileForm({
   initialName: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("profile");
+  const tCommon = useTranslations("common");
 
   const [name, setName] = useState(initialName);
   const [nameBusy, setNameBusy] = useState(false);
@@ -35,7 +38,7 @@ export function ProfileForm({
   async function saveName(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (name.trim().length < 3) {
-      toast.error("Lütfen ad ve soyadınızı eksiksiz girin.");
+      toast.error(t("toasts.nameTooShort"));
       return;
     }
     setNameBusy(true);
@@ -46,17 +49,17 @@ export function ProfileForm({
       .eq("id", userId);
     setNameBusy(false);
     if (error) {
-      toast.error(`Güncellenemedi: ${error.message}`);
+      toast.error(t("toasts.nameError", { message: error.message }));
       return;
     }
-    toast.success("İsim güncellendi");
+    toast.success(t("toasts.nameUpdated"));
     router.refresh();
   }
 
   async function savePassword(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (password.length < 6) {
-      toast.error("Şifre en az 6 karakter olmalıdır.");
+      toast.error(t("toasts.passwordShort"));
       return;
     }
     setPwBusy(true);
@@ -64,11 +67,11 @@ export function ProfileForm({
     const { error } = await supabase.auth.updateUser({ password });
     setPwBusy(false);
     if (error) {
-      toast.error(`Şifre güncellenemedi: ${error.message}`);
+      toast.error(t("toasts.passwordError", { message: error.message }));
       return;
     }
     setPassword("");
-    toast.success("Şifre güncellendi");
+    toast.success(t("toasts.passwordUpdated"));
   }
 
   return (
@@ -77,19 +80,19 @@ export function ProfileForm({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
             <UserRound className="size-4 text-[#e7a3a3]" />
-            Ad Soyad
+            {t("nameCard.title")}
           </CardTitle>
-          <CardDescription>Görünen adınızı güncelleyin.</CardDescription>
+          <CardDescription>{t("nameCard.description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={saveName} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="full-name">Ad Soyad</Label>
+              <Label htmlFor="full-name">{t("nameCard.label")}</Label>
               <Input id="full-name" value={name} onChange={(e) => setName(e.target.value)} disabled={nameBusy} required />
             </div>
             <Button type="submit" disabled={nameBusy} className="gap-2 font-medium text-white hover:opacity-90" style={{ backgroundColor: "#841515" }}>
               {nameBusy && <Loader2 className="size-4 animate-spin" />}
-              Kaydet
+              {tCommon("save")}
             </Button>
           </form>
         </CardContent>
@@ -99,14 +102,14 @@ export function ProfileForm({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
             <KeyRound className="size-4 text-[#e7a3a3]" />
-            Şifre Değiştir
+            {t("passwordCard.title")}
           </CardTitle>
-          <CardDescription>Yeni bir şifre belirleyin (en az 6 karakter).</CardDescription>
+          <CardDescription>{t("passwordCard.description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={savePassword} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="new-password">Yeni Şifre</Label>
+              <Label htmlFor="new-password">{t("passwordCard.label")}</Label>
               <div className="relative">
                 <Input
                   id="new-password"
@@ -123,7 +126,7 @@ export function ProfileForm({
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground transition-colors hover:text-foreground"
-                  aria-label={showPassword ? "Şifreyi gizle" : "Şifreyi göster"}
+                  aria-label={showPassword ? t("passwordCard.hide") : t("passwordCard.show")}
                 >
                   {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
@@ -131,7 +134,7 @@ export function ProfileForm({
             </div>
             <Button type="submit" disabled={pwBusy} className="gap-2 font-medium text-white hover:opacity-90" style={{ backgroundColor: "#841515" }}>
               {pwBusy && <Loader2 className="size-4 animate-spin" />}
-              Şifreyi Güncelle
+              {t("passwordCard.submit")}
             </Button>
           </form>
         </CardContent>

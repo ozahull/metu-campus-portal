@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Save, Ticket } from "lucide-react";
+import { ImageIcon, Loader2, Save, Ticket, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+
+const IMAGE_BUCKET = "club-images";
+
+// Public URL içinden bucket sonrası dosya yolunu çıkarır (eski dosyayı silmek için).
+function storagePath(url: string | null): string | null {
+  if (!url) return null;
+  const marker = `/${IMAGE_BUCKET}/`;
+  const idx = url.indexOf(marker);
+  return idx === -1 ? null : url.slice(idx + marker.length);
+}
 
 export type ClubInfo = {
   id: string;
@@ -117,15 +127,27 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
         <Textarea id="vision" rows={3} className="resize-none" value={form.vision} onChange={(e) => set("vision", e.target.value)} disabled={loading} />
       </div>
 
+      {/* Görseller: dosya yükleme (club-images public bucket) */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="logo_url">Logo URL</Label>
-          <Input id="logo_url" value={form.logo_url} onChange={(e) => set("logo_url", e.target.value)} disabled={loading} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="cover_url">Kapak Görseli URL</Label>
-          <Input id="cover_url" value={form.cover_url} onChange={(e) => set("cover_url", e.target.value)} disabled={loading} />
-        </div>
+        <ImageUploadField
+          clubId={club.id}
+          kind="logo"
+          label="Logo"
+          value={form.logo_url}
+          onChange={(url) => set("logo_url", url)}
+          disabled={loading}
+        />
+        <ImageUploadField
+          clubId={club.id}
+          kind="cover"
+          label="Kapak Görseli"
+          value={form.cover_url}
+          onChange={(url) => set("cover_url", url)}
+          disabled={loading}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="contact_email">İletişim E-posta</Label>
           <Input id="contact_email" type="email" value={form.contact_email} onChange={(e) => set("contact_email", e.target.value)} disabled={loading} />
@@ -203,5 +225,130 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
         {loading ? "Kaydediliyor…" : "Bilgileri Kaydet"}
       </Button>
     </form>
+  );
+}
+
+function ImageUploadField({
+  clubId,
+  kind,
+  label,
+  value,
+  onChange,
+  disabled,
+}: {
+  clubId: string;
+  kind: "logo" | "cover";
+  label: string;
+  value: string;
+  // Yükleme başarılı olunca yeni public URL ile form state'ini günceller.
+  onChange: (url: string) => void;
+  disabled: boolean;
+}) {
+  const router = useRouter();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const supabase = createClient();
+
+    // Path deseni storage policy tarafından zorunlu: klasör = club_id.
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `${clubId}/${kind}-${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(IMAGE_BUCKET)
+      .upload(path, file, { upsert: true, contentType: file.type || undefined });
+
+    if (uploadError) {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+      toast.error(`Görsel yüklenemedi: ${uploadError.message}`);
+      return;
+    }
+
+    // Bucket public — signed URL DEĞİL, public URL alınır.
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(path);
+
+    // clubs.logo_url / cover_url'e hemen yaz (UPDATE).
+    const payload = kind === "logo" ? { logo_url: publicUrl } : { cover_url: publicUrl };
+    const { error: updateError } = await supabase
+      .from("clubs")
+      .update(payload)
+      .eq("id", clubId);
+
+    if (updateError) {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+      toast.error(`Kaydedilemedi: ${updateError.message}`);
+      return;
+    }
+
+    // Eski dosyayı storage'dan temizle (opsiyonel; hata yutulur).
+    const oldPath = storagePath(value);
+    if (oldPath && oldPath !== path) {
+      await supabase.storage.from(IMAGE_BUCKET).remove([oldPath]);
+    }
+
+    onChange(publicUrl);
+    setUploading(false);
+    if (inputRef.current) inputRef.current.value = "";
+    toast.success(`${label} güncellendi`);
+    router.refresh();
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <div
+        className={cn(
+          "relative flex items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-white/[0.02]",
+          kind === "logo" ? "size-28" : "aspect-[16/6] w-full",
+        )}
+      >
+        {value ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={value}
+            alt={`${label} önizleme`}
+            className="size-full object-cover"
+          />
+        ) : (
+          <span className="inline-flex flex-col items-center gap-1 text-zinc-600">
+            <ImageIcon className="size-6" />
+            <span className="text-xs">Görsel yok</span>
+          </span>
+        )}
+      </div>
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFile}
+        disabled={disabled || uploading}
+        className="hidden"
+      />
+      <Button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        disabled={disabled || uploading}
+        size="sm"
+        variant="outline"
+        className="gap-1.5 border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white"
+      >
+        {uploading ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <Upload className="size-4" />
+        )}
+        {value ? "Değiştir" : "Görsel Yükle"}
+      </Button>
+    </div>
   );
 }

@@ -1,0 +1,208 @@
+"use client";
+
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ExternalLink, FileText, Loader2, Paperclip, Trash2, Upload } from "lucide-react";
+import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+export type EventDocument = {
+  id: string;
+  file_name: string;
+  note: string | null;
+  // Kısa ömürlü signed URL (server-side üretildi; public URL ASLA).
+  signedUrl: string | null;
+  // Yalnızca yükleyen kendi belgesini silebilir (RLS).
+  canDelete: boolean;
+};
+
+const DOC_BUCKET = "event-docs";
+
+export function EventDocuments({
+  eventId,
+  userId,
+  canUpload,
+  documents,
+  emphasize = false,
+}: {
+  eventId: string;
+  userId: string;
+  // Başkan veya okul: belge yükleyebilir. Danışman yalnızca görüntüler.
+  canUpload: boolean;
+  documents: EventDocument[];
+  // CHANGES_REQUESTED gibi belge yüklemenin öne çıkması gereken durumlarda true.
+  emphasize?: boolean;
+}) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [note, setNote] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    const supabase = createClient();
+
+    // Storage INSERT policy: path ${event_id}/${uploaded_by}-*; uid eşleşmesi şart.
+    const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
+    const path = `${eventId}/${userId}-${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(DOC_BUCKET)
+      .upload(path, file, { upsert: true, contentType: file.type || undefined });
+
+    if (uploadError) {
+      setLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      toast.error(`Belge yüklenemedi: ${uploadError.message}`);
+      return;
+    }
+
+    // Public URL DEĞİL — yalnızca dosya yolunu sakla; görüntüleme signed URL ile.
+    const { error: insertError } = await supabase.from("event_documents").insert({
+      event_id: eventId,
+      uploaded_by: userId,
+      file_url: path,
+      file_name: file.name,
+      note: note.trim() || null,
+    });
+
+    setLoading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (insertError) {
+      toast.error(`Belge kaydedilemedi: ${insertError.message}`);
+      return;
+    }
+    setNote("");
+    toast.success("Belge yüklendi.");
+    router.refresh();
+  }
+
+  async function handleDelete(doc: EventDocument) {
+    if (!window.confirm(`"${doc.file_name}" belgesini silmek istiyor musunuz?`)) {
+      return;
+    }
+    setLoading(true);
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("event_documents")
+      .delete()
+      .eq("id", doc.id);
+    setLoading(false);
+    if (error) {
+      toast.error(`Silinemedi: ${error.message}`);
+      return;
+    }
+    toast.success("Belge silindi.");
+    router.refresh();
+  }
+
+  // Görüntüleme yetkisi olanlar için (yükleme yoksa) yalnız liste; hiç belge ve
+  // yetki yoksa bileşeni gizle.
+  if (!canUpload && documents.length === 0) return null;
+
+  return (
+    <div
+      className={`mt-3 rounded-md border p-3 ${
+        emphasize
+          ? "border-[#841515]/40 bg-[#841515]/10"
+          : "border-white/5 bg-white/[0.02]"
+      }`}
+    >
+      <p className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-300">
+        <Paperclip className="size-3.5 text-[#e7a3a3]" />
+        Belgeler
+        {emphasize && (
+          <span className="text-[#e7a3a3]">— revizyon için belge ekleyin</span>
+        )}
+      </p>
+
+      {documents.length > 0 && (
+        <ul className="mt-2 space-y-1.5">
+          {documents.map((doc) => (
+            <li
+              key={doc.id}
+              className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-white/5 bg-zinc-900/40 px-3 py-2"
+            >
+              <div className="flex min-w-0 items-center gap-2">
+                <FileText className="size-4 shrink-0 text-zinc-500" />
+                <div className="min-w-0">
+                  <p className="truncate text-sm text-zinc-200">{doc.file_name}</p>
+                  {doc.note && (
+                    <p className="truncate text-xs text-zinc-500">{doc.note}</p>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {doc.signedUrl ? (
+                  <a
+                    href={doc.signedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2.5 py-1 text-xs text-zinc-300 hover:bg-white/5 hover:text-white"
+                  >
+                    <ExternalLink className="size-3.5" />
+                    Aç
+                  </a>
+                ) : (
+                  <span className="text-xs text-zinc-600">Bağlantı yok</span>
+                )}
+                {doc.canDelete && (
+                  <Button
+                    onClick={() => handleDelete(doc)}
+                    disabled={loading}
+                    size="icon-sm"
+                    variant="ghost"
+                    className="text-zinc-400 hover:bg-red-500/10 hover:text-red-400"
+                    aria-label="Belgeyi sil"
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {canUpload && (
+        <div className="mt-2.5 space-y-2">
+          <Input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            disabled={loading}
+            placeholder="Açıklama (opsiyonel)"
+            className="h-9 text-sm"
+          />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,application/pdf"
+            onChange={handleFile}
+            disabled={loading}
+            className="hidden"
+          />
+          <Button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={loading}
+            size="sm"
+            variant="outline"
+            className="gap-1.5 border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white"
+          >
+            {loading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Upload className="size-4" />
+            )}
+            Belge Yükle
+          </Button>
+          <p className="text-xs text-zinc-500">Görsel (JPG/PNG) veya PDF.</p>
+        </div>
+      )}
+    </div>
+  );
+}

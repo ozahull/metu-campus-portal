@@ -32,6 +32,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { EventDocuments, type EventDocument } from "./event-documents";
 
 export type ManageEvent = {
   id: string;
@@ -62,6 +63,9 @@ export function ManageEvents({
   events,
   canAdvisorDecide,
   ticketEnabled,
+  userId,
+  canUploadDocs,
+  documentsByEvent,
 }: {
   clubId: string;
   events: ManageEvent[];
@@ -69,6 +73,12 @@ export function ManageEvents({
   canAdvisorDecide: boolean;
   // Kulübün bilet sistemi açıksa etkinlik formunda bilet alanları görünür.
   ticketEnabled: boolean;
+  // Belge yükleme yolu için mevcut kullanıcı kimliği.
+  userId: string;
+  // Başkan/okul belge yükleyebilir; danışman yalnızca görüntüler.
+  canUploadDocs: boolean;
+  // Etkinlik id → o etkinliğe yüklü belgeler (signed URL'li, server-side).
+  documentsByEvent: Record<string, EventDocument[]>;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -370,6 +380,15 @@ export function ManageEvents({
                     </Button>
                   </div>
                 )}
+
+                {/* Belge ekleri (başkan yükler; danışman/okul görüntüler) */}
+                <EventDocuments
+                  eventId={ev.id}
+                  userId={userId}
+                  canUpload={canUploadDocs}
+                  documents={documentsByEvent[ev.id] ?? []}
+                  emphasize={ev.status === "CHANGES_REQUESTED"}
+                />
               </li>
             );
           })}

@@ -22,6 +22,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  EventDocuments,
+  type EventDocument,
+} from "../clubs/[id]/manage/event-documents";
 
 export type PendingEvent = {
   id: string;
@@ -30,6 +34,7 @@ export type PendingEvent = {
   location: string | null;
   review_note: string | null;
   club_name: string | null;
+  documents: EventDocument[];
 };
 
 export type ClubSetting = {
@@ -46,9 +51,11 @@ const dateFormatter = new Intl.DateTimeFormat("tr-TR", {
 export function AdminApprovals({
   pending,
   clubs,
+  userId,
 }: {
   pending: PendingEvent[];
   clubs: ClubSetting[];
+  userId: string;
 }) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -150,6 +157,12 @@ export function AdminApprovals({
                         </span>
                       )}
                     </div>
+                    <EventDocuments
+                      eventId={ev.id}
+                      userId={userId}
+                      canUpload={false}
+                      documents={ev.documents}
+                    />
                     <div className="mt-3 flex flex-wrap gap-2 border-t border-white/5 pt-3">
                       <Button onClick={() => decide(ev, "approve")} disabled={busy} size="sm" className="gap-1.5 bg-emerald-600 font-medium text-white hover:bg-emerald-600/90">
                         <Check className="size-4" /> Onayla

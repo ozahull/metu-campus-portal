@@ -233,6 +233,48 @@ export type Database = {
           },
         ];
       };
+      event_documents: {
+        Row: {
+          id: string;
+          event_id: string;
+          uploaded_by: string;
+          file_url: string;
+          file_name: string;
+          note: string | null;
+          created_at: string;
+        };
+        // Kolon-grant: yalnızca içerik kolonları yazılabilir.
+        Insert: {
+          event_id: string;
+          uploaded_by: string;
+          file_url: string;
+          file_name: string;
+          note?: string | null;
+        };
+        Update: {
+          event_id?: string;
+          uploaded_by?: string;
+          file_url?: string;
+          file_name?: string;
+          note?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "event_documents_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "event_documents_uploaded_by_fkey";
+            columns: ["uploaded_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       tickets: {
         Row: {
           id: string;

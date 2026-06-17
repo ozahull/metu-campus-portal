@@ -7,6 +7,9 @@ import {
   type ClubSetting,
   type PendingEvent,
 } from "./admin-approvals";
+import type { EventDocument } from "../clubs/[id]/manage/event-documents";
+
+const DOC_BUCKET = "event-docs";
 
 // Route Cache'i devre dışı bırak: rol kontrolü her istekte güncel veriyle yapılsın.
 export const dynamic = "force-dynamic";
@@ -71,7 +74,7 @@ export default async function AdminPage() {
     .eq("status", "PENDING_SCHOOL")
     .order("event_date", { ascending: true });
 
-  const pending: PendingEvent[] = (
+  const pendingBase = (
     (pendingRaw ?? []) as unknown as {
       id: string;
       title: string;
@@ -91,6 +94,45 @@ export default async function AdminPage() {
       club_name: club?.name ?? null,
     };
   });
+
+  // Bekleyen etkinliklerin belge ekleri (signed URL ile; public URL ASLA).
+  const docsByEvent: Record<string, EventDocument[]> = {};
+  const pendingIds = pendingBase.map((e) => e.id);
+  if (pendingIds.length > 0) {
+    const { data: docRaw } = await supabase
+      .from("event_documents")
+      .select("id, event_id, file_url, file_name, note")
+      .in("event_id", pendingIds)
+      .order("created_at", { ascending: true });
+
+    for (const d of (docRaw ?? []) as {
+      id: string;
+      event_id: string;
+      file_url: string;
+      file_name: string;
+      note: string | null;
+    }[]) {
+      let signedUrl: string | null = null;
+      if (d.file_url) {
+        const { data: signed } = await supabase.storage
+          .from(DOC_BUCKET)
+          .createSignedUrl(d.file_url, 120);
+        signedUrl = signed?.signedUrl ?? null;
+      }
+      (docsByEvent[d.event_id] ??= []).push({
+        id: d.id,
+        file_name: d.file_name,
+        note: d.note,
+        signedUrl,
+        canDelete: false, // okul yalnız görüntüler.
+      });
+    }
+  }
+
+  const pending: PendingEvent[] = pendingBase.map((e) => ({
+    ...e,
+    documents: docsByEvent[e.id] ?? [],
+  }));
 
   return (
     <main className="dark relative min-h-svh overflow-hidden bg-zinc-950 px-4 py-12 text-foreground">
@@ -114,7 +156,7 @@ export default async function AdminPage() {
 
         <AdminAssignments clubs={clubOptions} users={userOptions} />
 
-        <AdminApprovals pending={pending} clubs={clubSettings} />
+        <AdminApprovals pending={pending} clubs={clubSettings} userId={user.id} />
       </div>
     </main>
   );

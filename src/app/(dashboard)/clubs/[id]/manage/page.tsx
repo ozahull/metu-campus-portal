@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { ClubInfoForm, type ClubInfo } from "./club-info-form";
 import { ManageEvents, type ManageEvent } from "./manage-events";
+import type { EventDocument } from "./event-documents";
 import { ManageMembers, type RosterMember } from "./manage-members";
 import { ManageTickets, type EventTicketGroup } from "./manage-tickets";
 
@@ -39,6 +40,16 @@ type TicketRow = {
 };
 
 const RECEIPT_BUCKET = "receipts";
+const DOC_BUCKET = "event-docs";
+
+type EventDocumentRow = {
+  id: string;
+  event_id: string;
+  uploaded_by: string;
+  file_url: string;
+  file_name: string;
+  note: string | null;
+};
 
 function unwrap<T>(v: T | T[] | null): T | null {
   return Array.isArray(v) ? (v[0] ?? null) : v;
@@ -102,6 +113,36 @@ export default async function ClubManagePage({
     .eq("club_id", id)
     .order("event_date", { ascending: true });
   const events = (eventsRaw ?? []) as ManageEvent[];
+
+  // Belge ekleri: bu kulübün etkinliklerine ait event_documents. Görüntüleme
+  // kısa ömürlü signed URL ile (public URL ASLA). Yükleme başkan/okul'a açık.
+  const canUploadDocs = isSuperAdmin || isClubAdmin;
+  const documentsByEvent: Record<string, EventDocument[]> = {};
+  const eventIds = events.map((e) => e.id);
+  if (eventIds.length > 0) {
+    const { data: docRaw } = await supabase
+      .from("event_documents")
+      .select("id, event_id, uploaded_by, file_url, file_name, note")
+      .in("event_id", eventIds)
+      .order("created_at", { ascending: true });
+
+    for (const d of (docRaw ?? []) as EventDocumentRow[]) {
+      let signedUrl: string | null = null;
+      if (d.file_url) {
+        const { data: signed } = await supabase.storage
+          .from(DOC_BUCKET)
+          .createSignedUrl(d.file_url, 120);
+        signedUrl = signed?.signedUrl ?? null;
+      }
+      (documentsByEvent[d.event_id] ??= []).push({
+        id: d.id,
+        file_name: d.file_name,
+        note: d.note,
+        signedUrl,
+        canDelete: d.uploaded_by === user.id,
+      });
+    }
+  }
 
   // Üye listesi (isim + rol).
   const { data: rosterRaw } = await supabase
@@ -241,7 +282,15 @@ export default async function ClubManagePage({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ManageEvents clubId={id} events={events} canAdvisorDecide={canAssignAdmin} ticketEnabled={club.ticket_enabled} />
+              <ManageEvents
+                clubId={id}
+                events={events}
+                canAdvisorDecide={canAssignAdmin}
+                ticketEnabled={club.ticket_enabled}
+                userId={user.id}
+                canUploadDocs={canUploadDocs}
+                documentsByEvent={documentsByEvent}
+              />
             </CardContent>
           </Card>
 

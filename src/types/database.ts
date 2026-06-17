@@ -358,6 +358,35 @@ export type Database = {
           event_title: string;
         }[];
       };
+      analytics_overview: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          total_clubs: number;
+          total_members: number;
+          total_events: number;
+          approved_events: number;
+          total_tickets: number;
+          total_checkins: number;
+        }[];
+      };
+      analytics_clubs: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          club_id: string;
+          club_name: string;
+          member_count: number;
+          event_count: number;
+          approved_event_count: number;
+          total_checkins: number;
+        }[];
+      };
+      analytics_member_growth: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          month: string;
+          new_members: number;
+        }[];
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

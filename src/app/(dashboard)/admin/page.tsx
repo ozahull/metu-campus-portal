@@ -8,6 +8,12 @@ import {
   type PendingEvent,
 } from "./admin-approvals";
 import type { EventDocument } from "../clubs/[id]/manage/event-documents";
+import {
+  AdminAnalytics,
+  type ClubStat,
+  type MemberGrowthPoint,
+  type Overview,
+} from "./admin-analytics";
 
 const DOC_BUCKET = "event-docs";
 
@@ -134,6 +140,22 @@ export default async function AdminPage() {
     documents: docsByEvent[e.id] ?? [],
   }));
 
+  // Analitik (yalnız SUPER_ADMIN — RPC'ler is_super_admin() içeriyor).
+  const [
+    { data: overviewRows },
+    { data: clubStatsRows },
+    { data: growthRows },
+  ] = await Promise.all([
+    supabase.rpc("analytics_overview"),
+    supabase.rpc("analytics_clubs"),
+    supabase.rpc("analytics_member_growth"),
+  ]);
+
+  const overview: Overview | null =
+    (overviewRows as Overview[] | null)?.[0] ?? null;
+  const clubStats = (clubStatsRows as ClubStat[] | null) ?? [];
+  const memberGrowth = (growthRows as MemberGrowthPoint[] | null) ?? [];
+
   return (
     <main className="dark relative min-h-svh overflow-hidden bg-zinc-950 px-4 py-12 text-foreground">
       <div
@@ -157,6 +179,12 @@ export default async function AdminPage() {
         <AdminAssignments clubs={clubOptions} users={userOptions} />
 
         <AdminApprovals pending={pending} clubs={clubSettings} userId={user.id} />
+
+        <AdminAnalytics
+          overview={overview}
+          clubs={clubStats}
+          growth={memberGrowth}
+        />
       </div>
     </main>
   );

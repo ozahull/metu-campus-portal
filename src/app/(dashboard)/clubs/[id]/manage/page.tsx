@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, CalendarDays, Settings, Users } from "lucide-react";
+import { ArrowLeft, CalendarDays, QrCode, Settings, Ticket, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ import {
 import { ClubInfoForm, type ClubInfo } from "./club-info-form";
 import { ManageEvents, type ManageEvent } from "./manage-events";
 import { ManageMembers, type RosterMember } from "./manage-members";
+import { ManageTickets, type EventTicketGroup } from "./manage-tickets";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,26 @@ type RosterRow = {
   role: string;
   profile: { full_name: string | null } | { full_name: string | null }[] | null;
 };
+
+type TicketRow = {
+  id: string;
+  status: string;
+  receipt_url: string | null;
+  user_id: string;
+  event_id: string;
+  created_at: string;
+  profile: { full_name: string | null } | { full_name: string | null }[] | null;
+  events:
+    | { title: string; ticket_capacity: number | null }
+    | { title: string; ticket_capacity: number | null }[]
+    | null;
+};
+
+const RECEIPT_BUCKET = "receipts";
+
+function unwrap<T>(v: T | T[] | null): T | null {
+  return Array.isArray(v) ? (v[0] ?? null) : v;
+}
 
 export default async function ClubManagePage({
   params,
@@ -98,6 +119,57 @@ export default async function ClubManagePage({
     },
   );
 
+  // Biletler: bu kulübün etkinliklerine ait biletler (events!inner ile kulübe filtre).
+  const { data: ticketRaw } = await supabase
+    .from("tickets")
+    .select(
+      "id, status, receipt_url, user_id, event_id, created_at, profile:user_id(full_name), events!inner(title, club_id, ticket_capacity)",
+    )
+    .eq("events.club_id", id)
+    .order("created_at", { ascending: true });
+
+  const ticketRows = (ticketRaw ?? []) as unknown as TicketRow[];
+
+  // Etkinlik bazlı grupla: bekleyen (SUBMITTED) + onaylı/giriş sayacı.
+  const groupMap = new Map<string, EventTicketGroup>();
+  for (const t of ticketRows) {
+    const ev = unwrap(t.events);
+    if (!ev) continue;
+    let g = groupMap.get(t.event_id);
+    if (!g) {
+      g = {
+        eventId: t.event_id,
+        title: ev.title,
+        capacity: ev.ticket_capacity,
+        approvedCount: 0,
+        checkedInCount: 0,
+        pending: [],
+      };
+      groupMap.set(t.event_id, g);
+    }
+    if (t.status === "APPROVED") g.approvedCount += 1;
+    else if (t.status === "CHECKED_IN") {
+      g.approvedCount += 1;
+      g.checkedInCount += 1;
+    } else if (t.status === "SUBMITTED") {
+      // Dekontu kısa ömürlü signed URL ile göster (public URL ASLA).
+      let receiptSignedUrl: string | null = null;
+      if (t.receipt_url) {
+        const { data: signed } = await supabase.storage
+          .from(RECEIPT_BUCKET)
+          .createSignedUrl(t.receipt_url, 120);
+        receiptSignedUrl = signed?.signedUrl ?? null;
+      }
+      g.pending.push({
+        id: t.id,
+        full_name: unwrap(t.profile)?.full_name ?? null,
+        receiptSignedUrl,
+      });
+    }
+  }
+  const ticketGroups = Array.from(groupMap.values());
+  const hasTicketing = ticketGroups.length > 0;
+
   return (
     <main className="dark relative min-h-svh overflow-hidden bg-zinc-950 text-foreground">
       <div
@@ -170,6 +242,36 @@ export default async function ClubManagePage({
               <ManageEvents clubId={id} events={events} canAdvisorDecide={canAssignAdmin} />
             </CardContent>
           </Card>
+
+          {/* Biletler / Dekont onayı */}
+          {hasTicketing && (
+            <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
+              <CardHeader className="flex flex-row items-start justify-between gap-3">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
+                    <Ticket className="size-4 text-[#e7a3a3]" />
+                    Biletler
+                  </CardTitle>
+                  <CardDescription>
+                    Dekontları inceleyip onaylayın veya reddedin.
+                  </CardDescription>
+                </div>
+                <Link
+                  href={`/clubs/${id}/checkin`}
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "sm" }),
+                    "gap-1.5 border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white",
+                  )}
+                >
+                  <QrCode className="size-4" />
+                  Kapı Kontrol
+                </Link>
+              </CardHeader>
+              <CardContent>
+                <ManageTickets groups={ticketGroups} />
+              </CardContent>
+            </Card>
+          )}
 
           {/* Üyeler */}
           <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">

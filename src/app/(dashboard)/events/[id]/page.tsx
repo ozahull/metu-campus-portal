@@ -12,8 +12,16 @@ import {
 } from "@/components/ui/card";
 import { RSVPButton } from "@/components/shared/rsvp-button";
 import { AddToCalendar } from "./add-to-calendar";
+import { TicketFlow, type MyTicket } from "./ticket-flow";
 
 export const dynamic = "force-dynamic";
+
+type EventClub = {
+  id: string;
+  name: string;
+  iban: string | null;
+  ticket_enabled: boolean;
+};
 
 type EventDetail = {
   id: string;
@@ -23,7 +31,9 @@ type EventDetail = {
   location: string | null;
   status: string;
   club_id: string;
-  clubs: { id: string; name: string } | { id: string; name: string }[] | null;
+  ticket_price: number | null;
+  ticket_deadline: string | null;
+  clubs: EventClub | EventClub[] | null;
   event_attendees: { user_id: string }[] | null;
 };
 
@@ -48,7 +58,7 @@ export default async function EventDetailPage({
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, title, description, event_date, location, status, club_id, clubs(id, name), event_attendees(user_id)",
+      "id, title, description, event_date, location, status, club_id, ticket_price, ticket_deadline, clubs(id, name, iban, ticket_enabled), event_attendees(user_id)",
     )
     .eq("id", id)
     .maybeSingle<EventDetail>();
@@ -65,6 +75,21 @@ export default async function EventDetailPage({
   const club = Array.isArray(data.clubs) ? data.clubs[0] : data.clubs;
   const attendees = data.event_attendees ?? [];
   const isAttending = attendees.some((a) => a.user_id === user.id);
+
+  // Biletleme açık mı? (kulüp etkinleştirmiş + etkinliğin ücreti tanımlı)
+  const ticketingOn = Boolean(club?.ticket_enabled) && data.ticket_price !== null;
+
+  // Kullanıcının bu etkinlik için biletini çek (varsa).
+  let myTicket: MyTicket | null = null;
+  if (ticketingOn) {
+    const { data: t } = await supabase
+      .from("tickets")
+      .select("id, token, status, receipt_url")
+      .eq("event_id", data.id)
+      .eq("user_id", user.id)
+      .maybeSingle<MyTicket>();
+    myTicket = t ?? null;
+  }
 
   return (
     <main className="relative min-h-svh overflow-hidden bg-zinc-950 text-foreground">
@@ -131,13 +156,26 @@ export default async function EventDetailPage({
           </Card>
         )}
 
-        <div className="mt-6 flex flex-col gap-4 rounded-xl border border-white/5 bg-zinc-900/50 p-5 sm:flex-row sm:items-center sm:justify-between">
-          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-300">
-            <Flame className="size-4 text-orange-400" />
-            {attendees.length} kişi katılıyor
-          </span>
-          <RSVPButton eventId={data.id} userId={user.id} isAttending={isAttending} />
-        </div>
+        {ticketingOn ? (
+          <div className="mt-6">
+            <TicketFlow
+              eventId={data.id}
+              userId={user.id}
+              clubIban={club?.iban ?? null}
+              price={data.ticket_price}
+              closesAtISO={data.ticket_deadline ?? data.event_date}
+              ticket={myTicket}
+            />
+          </div>
+        ) : (
+          <div className="mt-6 flex flex-col gap-4 rounded-xl border border-white/5 bg-zinc-900/50 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-300">
+              <Flame className="size-4 text-orange-400" />
+              {attendees.length} kişi katılıyor
+            </span>
+            <RSVPButton eventId={data.id} userId={user.id} isAttending={isAttending} />
+          </div>
+        )}
 
         <div className="mt-6">
           <p className="mb-2 text-sm font-medium text-zinc-400">Takvime ekle</p>

@@ -61,6 +61,8 @@ export type Database = {
           whatsapp_url: string | null;
           instagram_url: string | null;
           requires_advisor_approval: boolean;
+          iban: string | null;
+          ticket_enabled: boolean;
         };
         Insert: {
           id?: string;
@@ -76,6 +78,8 @@ export type Database = {
           whatsapp_url?: string | null;
           instagram_url?: string | null;
           requires_advisor_approval?: boolean;
+          iban?: string | null;
+          ticket_enabled?: boolean;
         };
         Update: {
           id?: string;
@@ -91,6 +95,8 @@ export type Database = {
           whatsapp_url?: string | null;
           instagram_url?: string | null;
           requires_advisor_approval?: boolean;
+          iban?: string | null;
+          ticket_enabled?: boolean;
         };
         Relationships: [
           {
@@ -150,6 +156,9 @@ export type Database = {
           review_note: string | null;
           reviewed_by: string | null;
           reviewed_at: string | null;
+          ticket_price: number | null;
+          ticket_capacity: number | null;
+          ticket_deadline: string | null;
         };
         Insert: {
           id?: string;
@@ -162,6 +171,9 @@ export type Database = {
           review_note?: string | null;
           reviewed_by?: string | null;
           reviewed_at?: string | null;
+          ticket_price?: number | null;
+          ticket_capacity?: number | null;
+          ticket_deadline?: string | null;
         };
         Update: {
           id?: string;
@@ -174,6 +186,9 @@ export type Database = {
           review_note?: string | null;
           reviewed_by?: string | null;
           reviewed_at?: string | null;
+          ticket_price?: number | null;
+          ticket_capacity?: number | null;
+          ticket_deadline?: string | null;
         };
         Relationships: [
           {
@@ -218,6 +233,46 @@ export type Database = {
           },
         ];
       };
+      tickets: {
+        Row: {
+          id: string;
+          event_id: string;
+          user_id: string;
+          token: string;
+          status: string;
+          receipt_url: string | null;
+          reviewed_by: string | null;
+          reviewed_at: string | null;
+          checked_in_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        // Kolon-grant: yalnızca event_id + user_id yazılabilir (talep açma).
+        Insert: {
+          event_id: string;
+          user_id: string;
+        };
+        Update: {
+          event_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tickets_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tickets_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -244,6 +299,22 @@ export type Database = {
       event_school_decision: {
         Args: { p_event_id: string; p_decision: string; p_note?: string };
         Returns: string;
+      };
+      ticket_submit_receipt: {
+        Args: { p_ticket_id: string; p_receipt_url: string };
+        Returns: undefined;
+      };
+      ticket_approve: {
+        Args: { p_ticket_id: string; p_decision: string; p_note?: string };
+        Returns: undefined;
+      };
+      ticket_checkin: {
+        Args: { p_token: string };
+        Returns: {
+          ticket_id: string;
+          full_name: string | null;
+          event_title: string;
+        }[];
       };
     };
     Enums: Record<string, never>;

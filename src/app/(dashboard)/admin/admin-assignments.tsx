@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { GraduationCap, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -28,6 +29,7 @@ export function AdminAssignments({
   users: Option[];
 }) {
   const router = useRouter();
+  const t = useTranslations("admin.assignments");
 
   const [advClub, setAdvClub] = useState("");
   const [advUser, setAdvUser] = useState("");
@@ -36,7 +38,7 @@ export function AdminAssignments({
   async function assignAdvisor(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!advClub) {
-      toast.error("Kulüp seçin.");
+      toast.error(t("toasts.clubRequired"));
       return;
     }
     setAdvBusy(true);
@@ -47,10 +49,10 @@ export function AdminAssignments({
       .eq("id", advClub);
     setAdvBusy(false);
     if (error) {
-      toast.error(`Atama başarısız: ${error.message}`);
+      toast.error(t("toasts.error", { message: error.message }));
       return;
     }
-    toast.success(advUser ? "Danışman atandı" : "Danışman kaldırıldı");
+    toast.success(advUser ? t("toasts.assigned") : t("toasts.removed"));
     router.refresh();
   }
 
@@ -59,28 +61,27 @@ export function AdminAssignments({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
           <GraduationCap className="size-5 text-[#e7a3a3]" />
-          Akademik Danışman Ata
+          {t("title")}
         </CardTitle>
         <CardDescription>
-          Okul yönetimi yalnızca danışman atar. Kulüp başkanını danışman belirler.
-          (Boş bırakırsanız danışman kaldırılır.)
+          {t("desc")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={assignAdvisor} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="adv-club">Kulüp</Label>
+            <Label htmlFor="adv-club">{t("clubLabel")}</Label>
             <select id="adv-club" className={selectClass} value={advClub} onChange={(e) => setAdvClub(e.target.value)} disabled={advBusy}>
-              <option value="">Seçin…</option>
+              <option value="">{t("clubPlaceholder")}</option>
               {clubs.map((c) => (
                 <option key={c.id} value={c.id}>{c.label}</option>
               ))}
             </select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="adv-user">Danışman</Label>
+            <Label htmlFor="adv-user">{t("advisorLabel")}</Label>
             <select id="adv-user" className={selectClass} value={advUser} onChange={(e) => setAdvUser(e.target.value)} disabled={advBusy}>
-              <option value="">(Danışman yok)</option>
+              <option value="">{t("advisorNone")}</option>
               {users.map((u) => (
                 <option key={u.id} value={u.id}>{u.label}</option>
               ))}
@@ -89,7 +90,7 @@ export function AdminAssignments({
           <div className="sm:col-span-2">
             <Button type="submit" disabled={advBusy} className="gap-2 font-medium text-white hover:opacity-90" style={{ backgroundColor: "#841515" }}>
               {advBusy && <Loader2 className="size-4 animate-spin" />}
-              Danışmanı Kaydet
+              {t("submit")}
             </Button>
           </div>
         </form>

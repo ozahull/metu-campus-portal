@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Check,
   Clock,
@@ -43,11 +44,6 @@ export type ClubSetting = {
   requires_advisor_approval: boolean;
 };
 
-const dateFormatter = new Intl.DateTimeFormat("tr-TR", {
-  dateStyle: "medium",
-  timeStyle: "short",
-});
-
 export function AdminApprovals({
   pending,
   clubs,
@@ -58,6 +54,12 @@ export function AdminApprovals({
   userId: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("admin.approvals");
+  const locale = useLocale();
+  const dateFormatter = new Intl.DateTimeFormat(locale, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
   const [busyId, setBusyId] = useState<string | null>(null);
 
   async function decide(
@@ -67,11 +69,11 @@ export function AdminApprovals({
     let note: string | null = null;
     if (decision !== "approve") {
       note = window.prompt(
-        decision === "reject" ? "Reddetme notu (opsiyonel):" : "Revizyon notu:",
+        decision === "reject" ? t("rejectPrompt") : t("changesPrompt"),
       );
       if (note === null) return;
       if (decision === "changes" && note.trim() === "") {
-        toast.error("Revizyon için bir not girin.");
+        toast.error(t("toasts.changesNoteRequired"));
         return;
       }
     }
@@ -84,15 +86,15 @@ export function AdminApprovals({
     });
     setBusyId(null);
     if (error) {
-      toast.error(`İşlem başarısız: ${error.message}`);
+      toast.error(t("toasts.decideError", { message: error.message }));
       return;
     }
     toast.success(
       decision === "approve"
-        ? "Etkinlik onaylandı ve yayında"
+        ? t("toasts.approved")
         : decision === "reject"
-          ? "Etkinlik reddedildi"
-          : "Revizyon istendi",
+          ? t("toasts.rejected")
+          : t("toasts.changes"),
     );
     router.refresh();
   }
@@ -106,10 +108,10 @@ export function AdminApprovals({
       .eq("id", club.id);
     setBusyId(null);
     if (error) {
-      toast.error(`Güncellenemedi: ${error.message}`);
+      toast.error(t("toasts.settingError", { message: error.message }));
       return;
     }
-    toast.success("Onay ayarı güncellendi");
+    toast.success(t("toasts.settingUpdated"));
     router.refresh();
   }
 
@@ -120,13 +122,13 @@ export function AdminApprovals({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
             <ShieldQuestion className="size-5 text-[#e7a3a3]" />
-            Okul Onay Kuyruğu
+            {t("queueTitle")}
             <span className="ml-auto rounded-full bg-white/5 px-2 py-0.5 text-xs font-medium text-zinc-400">
               {pending.length}
             </span>
           </CardTitle>
           <CardDescription>
-            Okul onayı bekleyen etkinlikler. Onaylanınca öğrencilerde yayına girer.
+            {t("queueDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -135,7 +137,7 @@ export function AdminApprovals({
               <div className="flex size-10 items-center justify-center rounded-xl bg-white/5 text-zinc-400">
                 <Inbox className="size-5" />
               </div>
-              <p className="mt-3 text-sm text-zinc-500">Bekleyen etkinlik yok.</p>
+              <p className="mt-3 text-sm text-zinc-500">{t("emptyQueue")}</p>
             </div>
           ) : (
             <ul className="space-y-2">
@@ -165,13 +167,13 @@ export function AdminApprovals({
                     />
                     <div className="mt-3 flex flex-wrap gap-2 border-t border-white/5 pt-3">
                       <Button onClick={() => decide(ev, "approve")} disabled={busy} size="sm" className="gap-1.5 bg-emerald-600 font-medium text-white hover:bg-emerald-600/90">
-                        <Check className="size-4" /> Onayla
+                        <Check className="size-4" /> {t("approve")}
                       </Button>
                       <Button onClick={() => decide(ev, "changes")} disabled={busy} size="sm" variant="outline" className="gap-1.5 border-orange-500/40 bg-transparent text-orange-300 hover:bg-orange-500/10">
-                        <MessageSquareWarning className="size-4" /> Revizyon
+                        <MessageSquareWarning className="size-4" /> {t("requestChanges")}
                       </Button>
                       <Button onClick={() => decide(ev, "reject")} disabled={busy} size="sm" variant="outline" className="gap-1.5 border-red-500/40 bg-transparent text-red-300 hover:bg-red-500/10">
-                        <X className="size-4" /> Reddet
+                        <X className="size-4" /> {t("reject")}
                       </Button>
                     </div>
                   </li>
@@ -186,16 +188,15 @@ export function AdminApprovals({
       <Card className="border-white/10 bg-zinc-900/70 shadow-2xl shadow-black/40 backdrop-blur">
         <CardHeader>
           <CardTitle className="text-lg font-semibold text-white">
-            Danışman Onayı Ayarı
+            {t("settingsTitle")}
           </CardTitle>
           <CardDescription>
-            Açıksa etkinlikler önce danışmana, sonra okula gider. Kapalıysa doğrudan
-            okul onayına düşer.
+            {t("settingsDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {clubs.length === 0 ? (
-            <p className="text-sm text-zinc-500">Kulüp yok.</p>
+            <p className="text-sm text-zinc-500">{t("noClubs")}</p>
           ) : (
             <ul className="space-y-2">
               {clubs.map((club) => {
@@ -216,7 +217,7 @@ export function AdminApprovals({
                       }
                     >
                       {busy && <Loader2 className="size-4 animate-spin" />}
-                      {on ? "Açık" : "Kapalı"}
+                      {on ? t("on") : t("off")}
                     </Button>
                   </li>
                 );

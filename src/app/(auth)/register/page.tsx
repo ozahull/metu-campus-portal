@@ -155,7 +155,7 @@ export default function RegisterPage() {
                   <Input
                     id="firstName"
                     autoComplete="given-name"
-                    placeholder="Ayşe"
+                    placeholder={t("register.firstNamePlaceholder")}
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     disabled={loading}
@@ -167,7 +167,7 @@ export default function RegisterPage() {
                   <Input
                     id="lastName"
                     autoComplete="family-name"
-                    placeholder="Yılmaz"
+                    placeholder={t("register.lastNamePlaceholder")}
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     disabled={loading}

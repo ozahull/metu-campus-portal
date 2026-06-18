@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ArrowLeft, QrCode } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { buttonVariants } from "@/components/ui/button";
@@ -28,6 +29,7 @@ export default async function CheckinPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const t = await getTranslations("checkin");
   const supabase = await createClient();
 
   const {
@@ -96,7 +98,7 @@ export default async function CheckinPage({
           )}
         >
           <ArrowLeft className="size-4" />
-          Yönetime Dön
+          {t("back")}
         </Link>
 
         <header className="mt-6 mb-8 flex items-center gap-3">
@@ -108,10 +110,10 @@ export default async function CheckinPage({
           </span>
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-white">
-              {club.name} · Kapı Kontrol
+              {t("title", { name: club.name })}
             </h1>
             <p className="text-sm text-zinc-400">
-              QR okutun veya isimle bulup giriş yapın.
+              {t("subtitle")}
             </p>
           </div>
         </header>

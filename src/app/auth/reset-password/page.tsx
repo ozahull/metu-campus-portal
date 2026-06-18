@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   AlertCircle,
   CheckCircle2,
@@ -25,6 +26,7 @@ import {
 
 export default function ResetPasswordPage() {
   const router = useRouter();
+  const t = useTranslations("auth");
 
   const [checking, setChecking] = useState(true);
   const [validSession, setValidSession] = useState(false);
@@ -51,11 +53,11 @@ export default function ResetPasswordPage() {
     setError(null);
 
     if (password.length < 6) {
-      setError("Şifre en az 6 karakter olmalıdır.");
+      setError(t("reset.passwordShort"));
       return;
     }
     if (password !== confirm) {
-      setError("Şifreler eşleşmiyor.");
+      setError(t("reset.mismatch"));
       return;
     }
 
@@ -66,7 +68,7 @@ export default function ResetPasswordPage() {
     setLoading(false);
 
     if (updateError) {
-      setError("Şifre güncellenemedi. Lütfen tekrar deneyin.");
+      setError(t("reset.updateError"));
       return;
     }
 
@@ -82,10 +84,10 @@ export default function ResetPasswordPage() {
       <Card className="w-full max-w-sm border-white/10 bg-zinc-900/70 shadow-2xl shadow-black/40 backdrop-blur">
         <CardHeader className="space-y-2 text-center">
           <CardTitle className="text-xl font-semibold tracking-tight text-balance">
-            Yeni Şifre Belirle
+            {t("reset.title")}
           </CardTitle>
           <CardDescription className="text-pretty">
-            Hesabınız için yeni bir şifre oluşturun.
+            {t("reset.subtitle")}
           </CardDescription>
         </CardHeader>
 
@@ -97,17 +99,17 @@ export default function ResetPasswordPage() {
           ) : !validSession ? (
             <Alert variant="destructive">
               <AlertCircle className="size-4" />
-              <AlertTitle>Geçersiz veya süresi dolmuş link</AlertTitle>
+              <AlertTitle>{t("reset.invalidTitle")}</AlertTitle>
               <AlertDescription>
-                Lütfen şifre sıfırlama işlemini yeniden başlatın.
+                {t("reset.invalidBody")}
               </AlertDescription>
             </Alert>
           ) : done ? (
             <Alert className="border-emerald-500/40 bg-emerald-950/40 text-emerald-200 [&>svg]:text-emerald-400">
               <CheckCircle2 className="size-4" />
-              <AlertTitle>Şifreniz güncellendi</AlertTitle>
+              <AlertTitle>{t("reset.doneTitle")}</AlertTitle>
               <AlertDescription className="text-emerald-300/90">
-                Panele yönlendiriliyorsunuz…
+                {t("reset.doneBody")}
               </AlertDescription>
             </Alert>
           ) : (
@@ -115,19 +117,19 @@ export default function ResetPasswordPage() {
               {error && (
                 <Alert variant="destructive">
                   <AlertCircle className="size-4" />
-                  <AlertTitle>Bir sorun oluştu</AlertTitle>
+                  <AlertTitle>{t("reset.errorTitle")}</AlertTitle>
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="password">Yeni Şifre</Label>
+                <Label htmlFor="password">{t("reset.newPassword")}</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete="new-password"
-                    placeholder="En az 6 karakter"
+                    placeholder={t("reset.newPasswordPlaceholder")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
@@ -138,7 +140,7 @@ export default function ResetPasswordPage() {
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground transition-colors hover:text-foreground"
-                    aria-label={showPassword ? "Şifreyi gizle" : "Şifreyi göster"}
+                    aria-label={showPassword ? t("hidePassword") : t("showPassword")}
                   >
                     {showPassword ? (
                       <EyeOff className="size-4" />
@@ -150,12 +152,12 @@ export default function ResetPasswordPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirm">Yeni Şifre (Tekrar)</Label>
+                <Label htmlFor="confirm">{t("reset.confirmLabel")}</Label>
                 <Input
                   id="confirm"
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
-                  placeholder="Şifreyi tekrar girin"
+                  placeholder={t("reset.confirmPlaceholder")}
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   disabled={loading}
@@ -171,7 +173,7 @@ export default function ResetPasswordPage() {
                 style={{ backgroundColor: "#841515" }}
               >
                 {loading && <Loader2 className="size-4 animate-spin" />}
-                {loading ? "Güncelleniyor…" : "Şifreyi Güncelle"}
+                {loading ? t("reset.submitting") : t("reset.submit")}
               </Button>
             </form>
           )}

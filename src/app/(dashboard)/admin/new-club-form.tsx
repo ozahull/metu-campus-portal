@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Loader2, Plus, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/card";
 
 export function NewClubForm() {
+  const t = useTranslations("admin.newClub");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,7 +28,7 @@ export function NewClubForm() {
 
     const clubName = name.trim();
     if (clubName.length === 0) {
-      toast.error("Kulüp adı boş olamaz.");
+      toast.error(t("toasts.nameRequired"));
       return;
     }
 
@@ -41,11 +43,11 @@ export function NewClubForm() {
     setLoading(false);
 
     if (error) {
-      toast.error(`Kulüp eklenemedi: ${error.message}`);
+      toast.error(t("toasts.error", { message: error.message }));
       return;
     }
 
-    toast.success("Kulüp başarıyla eklendi");
+    toast.success(t("toasts.success"));
     setName("");
     setDescription("");
   }
@@ -62,10 +64,10 @@ export function NewClubForm() {
           </div>
           <div>
             <CardTitle className="text-xl font-semibold tracking-tight">
-              Yeni Kulüp Ekle
+              {t("title")}
             </CardTitle>
             <CardDescription>
-              Yönetici paneli · Topluluk oluşturma
+              {t("subtitle")}
             </CardDescription>
           </div>
         </div>
@@ -74,10 +76,10 @@ export function NewClubForm() {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-5" noValidate>
           <div className="space-y-2">
-            <Label htmlFor="name">Kulüp Adı</Label>
+            <Label htmlFor="name">{t("nameLabel")}</Label>
             <Input
               id="name"
-              placeholder="Örn. Bilgisayar Topluluğu"
+              placeholder={t("namePlaceholder")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               disabled={loading}
@@ -86,10 +88,10 @@ export function NewClubForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Kulüp Açıklaması</Label>
+            <Label htmlFor="description">{t("descLabel")}</Label>
             <Textarea
               id="description"
-              placeholder="Kulübün amacını ve faaliyetlerini kısaca açıklayın…"
+              placeholder={t("descPlaceholder")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               disabled={loading}
@@ -110,7 +112,7 @@ export function NewClubForm() {
             ) : (
               <Plus className="size-4" />
             )}
-            {loading ? "Ekleniyor…" : "Kulübü Ekle"}
+            {loading ? t("submitting") : t("submit")}
           </Button>
         </form>
       </CardContent>

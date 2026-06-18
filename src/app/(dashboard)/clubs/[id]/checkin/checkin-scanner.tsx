@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type { Html5Qrcode } from "html5-qrcode";
 import {
   BadgeCheck,
@@ -34,6 +35,7 @@ const READER_ID = "qr-reader";
 
 export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
   const router = useRouter();
+  const t = useTranslations("checkin");
   const [scanning, setScanning] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<CheckinResult | null>(null);
@@ -74,11 +76,13 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
     const row = Array.isArray(data) ? data[0] : null;
     setResult({
       ok: true,
-      message: "Giriş yapıldı",
+      message: t("checkedInMessage"),
       name: row?.full_name ?? null,
       event: row?.event_title,
     });
-    toast.success(`Giriş: ${row?.full_name ?? "kullanıcı"}`);
+    toast.success(
+      t("successToast", { name: row?.full_name ?? t("successFallback") }),
+    );
     router.refresh();
   }
 
@@ -123,9 +127,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
       } catch (err) {
         if (!cancelled) {
           setScanning(false);
-          toast.error(
-            "Kamera başlatılamadı. İzin verin veya isimle arama kullanın.",
-          );
+          toast.error(t("cameraError"));
           console.error("[Checkin] kamera hatası:", err);
         }
       }
@@ -158,7 +160,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
             {result.ok ? (
               <>
                 <p className="font-semibold text-emerald-200">
-                  {result.name ?? "Kullanıcı"} · giriş yaptı
+                  {t("checkedInResult", { name: result.name ?? t("resultUser") })}
                 </p>
                 {result.event && (
                   <p className="truncate text-sm text-emerald-300/80">
@@ -178,7 +180,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
         <div className="flex items-center justify-between gap-3">
           <p className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
             <Camera className="size-4 text-[#e7a3a3]" />
-            QR Tarama
+            {t("qrTitle")}
           </p>
           {scanning ? (
             <Button
@@ -190,7 +192,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
               className="gap-1.5 border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white"
             >
               <CameraOff className="size-4" />
-              Durdur
+              {t("stop")}
             </Button>
           ) : (
             <Button
@@ -208,7 +210,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
               ) : (
                 <Camera className="size-4" />
               )}
-              Kamerayı Aç
+              {t("openCamera")}
             </Button>
           )}
         </div>
@@ -222,7 +224,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
         />
         {!scanning && (
           <p className="mt-3 text-xs text-zinc-500">
-            Kamerayı açıp katılımcının QR kodunu okutun.
+            {t("cameraHint")}
           </p>
         )}
       </div>
@@ -231,14 +233,14 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
       <div className="rounded-xl border border-white/5 bg-zinc-900/50 p-5">
         <p className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
           <Search className="size-4 text-[#e7a3a3]" />
-          İsimle Bul
+          {t("findTitle")}
         </p>
         <div className="relative mt-3">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" />
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Katılımcı adı…"
+            placeholder={t("searchPlaceholder")}
             className="pl-9"
           />
         </div>
@@ -246,22 +248,22 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
         <ul className="mt-3 space-y-2">
           {filtered.length === 0 ? (
             <li className="rounded-lg border border-dashed border-white/10 bg-white/[0.02] px-4 py-6 text-center text-sm text-zinc-500">
-              Onaylı (giriş yapmamış) bilet bulunamadı.
+              {t("noApproved")}
             </li>
           ) : (
-            filtered.map((t) => (
+            filtered.map((ticket) => (
               <li
-                key={t.token}
+                key={ticket.token}
                 className="flex items-center justify-between gap-3 rounded-md border border-white/5 bg-white/[0.02] px-3 py-2.5"
               >
                 <span className="inline-flex min-w-0 items-center gap-2 text-sm text-zinc-200">
                   <User className="size-4 shrink-0 text-zinc-500" />
                   <span className="truncate">
-                    {t.full_name ?? "İsimsiz kullanıcı"}
+                    {ticket.full_name ?? t("unnamedUser")}
                   </span>
                 </span>
                 <Button
-                  onClick={() => doCheckin(t.token)}
+                  onClick={() => doCheckin(ticket.token)}
                   disabled={processing}
                   size="sm"
                   variant="outline"
@@ -272,7 +274,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
                   ) : (
                     <BadgeCheck className="size-4" />
                   )}
-                  Giriş
+                  {t("checkinButton")}
                 </Button>
               </li>
             ))

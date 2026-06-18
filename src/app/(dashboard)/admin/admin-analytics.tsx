@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import {
   Area,
   AreaChart,
@@ -55,27 +56,26 @@ const METU_RED = "#841515";
 
 const metricDefs: {
   key: keyof Overview;
-  label: string;
+  labelKey: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
-  { key: "total_clubs", label: "Toplam Kulüp", icon: Users2 },
-  { key: "total_members", label: "Toplam Üyelik", icon: Users },
-  { key: "total_events", label: "Toplam Etkinlik", icon: CalendarDays },
-  { key: "approved_events", label: "Onaylı Etkinlik", icon: CalendarCheck },
-  { key: "total_tickets", label: "Satılan Bilet", icon: Ticket },
-  { key: "total_checkins", label: "Gelen Kişi", icon: UserCheck },
+  { key: "total_clubs", labelKey: "metricClubs", icon: Users2 },
+  { key: "total_members", labelKey: "metricMembers", icon: Users },
+  { key: "total_events", labelKey: "metricEvents", icon: CalendarDays },
+  { key: "approved_events", labelKey: "metricApproved", icon: CalendarCheck },
+  { key: "total_tickets", labelKey: "metricTickets", icon: Ticket },
+  { key: "total_checkins", labelKey: "metricCheckins", icon: UserCheck },
 ];
 
-function formatMonth(ym: string): string {
-  // "YYYY-MM" → "Oca 2026"
+// "YYYY-MM" → locale'e göre kısa ay + yıl (örn. "Oca 2026" / "Jan 2026").
+function formatMonth(ym: string, locale: string): string {
   const [y, m] = ym.split("-");
   const idx = Number.parseInt(m, 10) - 1;
-  const names = [
-    "Oca", "Şub", "Mar", "Nis", "May", "Haz",
-    "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara",
-  ];
   if (idx < 0 || idx > 11 || !y) return ym;
-  return `${names[idx]} ${y}`;
+  return new Date(Number(y), idx, 1).toLocaleDateString(locale, {
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export function AdminAnalytics({
@@ -87,8 +87,10 @@ export function AdminAnalytics({
   clubs: ClubStat[];
   growth: MemberGrowthPoint[];
 }) {
+  const t = useTranslations("admin.analytics");
+  const locale = useLocale();
   const chartData = growth.map((g) => ({
-    month: formatMonth(g.month),
+    month: formatMonth(g.month, locale),
     new_members: Number(g.new_members),
   }));
 
@@ -96,12 +98,12 @@ export function AdminAnalytics({
     <section className="space-y-6">
       <header className="flex items-center gap-2">
         <BarChart3 className="size-5 text-[#e7a3a3]" />
-        <h2 className="text-xl font-bold tracking-tight text-white">Analitik</h2>
+        <h2 className="text-xl font-bold tracking-tight text-white">{t("heading")}</h2>
       </header>
 
       {/* Metrik kartları */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {metricDefs.map(({ key, label, icon: Icon }) => (
+        {metricDefs.map(({ key, labelKey, icon: Icon }) => (
           <Card
             key={key}
             className="border-white/5 bg-zinc-900/50 backdrop-blur transition-colors hover:border-[#841515]/40"
@@ -109,7 +111,7 @@ export function AdminAnalytics({
             <CardContent className="flex flex-col gap-2 p-4">
               <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-400">
                 <Icon className="size-3.5 text-[#e7a3a3]" />
-                {label}
+                {t(labelKey)}
               </span>
               <span
                 className="text-3xl font-bold tracking-tight"
@@ -127,17 +129,17 @@ export function AdminAnalytics({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
             <TrendingUp className="size-5 text-[#e7a3a3]" />
-            Aylık Üye Artışı
+            {t("growthTitle")}
           </CardTitle>
           <CardDescription>
-            Her ay kulüplere katılan yeni üye sayısı.
+            {t("growthDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {chartData.length === 0 ? (
             <EmptyState
               icon={LineChartIcon}
-              text="Grafik için yeterli veri yok."
+              text={t("growthEmpty")}
             />
           ) : (
             <div className="h-72 w-full">
@@ -178,7 +180,7 @@ export function AdminAnalytics({
                       color: "#fff",
                     }}
                     labelStyle={{ color: "#a1a1aa" }}
-                    formatter={(value) => [value as number, "Yeni üye"]}
+                    formatter={(value) => [value as number, t("tooltipNewMember")]}
                   />
                   <Area
                     type="monotone"
@@ -199,25 +201,25 @@ export function AdminAnalytics({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
             <Users2 className="size-5 text-[#e7a3a3]" />
-            Kulüp Performansı
+            {t("clubsTitle")}
           </CardTitle>
           <CardDescription>
-            Kulüp bazında üye, etkinlik ve katılım dağılımı.
+            {t("clubsDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {clubs.length === 0 ? (
-            <EmptyState icon={Users2} text="Henüz kulüp verisi yok." />
+            <EmptyState icon={Users2} text={t("clubsEmpty")} />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/10 text-left text-xs text-zinc-400">
-                    <th className="py-2 pr-3 font-medium">Kulüp</th>
-                    <th className="px-3 py-2 text-right font-medium">Üye</th>
-                    <th className="px-3 py-2 text-right font-medium">Etkinlik</th>
-                    <th className="px-3 py-2 text-right font-medium">Onaylı</th>
-                    <th className="py-2 pl-3 text-right font-medium">Gelen</th>
+                    <th className="py-2 pr-3 font-medium">{t("colClub")}</th>
+                    <th className="px-3 py-2 text-right font-medium">{t("colMember")}</th>
+                    <th className="px-3 py-2 text-right font-medium">{t("colEvent")}</th>
+                    <th className="px-3 py-2 text-right font-medium">{t("colApproved")}</th>
+                    <th className="py-2 pl-3 text-right font-medium">{t("colCheckin")}</th>
                   </tr>
                 </thead>
                 <tbody>

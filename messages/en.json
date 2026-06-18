@@ -80,10 +80,43 @@
       "emailLabel": "METU Email",
       "passwordLabel": "Password",
       "passwordPlaceholder": "At least 6 characters",
+      "firstNamePlaceholder": "Jane",
+      "lastNamePlaceholder": "Doe",
       "submit": "Create Account",
       "submitting": "Creating account…",
       "haveAccount": "Already have an account?",
       "loginLink": "Sign in"
+    },
+    "forgot": {
+      "title": "Forgot your password?",
+      "subtitle": "Enter your email address and we'll send you a reset link.",
+      "sentTitle": "Reset email sent",
+      "sentBody": "Check your inbox (and spam folder) and click the link.",
+      "errorTitle": "Something went wrong",
+      "domainError": "Only @metu.edu.tr or @ncc.metu.edu.tr email addresses are allowed.",
+      "sendError": "Could not send the reset email. Please try again.",
+      "emailLabel": "Email",
+      "submit": "Send Reset Link",
+      "submitting": "Sending…",
+      "backToLogin": "Back to sign in"
+    },
+    "reset": {
+      "title": "Set a New Password",
+      "subtitle": "Create a new password for your account.",
+      "invalidTitle": "Invalid or expired link",
+      "invalidBody": "Please restart the password reset process.",
+      "doneTitle": "Your password has been updated",
+      "doneBody": "Redirecting you to the dashboard…",
+      "errorTitle": "Something went wrong",
+      "passwordShort": "Password must be at least 6 characters.",
+      "mismatch": "Passwords do not match.",
+      "updateError": "Could not update password. Please try again.",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "At least 6 characters",
+      "confirmLabel": "New Password (again)",
+      "confirmPlaceholder": "Re-enter password",
+      "submit": "Update Password",
+      "submitting": "Updating…"
     }
   },
   "home": {
@@ -93,7 +126,9 @@
     "noUpcoming": "No events are currently scheduled.",
     "organizer": "organized by: {name}",
     "attendeeCount": "{count} attending",
-    "activeClubs": "Active Clubs"
+    "activeClubs": "Active Clubs",
+    "activeClubsEmptyTitle": "No active clubs yet",
+    "activeClubsEmptyBody": "They'll appear here as new communities are added."
   },
   "events": {
     "title": "Events",
@@ -358,5 +393,111 @@
         "deleted": "Document deleted."
       }
     }
+  },
+  "meta": {
+    "title": "METU Campus Portal",
+    "description": "METU NCC Community & Event Portal"
+  },
+  "admin": {
+    "page": {
+      "title": "Admin Panel",
+      "subtitle": "Super admin · clubs, admins, and advisors",
+      "unnamedUser": "(Unnamed user)"
+    },
+    "newClub": {
+      "title": "Add New Club",
+      "subtitle": "Admin panel · Create a community",
+      "nameLabel": "Club Name",
+      "namePlaceholder": "e.g. Computer Science Society",
+      "descLabel": "Club Description",
+      "descPlaceholder": "Briefly describe the club's purpose and activities…",
+      "submit": "Add Club",
+      "submitting": "Adding…",
+      "toasts": {
+        "nameRequired": "Club name cannot be empty.",
+        "error": "Could not add club: {message}",
+        "success": "Club added successfully"
+      }
+    },
+    "assignments": {
+      "title": "Assign Academic Advisor",
+      "desc": "School management only assigns advisors. The advisor designates the club president. (Leave empty to remove the advisor.)",
+      "clubLabel": "Club",
+      "clubPlaceholder": "Select…",
+      "advisorLabel": "Advisor",
+      "advisorNone": "(No advisor)",
+      "submit": "Save Advisor",
+      "toasts": {
+        "clubRequired": "Select a club.",
+        "error": "Assignment failed: {message}",
+        "assigned": "Advisor assigned",
+        "removed": "Advisor removed"
+      }
+    },
+    "approvals": {
+      "queueTitle": "School Approval Queue",
+      "queueDesc": "Events awaiting school approval. Once approved, they go live for students.",
+      "emptyQueue": "No pending events.",
+      "approve": "Approve",
+      "requestChanges": "Request Changes",
+      "reject": "Reject",
+      "rejectPrompt": "Rejection note (optional):",
+      "changesPrompt": "Changes note:",
+      "settingsTitle": "Advisor Approval Setting",
+      "settingsDesc": "When on, events go to the advisor first, then the school. When off, they go directly to school approval.",
+      "noClubs": "No clubs.",
+      "on": "On",
+      "off": "Off",
+      "toasts": {
+        "changesNoteRequired": "Enter a note for the revision.",
+        "decideError": "Operation failed: {message}",
+        "approved": "Event approved and live",
+        "rejected": "Event rejected",
+        "changes": "Changes requested",
+        "settingError": "Could not update: {message}",
+        "settingUpdated": "Approval setting updated"
+      }
+    },
+    "analytics": {
+      "heading": "Analytics",
+      "metricClubs": "Total Clubs",
+      "metricMembers": "Total Memberships",
+      "metricEvents": "Total Events",
+      "metricApproved": "Approved Events",
+      "metricTickets": "Tickets Sold",
+      "metricCheckins": "Attendees",
+      "growthTitle": "Monthly Member Growth",
+      "growthDesc": "New members joining clubs each month.",
+      "growthEmpty": "Not enough data for the chart.",
+      "tooltipNewMember": "New members",
+      "clubsTitle": "Club Performance",
+      "clubsDesc": "Member, event, and attendance breakdown per club.",
+      "clubsEmpty": "No club data yet.",
+      "colClub": "Club",
+      "colMember": "Members",
+      "colEvent": "Events",
+      "colApproved": "Approved",
+      "colCheckin": "Attended"
+    }
+  },
+  "checkin": {
+    "back": "Back to Management",
+    "title": "{name} · Door Check-in",
+    "subtitle": "Scan a QR code or find by name to check in.",
+    "qrTitle": "QR Scan",
+    "stop": "Stop",
+    "openCamera": "Open Camera",
+    "cameraHint": "Open the camera and scan the attendee's QR code.",
+    "cameraError": "Could not start the camera. Grant permission or use name search.",
+    "findTitle": "Find by Name",
+    "searchPlaceholder": "Attendee name…",
+    "noApproved": "No approved (not-yet-checked-in) tickets found.",
+    "unnamedUser": "Unnamed user",
+    "checkinButton": "Check in",
+    "checkedInResult": "{name} · checked in",
+    "resultUser": "User",
+    "checkedInMessage": "Checked in",
+    "successToast": "Checked in: {name}",
+    "successFallback": "user"
   }
 }

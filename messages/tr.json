@@ -80,10 +80,43 @@
       "emailLabel": "METU E-posta",
       "passwordLabel": "Şifre",
       "passwordPlaceholder": "En az 6 karakter",
+      "firstNamePlaceholder": "Ayşe",
+      "lastNamePlaceholder": "Yılmaz",
       "submit": "Hesap Oluştur",
       "submitting": "Hesap oluşturuluyor…",
       "haveAccount": "Zaten hesabınız var mı?",
       "loginLink": "Giriş yapın"
+    },
+    "forgot": {
+      "title": "Şifrenizi mi unuttunuz?",
+      "subtitle": "E-posta adresinizi girin, size bir sıfırlama linki gönderelim.",
+      "sentTitle": "Sıfırlama maili gönderildi",
+      "sentBody": "Gelen kutunuzu (ve spam klasörünü) kontrol edip linke tıklayın.",
+      "errorTitle": "Bir sorun oluştu",
+      "domainError": "Sadece @metu.edu.tr veya @ncc.metu.edu.tr uzantılı mail kullanılabilir.",
+      "sendError": "Sıfırlama maili gönderilemedi. Lütfen tekrar deneyin.",
+      "emailLabel": "E-posta",
+      "submit": "Sıfırlama Linki Gönder",
+      "submitting": "Gönderiliyor…",
+      "backToLogin": "Girişe dön"
+    },
+    "reset": {
+      "title": "Yeni Şifre Belirle",
+      "subtitle": "Hesabınız için yeni bir şifre oluşturun.",
+      "invalidTitle": "Geçersiz veya süresi dolmuş link",
+      "invalidBody": "Lütfen şifre sıfırlama işlemini yeniden başlatın.",
+      "doneTitle": "Şifreniz güncellendi",
+      "doneBody": "Panele yönlendiriliyorsunuz…",
+      "errorTitle": "Bir sorun oluştu",
+      "passwordShort": "Şifre en az 6 karakter olmalıdır.",
+      "mismatch": "Şifreler eşleşmiyor.",
+      "updateError": "Şifre güncellenemedi. Lütfen tekrar deneyin.",
+      "newPassword": "Yeni Şifre",
+      "newPasswordPlaceholder": "En az 6 karakter",
+      "confirmLabel": "Yeni Şifre (Tekrar)",
+      "confirmPlaceholder": "Şifreyi tekrar girin",
+      "submit": "Şifreyi Güncelle",
+      "submitting": "Güncelleniyor…"
     }
   },
   "home": {
@@ -93,7 +126,9 @@
     "noUpcoming": "Şu an planlanan bir etkinlik yok.",
     "organizer": "düzenleyen: {name}",
     "attendeeCount": "{count} Kişi Katılıyor",
-    "activeClubs": "Aktif Kulüpler"
+    "activeClubs": "Aktif Kulüpler",
+    "activeClubsEmptyTitle": "Henüz aktif kulüp bulunmuyor",
+    "activeClubsEmptyBody": "Yeni topluluklar eklendiğinde burada görünecek."
   },
   "events": {
     "title": "Etkinlikler",
@@ -358,5 +393,111 @@
         "deleted": "Belge silindi."
       }
     }
+  },
+  "meta": {
+    "title": "ODTÜ Kampüs Portalı",
+    "description": "ODTÜ KKK Topluluk ve Etkinlik Portalı"
+  },
+  "admin": {
+    "page": {
+      "title": "Yönetim Paneli",
+      "subtitle": "Süper yönetici · kulüp, yönetici ve danışman yönetimi",
+      "unnamedUser": "(İsimsiz kullanıcı)"
+    },
+    "newClub": {
+      "title": "Yeni Kulüp Ekle",
+      "subtitle": "Yönetici paneli · Topluluk oluşturma",
+      "nameLabel": "Kulüp Adı",
+      "namePlaceholder": "Örn. Bilgisayar Topluluğu",
+      "descLabel": "Kulüp Açıklaması",
+      "descPlaceholder": "Kulübün amacını ve faaliyetlerini kısaca açıklayın…",
+      "submit": "Kulübü Ekle",
+      "submitting": "Ekleniyor…",
+      "toasts": {
+        "nameRequired": "Kulüp adı boş olamaz.",
+        "error": "Kulüp eklenemedi: {message}",
+        "success": "Kulüp başarıyla eklendi"
+      }
+    },
+    "assignments": {
+      "title": "Akademik Danışman Ata",
+      "desc": "Okul yönetimi yalnızca danışman atar. Kulüp başkanını danışman belirler. (Boş bırakırsanız danışman kaldırılır.)",
+      "clubLabel": "Kulüp",
+      "clubPlaceholder": "Seçin…",
+      "advisorLabel": "Danışman",
+      "advisorNone": "(Danışman yok)",
+      "submit": "Danışmanı Kaydet",
+      "toasts": {
+        "clubRequired": "Kulüp seçin.",
+        "error": "Atama başarısız: {message}",
+        "assigned": "Danışman atandı",
+        "removed": "Danışman kaldırıldı"
+      }
+    },
+    "approvals": {
+      "queueTitle": "Okul Onay Kuyruğu",
+      "queueDesc": "Okul onayı bekleyen etkinlikler. Onaylanınca öğrencilerde yayına girer.",
+      "emptyQueue": "Bekleyen etkinlik yok.",
+      "approve": "Onayla",
+      "requestChanges": "Revizyon",
+      "reject": "Reddet",
+      "rejectPrompt": "Reddetme notu (opsiyonel):",
+      "changesPrompt": "Revizyon notu:",
+      "settingsTitle": "Danışman Onayı Ayarı",
+      "settingsDesc": "Açıksa etkinlikler önce danışmana, sonra okula gider. Kapalıysa doğrudan okul onayına düşer.",
+      "noClubs": "Kulüp yok.",
+      "on": "Açık",
+      "off": "Kapalı",
+      "toasts": {
+        "changesNoteRequired": "Revizyon için bir not girin.",
+        "decideError": "İşlem başarısız: {message}",
+        "approved": "Etkinlik onaylandı ve yayında",
+        "rejected": "Etkinlik reddedildi",
+        "changes": "Revizyon istendi",
+        "settingError": "Güncellenemedi: {message}",
+        "settingUpdated": "Onay ayarı güncellendi"
+      }
+    },
+    "analytics": {
+      "heading": "Analitik",
+      "metricClubs": "Toplam Kulüp",
+      "metricMembers": "Toplam Üyelik",
+      "metricEvents": "Toplam Etkinlik",
+      "metricApproved": "Onaylı Etkinlik",
+      "metricTickets": "Satılan Bilet",
+      "metricCheckins": "Gelen Kişi",
+      "growthTitle": "Aylık Üye Artışı",
+      "growthDesc": "Her ay kulüplere katılan yeni üye sayısı.",
+      "growthEmpty": "Grafik için yeterli veri yok.",
+      "tooltipNewMember": "Yeni üye",
+      "clubsTitle": "Kulüp Performansı",
+      "clubsDesc": "Kulüp bazında üye, etkinlik ve katılım dağılımı.",
+      "clubsEmpty": "Henüz kulüp verisi yok.",
+      "colClub": "Kulüp",
+      "colMember": "Üye",
+      "colEvent": "Etkinlik",
+      "colApproved": "Onaylı",
+      "colCheckin": "Gelen"
+    }
+  },
+  "checkin": {
+    "back": "Yönetime Dön",
+    "title": "{name} · Kapı Kontrol",
+    "subtitle": "QR okutun veya isimle bulup giriş yapın.",
+    "qrTitle": "QR Tarama",
+    "stop": "Durdur",
+    "openCamera": "Kamerayı Aç",
+    "cameraHint": "Kamerayı açıp katılımcının QR kodunu okutun.",
+    "cameraError": "Kamera başlatılamadı. İzin verin veya isimle arama kullanın.",
+    "findTitle": "İsimle Bul",
+    "searchPlaceholder": "Katılımcı adı…",
+    "noApproved": "Onaylı (giriş yapmamış) bilet bulunamadı.",
+    "unnamedUser": "İsimsiz kullanıcı",
+    "checkinButton": "Giriş",
+    "checkedInResult": "{name} · giriş yaptı",
+    "resultUser": "Kullanıcı",
+    "checkedInMessage": "Giriş yapıldı",
+    "successToast": "Giriş: {name}",
+    "successFallback": "kullanıcı"
   }
 }

@@ -1,8 +1,10 @@
+import { getTranslations } from "next-intl/server";
 import { Inbox } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { ClubCard, type Club } from "@/components/shared/club-card";
 
 export async function ClubsGrid() {
+  const t = await getTranslations("home");
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -23,10 +25,10 @@ export async function ClubsGrid() {
           <Inbox className="size-6" />
         </div>
         <p className="mt-4 text-sm font-medium text-zinc-300">
-          Henüz aktif kulüp bulunmuyor
+          {t("activeClubsEmptyTitle")}
         </p>
         <p className="mt-1 text-sm text-zinc-500">
-          Yeni topluluklar eklendiğinde burada görünecek.
+          {t("activeClubsEmptyBody")}
         </p>
       </div>
     );

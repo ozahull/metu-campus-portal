@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { NewClubForm } from "./new-club-form";
 import { AdminAssignments, type Option } from "./admin-assignments";
@@ -21,6 +22,7 @@ const DOC_BUCKET = "event-docs";
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
+  const t = await getTranslations("admin.page");
   const supabase = await createClient();
 
   const {
@@ -65,7 +67,7 @@ export default async function AdminPage() {
   }));
   const userOptions: Option[] = (usersRaw ?? []).map((u) => ({
     id: u.id,
-    label: u.full_name ?? "(İsimsiz kullanıcı)",
+    label: u.full_name ?? t("unnamedUser"),
   }));
   const clubSettings: ClubSetting[] = (clubsRaw ?? []).map((c) => ({
     id: c.id,
@@ -165,10 +167,10 @@ export default async function AdminPage() {
       <div className="mx-auto w-full max-w-4xl space-y-8">
         <header>
           <h1 className="text-2xl font-bold tracking-tight text-white">
-            Yönetim Paneli
+            {t("title")}
           </h1>
           <p className="mt-1 text-sm text-zinc-400">
-            Süper yönetici · kulüp, yönetici ve danışman yönetimi
+            {t("subtitle")}
           </p>
         </header>
 

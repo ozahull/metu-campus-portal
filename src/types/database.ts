@@ -278,6 +278,96 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string | null
+          club_id: string | null
+          created_at: string
+          event_id: string | null
+          id: string
+          link: string | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          club_id?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          club_id?: string | null
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          scope: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          scope?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          scope?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           email: string | null
@@ -409,6 +499,10 @@ export type Database = {
       is_club_admin: { Args: { p_club_id: string }; Returns: boolean }
       is_club_advisor: { Args: { p_club_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      set_notification_preference: {
+        Args: { p_scope: string }
+        Returns: undefined
+      }
       ticket_approve: {
         Args: { p_decision: string; p_note?: string; p_ticket_id: string }
         Returns: undefined

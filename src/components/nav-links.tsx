@@ -46,8 +46,8 @@ export function NavLinks({
                 ? "px-3 py-1.5 text-sm"
                 : "px-3 py-2.5 text-base",
               active
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                ? "bg-primary/10 text-primary hover:bg-muted"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
           >
             <Icon className={variant === "desktop" ? "size-4" : "size-5"} />

@@ -51,26 +51,27 @@ export async function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-        {/* Sol: logo + masaüstü linkler */}
-        <div className="flex items-center gap-6">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 font-semibold tracking-tight text-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-lg"
-          >
-            <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
-              KKK
-            </span>
-            <span className="hidden sm:inline">{t("brand")}</span>
-          </Link>
+      <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-4 sm:px-6 lg:px-8">
+        {/* Sol: logo + marka */}
+        <Link
+          href="/dashboard"
+          className="flex shrink-0 items-center gap-2 rounded-lg font-semibold tracking-tight text-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        >
+          {/* KKK rozeti her iki temada da marka kırmızısında (bg-primary) yaşar. */}
+          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
+            KKK
+          </span>
+          <span className="hidden sm:inline">{t("brand")}</span>
+        </Link>
 
-          <nav className="hidden items-center gap-1 md:flex">
-            <NavLinks />
-          </nav>
-        </div>
+        {/* Linkler logonun hemen yanında, sola kümeli (Linear/GitHub deseni) */}
+        <nav className="hidden items-center gap-1 md:flex">
+          <NavLinks />
+        </nav>
 
-        {/* Sağ: tema + dil + (bildirim yeri) + avatar; mobilde hamburger */}
-        <div className="flex items-center gap-1 sm:gap-1.5">
+        {/* Sağ: ml-auto ile sağa yaslı — tema + dil + (bildirim yeri) + avatar;
+            mobilde hamburger. Ortada esneyen boşluk kalır. */}
+        <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
           <ThemeSwitcher />
           <LanguageSwitcher />
 

@@ -39,10 +39,15 @@ tamamen KOYU TEMA (zinc-950 zemin) ve METU kırmızısı (#841515) aksanlar.
     `<Link className={cn(buttonVariants({variant,size}), "...")}>`
   - Base color: slate (globals.css OKLCH değişkenleri slate'e ayarlı)
 - **Auth & DB:** Supabase (@supabase/supabase-js + @supabase/ssr)
+  - Supabase proje ref: **zmnmdcuvdrvgdkdcaxjj** (URL: https://zmnmdcuvdrvgdkdcaxjj.supabase.co)
+- **i18n:** next-intl (cookie tabanlı, diller: tr/en, varsayılan tr). **Path routing YOK**
+  — dil URL'den değil `NEXT_LOCALE` cookie'sinden okunur (src/i18n/config.ts,
+  request.ts, locale-actions.ts; çeviriler messages/tr.json + messages/en.json).
+  Dil switcher navbar'da; server tarafı `getRequestConfig` ile cookie'yi okur.
 - **Toast:** sonner (theme="dark" sabit, next-themes bağımlılığı kaldırıldı)
 - **İkonlar:** lucide-react
 - **Deploy:** Vercel (GitHub'a her push otomatik deploy tetikler)
-- **Repo:** github.com/qkmgd5yg89-byte/metu-campus-portal (branch: main)
+- **Repo:** github.com/ozahull/metu-campus-portal (branch: main)
 
 ================================================================
 ## 3. KLASÖR YAPISI
@@ -421,9 +426,7 @@ FAZ 1 TAMAMLANDI (kod tarafı) — CLUB_ADMIN + topluluk yönetim paneli:
 - src/types/database.ts güncellendi (yeni kolonlar + is_club_admin). tsc temiz.
 - Kulüp admini SADECE kendi kulübünü yönetir (is_club_admin RLS); başka kulüpte
   /manage → redirect. Global profiles.role hâlâ trigger korumalı.
-- ⚠️ Bu fazın migration'ları (20260616*) henüz production'a UYGULANMADI —
-  `npx supabase db push` ile uygulanmalı (aksi halde yeni kolonlar/politikalar
-  canlıda yok; manage paneli RLS/kolon hatası verir).
+- ✅ Migration'lar (20260616*) yeni projeye UYGULANDI (bkz. ALTYAPI DURUMU).
 
 FAZ 1.5 TAMAMLANDI (kod tarafı) — Yetki devri (okul → danışman → başkan):
 - Model: SUPER_ADMIN yalnızca DANIŞMAN atar; danışman kulübün BAŞKANINI
@@ -435,7 +438,7 @@ FAZ 1.5 TAMAMLANDI (kod tarafı) — Yetki devri (okul → danışman → başka
   ataması SUPER_ADMIN+DANIŞMAN'a kilitli.
 - UI: /admin yalnızca danışman atar; manage erişimi danışman+başkan+okul;
   başkan-atama kontrolü yalnızca danışman+okul'a; detayda "Yönet" danışman/başkana.
-- ⚠️ 20260616121000 migration'ı henüz production'a UYGULANMADI (db push gerek).
+- ✅ 20260616121000 migration'ı yeni projeye UYGULANDI.
 
 FAZ 2 TAMAMLANDI (kod tarafı) — Etkinlik onay akışı (iki kapı):
 - Etkinlik artık otomatik APPROVED değil. Oluşturma → event_submit →
@@ -452,7 +455,7 @@ FAZ 2 TAMAMLANDI (kod tarafı) — Etkinlik onay akışı (iki kapı):
   yalnızca içerik kolonlarını insert/update edebilir (status/review_* yalnızca
   RPC=owner). Eski AddEventDialog (status:'APPROVED' doğrudan insert) KALDIRILDI;
   oluşturma yalnızca manage panelinden (insert içerik → event_submit).
-- ⚠️ 20260616122000 migration'ı henüz production'a UYGULANMADI (db push gerek).
+- ✅ 20260616122000 migration'ı yeni projeye UYGULANDI.
 
 ⚠️ ÖNEMLİ — profiles.role ENUM'dur (user_role):
 - Production'da profiles.role bir PostgreSQL ENUM tipidir (user_role), text DEĞİL.
@@ -466,7 +469,7 @@ FAZ 2 TAMAMLANDI (kod tarafı) — Etkinlik onay akışı (iki kapı):
 
 İLERİSİ İÇİN (opsiyonel bakım):
 - Tipleri uzaktan yeniden üret (şema değişince):
-    npx supabase gen types typescript --project-id qxhyxxekaukwksupphzv > src/types/database.ts
+    npx supabase gen types typescript --project-id zmnmdcuvdrvgdkdcaxjj > src/types/database.ts
 - Canlı politika denetimi:
     select * from pg_policies where schemaname='public';
 
@@ -477,8 +480,55 @@ FAZ 3 TAMAMLANDI (kod tarafı) — Öğrenci tarafı: etkinlik keşfi + zengin k
   Navbar "Etkinlikler" → /events aktif, /profile (kulüpler + RSVP'ler + isim/şifre).
 - src/lib yok; ortak event-status.ts mevcut. tsc temiz. Öğrenci yalnızca APPROVED.
 
+FAZ 4 TAMAMLANDI — Biletleme (IBAN + dekont + QR check-in; ONLINE ÖDEME YOK):
+- DB (20260617120000_ticketing + 20260617130000_ticket_column_grants):
+  clubs.iban + clubs.ticket_enabled; events.ticket_price/ticket_capacity/
+  ticket_deadline; tickets tablosu (token = upper(encode(extensions.
+  gen_random_bytes(5),'hex')) — pgcrypto extensions'ta, aşağıdaki nota bak;
+  status PENDING_PAYMENT→SUBMITTED→APPROVED/REJECTED→CHECKED_IN, receipt_url,
+  (event_id,user_id) unique). Kolon-grant: authenticated yalnızca (event_id,
+  user_id) INSERT + PENDING iken kendi biletini DELETE; status/receipt/review
+  yalnızca RPC ile. 3 SECURITY DEFINER RPC: ticket_submit_receipt (dekont
+  yükle→SUBMITTED), ticket_approve (başkan/okul onay/red + kapasite kontrolü),
+  ticket_checkin (QR/token ile kapıda giriş; başkan/danışman/okul; tek kullanım).
+- UI: /events/[id] ticket-flow (öğrenci: talep aç + IBAN gör + dekont yükle),
+  manage/manage-tickets (başkan: dekont onay kuyruğu), /clubs/[id]/checkin +
+  checkin-scanner (QR/token kapı girişi). src/lib/ticket-status.ts ortak etiketler.
+
+FAZ 5 TAMAMLANDI — Etkinlik belge eki (onay zincirine kanıt/evrak):
+- DB (20260617140000_event_documents): event_documents tablosu (event_id,
+  uploaded_by, file_url → event-docs bucket, file_name, note). RLS: SELECT
+  yükleyen+başkan+danışman+okul; INSERT yalnız başkan/okul kendi adına; DELETE
+  yükleyen. Storage 'event-docs' (PRIVATE) insert/select politikaları
+  (path: ${event_id}/${uploaded_by}-${ts}.ext; erişim signed URL ile).
+- UI: manage/event-documents (başkan belge yükler/siler; onay zinciri görür).
+
+FAZ 6 TAMAMLANDI — Okula raporlama / analitik (yalnız SUPER_ADMIN):
+- DB (20260617150000_analytics): 3 SECURITY DEFINER okuma RPC'si (hepsi
+  is_super_admin() kapılı, aksi 'Yetkisiz'): analytics_overview (kampüs özeti —
+  kulüp/üye/etkinlik/onaylı/bilet/checkin sayıları), analytics_clubs (kulüp
+  bazlı performans), analytics_member_growth (aylık üye artışı zaman serisi).
+- UI: /admin admin-analytics (özet kartları + kulüp tablosu + büyüme).
+
+ALTYAPI DURUMU (2026-07-13 — YENİ Supabase projesi zmnmdcuvdrvgdkdcaxjj):
+- 19/19 migration TEMİZ bir projeye sırayla UYGULANDI (npx supabase db push).
+  Artık "henüz production'a uygulanmadı" uyarısı YOK — Faz 0..6'nın tüm şeması
+  canlıda. (Yukarıdaki Faz 1/1.5/2 blokları buna göre güncellendi.)
+- Storage bucket'ları AÇIK (Supabase panelinden elle oluşturuldu, SQL ile değil):
+  • club-images (PUBLIC) — kulüp logo/kapak; okuma public, yazma/güncelle/sil
+    yalnız başkan/okul (20260617160000_club_images storage politikaları).
+  • event-docs (PRIVATE) — etkinlik evrakı; erişim signed URL ile, yazma başkan/okul
+    (20260617140000_event_documents storage politikaları).
+- ⚠️ pgcrypto Supabase'de "extensions" ŞEMASINDA kurulu, public'te DEĞİL.
+  Migration'da/runtime'da pgcrypto fonksiyonları (gen_random_bytes, crypt, digest,
+  hmac, gen_salt, pgp_* vb.) "extensions." ile NİTELENMELİ (ör. extensions.
+  gen_random_bytes) — aksi halde search_path'te olmadığı için "function ...
+  does not exist (42883)" hatası. gen_random_uuid ÇEKİRDEK fonksiyondur,
+  nitelenmez/dokunulmaz. (Bkz. 20260617120000_ticketing.sql:20 DEFAULT ifadesi.)
+
 DİKKAT EDİLECEKLER (teknik borç / bekleyenler):
-- Görseller URL ile (logo/cover) — Supabase Storage yükleme UI'ı yok (ileride).
+- (ÇÖZÜLDÜ) Kulüp logo/kapak artık Supabase Storage'a (club-images, PUBLIC)
+  yükleniyor — keyfi dış link kaldırıldı. Etkinlik evrakı event-docs (PRIVATE).
 - lucide'de Instagram ikonu yok; AtSign kullanıldı.
 - (ÇÖZÜLDÜ) Navbar "Etkinlikler" artık /events'e bağlı.
 - (ÇÖZÜLDÜ) profiles.email gizliliği: kolon-seviyesi grant ile kısıtlandı

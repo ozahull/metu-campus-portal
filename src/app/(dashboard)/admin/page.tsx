@@ -5,6 +5,7 @@ import {
   BarChart3,
   Building2,
   ClipboardCheck,
+  FileText,
   ShieldCheck,
   UserCog,
 } from "lucide-react";
@@ -26,6 +27,7 @@ import {
   type MemberGrowthPoint,
   type Overview,
 } from "./admin-analytics";
+import { TermReport } from "./term-report";
 
 const DOC_BUCKET = "event-docs";
 
@@ -217,6 +219,10 @@ export default async function AdminPage() {
             <BarChart3 className="size-4" />
             {t("tabAnalytics")}
           </TabsTab>
+          <TabsTab value="report">
+            <FileText className="size-4" />
+            {t("tabReport")}
+          </TabsTab>
         </TabsList>
 
         <TabsPanel value="approvals">
@@ -242,6 +248,10 @@ export default async function AdminPage() {
             clubs={clubStats}
             growth={memberGrowth}
           />
+        </TabsPanel>
+
+        <TabsPanel value="report">
+          <TermReport />
         </TabsPanel>
       </Tabs>
     </PageShell>

@@ -601,6 +601,18 @@ export type Database = {
           total_tickets: number
         }[]
       }
+      analytics_term_report: {
+        Args: { p_end: string; p_start: string }
+        Returns: {
+          checkin_total: number
+          club_id: string
+          club_name: string
+          event_count: number
+          member_total: number
+          new_members: number
+          rsvp_total: number
+        }[]
+      }
       club_announce: {
         Args: {
           p_body: string

@@ -182,3 +182,50 @@
     @apply font-sans;
   }
 }
+
+/*
+  YAZDIRMA (Faz 9B — Dönem Raporu). Yalnız .print-report bölgesi yazdırılır;
+  geri kalan arayüz gizlenir. Kağıt için token'lar .print-report üzerinde
+  sabit AÇIK palete remap edilir (tema koyu olsa bile rapor beyaz zeminde
+  siyah metin çıkar) — bu remap yalnız @media print içinde, TSX token-only kalır.
+*/
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+  body * {
+    visibility: hidden !important;
+  }
+  .print-report,
+  .print-report * {
+    visibility: visible !important;
+  }
+  .print-report {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    --background: #ffffff;
+    --foreground: #141414;
+    --card: #ffffff;
+    --card-foreground: #141414;
+    --popover: #ffffff;
+    --popover-foreground: #141414;
+    --muted: #f4f4f5;
+    --muted-foreground: #52525b;
+    --accent: #f4f4f5;
+    --accent-foreground: #141414;
+    --secondary: #f4f4f5;
+    --border: #d4d4d8;
+    --input: #d4d4d8;
+    --primary: #841515;
+    --primary-foreground: #ffffff;
+  }
+  .print-hide {
+    display: none !important;
+  }
+  .print-break {
+    break-inside: avoid;
+  }
+}

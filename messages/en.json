@@ -551,7 +551,8 @@
       "tabClubs": "Clubs",
       "tabApprovals": "Approvals",
       "tabAssignments": "Assignments",
-      "tabAnalytics": "Analytics"
+      "tabAnalytics": "Analytics",
+      "tabReport": "Term Report"
     },
     "fairMode": {
       "title": "Club Fair Mode",
@@ -636,6 +637,31 @@
       "colEvent": "Events",
       "colApproved": "Approved",
       "colCheckin": "Attended"
+    },
+    "termReport": {
+      "startDate": "Start",
+      "endDate": "End",
+      "generate": "Generate Report",
+      "download": "Download PDF",
+      "hint": "Pick a date range and generate the report.",
+      "reportTitle": "METU NCC · Term Report",
+      "range": "{start} – {end}",
+      "generatedAt": "Generated: {date}",
+      "campusTotals": "Campus Totals",
+      "mostActive": "Most Active Clubs",
+      "perClub": "Per Club",
+      "members": "Members",
+      "newMembers": "New Members",
+      "events": "Events",
+      "rsvp": "RSVP",
+      "checkin": "Attended",
+      "attendanceRate": "Attendance Rate",
+      "colClub": "Club",
+      "eventsCount": "{count} events",
+      "toasts": {
+        "badRange": "Start date cannot be after end date.",
+        "error": "Could not generate report: {message}"
+      }
     }
   },
   "checkin": {

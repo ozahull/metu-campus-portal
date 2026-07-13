@@ -551,7 +551,8 @@
       "tabClubs": "Kulüpler",
       "tabApprovals": "Onay Kuyruğu",
       "tabAssignments": "Atamalar",
-      "tabAnalytics": "Analitik"
+      "tabAnalytics": "Analitik",
+      "tabReport": "Dönem Raporu"
     },
     "fairMode": {
       "title": "Kulüp Fuarı Modu",
@@ -636,6 +637,31 @@
       "colEvent": "Etkinlik",
       "colApproved": "Onaylı",
       "colCheckin": "Gelen"
+    },
+    "termReport": {
+      "startDate": "Başlangıç",
+      "endDate": "Bitiş",
+      "generate": "Rapor Oluştur",
+      "download": "PDF İndir",
+      "hint": "Tarih aralığı seçip rapor oluşturun.",
+      "reportTitle": "ODTÜ KKK · Dönem Raporu",
+      "range": "{start} – {end}",
+      "generatedAt": "Oluşturma: {date}",
+      "campusTotals": "Kampüs Toplamları",
+      "mostActive": "En Aktif Kulüpler",
+      "perClub": "Kulüp Bazında",
+      "members": "Üye",
+      "newMembers": "Yeni Üye",
+      "events": "Etkinlik",
+      "rsvp": "RSVP",
+      "checkin": "Gelen",
+      "attendanceRate": "Katılım Oranı",
+      "colClub": "Kulüp",
+      "eventsCount": "{count} etkinlik",
+      "toasts": {
+        "badRange": "Başlangıç tarihi bitişten sonra olamaz.",
+        "error": "Rapor oluşturulamadı: {message}"
+      }
     }
   },
   "checkin": {

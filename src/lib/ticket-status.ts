@@ -7,26 +7,28 @@ export type TicketStatus =
   | "REJECTED"
   | "CHECKED_IN";
 
+// cls'ler iki temada da okunur (bkz. event-status.ts): metin açık temada koyu,
+// koyu temada açık (dark:) varyant kullanır.
 export const TICKET_STATUS_META: Record<string, { label: string; cls: string }> = {
   PENDING_PAYMENT: {
     label: "Ödeme bekliyor",
-    cls: "border-amber-500/30 bg-amber-500/10 text-amber-300",
+    cls: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
   },
   SUBMITTED: {
     label: "Onay bekliyor",
-    cls: "border-sky-500/30 bg-sky-500/10 text-sky-300",
+    cls: "border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-300",
   },
   APPROVED: {
     label: "Onaylandı",
-    cls: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+    cls: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
   },
   REJECTED: {
     label: "Reddedildi",
-    cls: "border-red-500/30 bg-red-500/10 text-red-300",
+    cls: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300",
   },
   CHECKED_IN: {
     label: "Giriş yapıldı",
-    cls: "border-violet-500/30 bg-violet-500/10 text-violet-300",
+    cls: "border-violet-500/30 bg-violet-500/10 text-violet-700 dark:text-violet-300",
   },
 };
 
@@ -34,7 +36,7 @@ export function ticketStatusMeta(status: string) {
   return (
     TICKET_STATUS_META[status] ?? {
       label: status,
-      cls: "border-white/10 bg-white/5 text-zinc-300",
+      cls: "border-border bg-muted text-muted-foreground",
     }
   );
 }

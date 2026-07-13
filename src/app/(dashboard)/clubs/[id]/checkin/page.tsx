@@ -83,38 +83,30 @@ export default async function CheckinPage({
     .sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? "", "tr"));
 
   return (
-    <main className="dark relative min-h-svh overflow-hidden bg-zinc-950 text-foreground">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(50%_60%_at_50%_0%,rgba(132,21,21,0.18),transparent)]"
-      />
-
-      <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
-        <Link
-          href={`/clubs/${id}/manage`}
-          className={cn(
-            buttonVariants({ variant: "ghost", size: "sm" }),
-            "-ml-2 gap-1.5 text-zinc-400 hover:bg-white/5 hover:text-white",
-          )}
-        >
-          <ArrowLeft className="size-4" />
-          {t("back")}
-        </Link>
-
-        <header className="mt-6 mb-8 flex items-center gap-3">
-          <span
-            className="flex size-10 items-center justify-center rounded-xl text-white shadow-lg"
-            style={{ backgroundColor: "#841515" }}
+    <main className="relative">
+      <div className="mx-auto w-full max-w-2xl px-4 pb-14 sm:px-6 lg:px-8">
+        <div className="pt-6">
+          <Link
+            href={`/clubs/${id}/manage`}
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "-ml-2 gap-1.5 text-muted-foreground",
+            )}
           >
+            <ArrowLeft className="size-4" />
+            {t("back")}
+          </Link>
+        </div>
+
+        <header className="mt-4 mb-8 flex items-center gap-3">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
             <QrCode className="size-5" />
           </span>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">
+            <h1 className="text-2xl font-bold tracking-tight">
               {t("title", { name: club.name })}
             </h1>
-            <p className="text-sm text-zinc-400">
-              {t("subtitle")}
-            </p>
+            <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
           </div>
         </header>
 

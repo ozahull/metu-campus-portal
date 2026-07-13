@@ -117,11 +117,10 @@ export default function RegisterPage() {
 
   return (
     <AuthShell>
-      <Card className="w-full max-w-md border-white/10 bg-zinc-900/70 shadow-2xl shadow-black/40 backdrop-blur">
+      <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-3 text-center">
           <div
-            className="mx-auto flex size-12 items-center justify-center rounded-2xl text-white shadow-lg"
-            style={{ backgroundColor: "#841515" }}
+            className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm"
           >
             <span className="text-lg font-semibold tracking-tight">KKK</span>
           </div>
@@ -135,10 +134,10 @@ export default function RegisterPage() {
 
         <CardContent>
           {confirmSent ? (
-            <Alert className="border-emerald-500/40 bg-emerald-950/40 text-emerald-200 [&>svg]:text-emerald-400">
+            <Alert className="border-success/40 bg-success/10 text-success [&>svg]:text-success">
               <CheckCircle2 className="size-4" />
               <AlertTitle>{t("register.confirmTitle")}</AlertTitle>
-              <AlertDescription className="text-emerald-300/90">
+              <AlertDescription className="text-success/90">
                 {t("register.confirmBody")}
               </AlertDescription>
             </Alert>
@@ -233,8 +232,7 @@ export default function RegisterPage() {
                 type="submit"
                 size="lg"
                 disabled={loading || !formValid}
-                className="w-full gap-2 font-medium text-white hover:opacity-90"
-                style={{ backgroundColor: "#841515" }}
+                className="w-full gap-2 font-medium"
               >
                 {loading && <Loader2 className="size-4 animate-spin" />}
                 {loading ? t("register.submitting") : t("register.submit")}

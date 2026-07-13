@@ -75,7 +75,7 @@ export function ManageMembers({
 
   if (members.length === 0) {
     return (
-      <p className="rounded-lg border border-dashed border-white/10 bg-white/[0.02] px-5 py-8 text-center text-sm text-zinc-500">
+      <p className="rounded-lg border border-dashed border-border bg-muted/40 px-5 py-8 text-center text-sm text-muted-foreground">
         {t("empty")}
       </p>
     );
@@ -89,17 +89,17 @@ export function ManageMembers({
         return (
           <li
             key={m.user_id}
-            className="flex items-center justify-between gap-3 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5"
+            className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/40"
           >
             <div className="flex min-w-0 items-center gap-3">
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/5 text-zinc-300">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
                 <UserRound className="size-4" />
               </span>
-              <span className="truncate text-sm font-medium text-zinc-200">
+              <span className="truncate text-sm font-medium">
                 {m.full_name ?? t("unnamed")}
               </span>
               {isAdmin && (
-                <span className="rounded-full border border-[#841515]/30 bg-[#841515]/10 px-2 py-0.5 text-[10px] font-medium text-[#e7a3a3]">
+                <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
                   {t("adminBadge")}
                 </span>
               )}
@@ -107,15 +107,15 @@ export function ManageMembers({
             <div className="flex shrink-0 gap-1">
               {canAssignAdmin &&
                 (isAdmin ? (
-                  <Button onClick={() => setRole(m, "MEMBER")} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-white" aria-label={t("demoteAria")}>
+                  <Button onClick={() => setRole(m, "MEMBER")} disabled={busy} size="icon-sm" variant="ghost" aria-label={t("demoteAria")}>
                     <ShieldMinus className="size-4" />
                   </Button>
                 ) : (
-                  <Button onClick={() => setRole(m, "ADMIN")} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-[#e7a3a3]" aria-label={t("promoteAria")}>
+                  <Button onClick={() => setRole(m, "ADMIN")} disabled={busy} size="icon-sm" variant="ghost" className="hover:text-primary" aria-label={t("promoteAria")}>
                     <ShieldCheck className="size-4" />
                   </Button>
                 ))}
-              <Button onClick={() => removeMember(m)} disabled={busy} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-red-500/10 hover:text-red-400" aria-label={t("removeAria")}>
+              <Button onClick={() => removeMember(m)} disabled={busy} size="icon-sm" variant="ghost" className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label={t("removeAria")}>
                 <UserX className="size-4" />
               </Button>
             </div>

@@ -59,6 +59,7 @@
     }
   },
   "auth": {
+    "tagline": "Kampüsteki toplulukları keşfet, etkinliklere katıl ve kendi kulübünü yönet.",
     "showPassword": "Şifreyi göster",
     "hidePassword": "Şifreyi gizle",
     "login": {
@@ -135,6 +136,9 @@
     "noUpcoming": "Şu an planlanan bir etkinlik yok.",
     "organizer": "düzenleyen: {name}",
     "attendeeCount": "{count} Kişi Katılıyor",
+    "seeAll": "Tümünü gör",
+    "statClubs": "Üye olduğun kulüp",
+    "statEvents": "Yaklaşan katılımın",
     "activeClubs": "Aktif Kulüpler",
     "activeClubsEmptyTitle": "Henüz aktif kulüp bulunmuyor",
     "activeClubsEmptyBody": "Yeni topluluklar eklendiğinde burada görünecek."
@@ -222,6 +226,10 @@
     "emptyBody": "Farklı bir anahtar kelimeyle tekrar deneyin.",
     "noDescription": "Bu kulüp için henüz bir açıklama eklenmemiş.",
     "cardExplore": "Kulübü İncele",
+    "allCategories": "Tümü",
+    "memberCount": "{count} üye",
+    "tabEvents": "Etkinlikler",
+    "tabMembers": "Üyeler",
     "back": "Geri Dön",
     "notFoundTitle": "Kulüp bulunamadı",
     "notFoundBody": "Aradığınız kulüp mevcut değil veya kaldırılmış olabilir.",
@@ -244,6 +252,10 @@
   "manage": {
     "shell": {
       "back": "Kulübe Dön",
+      "tabInfo": "Bilgi",
+      "tabEvents": "Etkinlikler",
+      "tabTickets": "Biletler",
+      "tabMembers": "Üyeler",
       "title": "{name} · Yönetim",
       "roleSuper": "Süper yönetici",
       "roleAdvisor": "Danışman",
@@ -411,7 +423,11 @@
     "page": {
       "title": "Yönetim Paneli",
       "subtitle": "Süper yönetici · kulüp, yönetici ve danışman yönetimi",
-      "unnamedUser": "(İsimsiz kullanıcı)"
+      "unnamedUser": "(İsimsiz kullanıcı)",
+      "tabClubs": "Kulüpler",
+      "tabApprovals": "Onay Kuyruğu",
+      "tabAssignments": "Atamalar",
+      "tabAnalytics": "Analitik"
     },
     "newClub": {
       "title": "Yeni Kulüp Ekle",

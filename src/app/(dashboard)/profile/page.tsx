@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowRight, CalendarClock, Inbox, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { PageShell } from "@/components/shared/page-shell";
 import {
   Card,
   CardContent,
@@ -80,86 +81,79 @@ export default async function ProfilePage() {
     .sort((a, b) => a.event_date.localeCompare(b.event_date));
 
   return (
-    <main className="relative min-h-svh overflow-hidden bg-zinc-950 text-foreground">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(50%_60%_at_50%_0%,rgba(132,21,21,0.18),transparent)]"
-      />
+    <PageShell>
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{displayName}</p>
+      </header>
 
-      <div className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-white">{t("title")}</h1>
-          <p className="mt-1 text-sm text-zinc-400">{displayName}</p>
-        </header>
+      <ProfileForm userId={user.id} initialName={profile?.full_name ?? ""} />
 
-        <ProfileForm userId={user.id} initialName={profile?.full_name ?? ""} />
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Kulüplerim */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+              <Users className="size-4 text-primary" />
+              {t("myClubs", { count: memberships.length })}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {memberships.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t("noClubs")}</p>
+            ) : (
+              <ul className="space-y-2">
+                {memberships.map((m) => (
+                  <li key={m.id}>
+                    <Link href={`/clubs/${m.id}`} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/40 px-3 py-2.5 transition-colors hover:border-primary/40">
+                      <span className="truncate text-sm font-medium">{m.name}</span>
+                      <span className="flex items-center gap-2">
+                        {m.role.toUpperCase() === "ADMIN" && (
+                          <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">{t("presidentBadge")}</span>
+                        )}
+                        <ArrowRight className="size-4 text-muted-foreground" />
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
 
-        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Kulüplerim */}
-          <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
-                <Users className="size-4 text-[#e7a3a3]" />
-                {t("myClubs", { count: memberships.length })}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {memberships.length === 0 ? (
-                <p className="text-sm text-zinc-500">{t("noClubs")}</p>
-              ) : (
-                <ul className="space-y-2">
-                  {memberships.map((m) => (
-                    <li key={m.id}>
-                      <Link href={`/clubs/${m.id}`} className="flex items-center justify-between gap-3 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5 transition-colors hover:border-[#841515]/40 hover:bg-white/[0.05]">
-                        <span className="truncate text-sm font-medium text-zinc-200">{m.name}</span>
-                        <span className="flex items-center gap-2">
-                          {m.role.toUpperCase() === "ADMIN" && (
-                            <span className="rounded-full border border-[#841515]/30 bg-[#841515]/10 px-2 py-0.5 text-[10px] font-medium text-[#e7a3a3]">{t("presidentBadge")}</span>
-                          )}
-                          <ArrowRight className="size-4 text-zinc-500" />
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Katılacağım etkinlikler */}
-          <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
-                <CalendarClock className="size-4 text-[#e7a3a3]" />
-                {t("myEvents", { count: rsvps.length })}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {rsvps.length === 0 ? (
-                <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 bg-white/[0.02] px-6 py-8 text-center">
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-white/5 text-zinc-400">
-                    <Inbox className="size-5" />
-                  </div>
-                  <p className="mt-3 text-sm text-zinc-500">{t("noEvents")}</p>
+        {/* Katılacağım etkinlikler */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+              <CalendarClock className="size-4 text-primary" />
+              {t("myEvents", { count: rsvps.length })}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {rsvps.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/40 px-6 py-8 text-center">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                  <Inbox className="size-5" />
                 </div>
-              ) : (
-                <ul className="space-y-2">
-                  {rsvps.map((e) => (
-                    <li key={e.id}>
-                      <Link href={`/events/${e.id}`} className="block rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5 transition-colors hover:border-[#841515]/40 hover:bg-white/[0.05]">
-                        <p className="truncate text-sm font-medium text-zinc-200">{e.title}</p>
-                        <p className="mt-0.5 text-xs text-zinc-500">
-                          {dateFormatter.format(new Date(e.event_date))}
-                        </p>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                <p className="mt-3 text-sm text-muted-foreground">{t("noEvents")}</p>
+              </div>
+            ) : (
+              <ul className="space-y-2">
+                {rsvps.map((e) => (
+                  <li key={e.id}>
+                    <Link href={`/events/${e.id}`} className="block rounded-lg border border-border bg-muted/40 px-3 py-2.5 transition-colors hover:border-primary/40">
+                      <p className="truncate text-sm font-medium">{e.title}</p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {dateFormatter.format(new Date(e.event_date))}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
       </div>
-    </main>
+    </PageShell>
   );
 }

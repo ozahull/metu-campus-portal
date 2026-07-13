@@ -81,7 +81,7 @@ export default function ResetPasswordPage() {
 
   return (
     <AuthShell>
-      <Card className="w-full max-w-sm border-white/10 bg-zinc-900/70 shadow-2xl shadow-black/40 backdrop-blur">
+      <Card className="w-full max-w-sm shadow-xl">
         <CardHeader className="space-y-2 text-center">
           <CardTitle className="text-xl font-semibold tracking-tight text-balance">
             {t("reset.title")}
@@ -105,10 +105,10 @@ export default function ResetPasswordPage() {
               </AlertDescription>
             </Alert>
           ) : done ? (
-            <Alert className="border-emerald-500/40 bg-emerald-950/40 text-emerald-200 [&>svg]:text-emerald-400">
+            <Alert className="border-success/40 bg-success/10 text-success [&>svg]:text-success">
               <CheckCircle2 className="size-4" />
               <AlertTitle>{t("reset.doneTitle")}</AlertTitle>
-              <AlertDescription className="text-emerald-300/90">
+              <AlertDescription className="text-success/90">
                 {t("reset.doneBody")}
               </AlertDescription>
             </Alert>
@@ -169,8 +169,7 @@ export default function ResetPasswordPage() {
                 type="submit"
                 size="lg"
                 disabled={loading || password.length === 0 || confirm.length === 0}
-                className="w-full gap-2 font-medium text-white hover:opacity-90"
-                style={{ backgroundColor: "#841515" }}
+                className="w-full gap-2 font-medium"
               >
                 {loading && <Loader2 className="size-4 animate-spin" />}
                 {loading ? t("reset.submitting") : t("reset.submit")}

@@ -1,44 +1,55 @@
 import { getTranslations } from "next-intl/server";
 import { Inbox } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { ClubCard, type Club } from "@/components/shared/club-card";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ClubsCollection } from "@/components/shared/clubs-collection";
+import type { Club } from "@/components/shared/club-card";
+
+type ClubQueryRow = {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  logo_url: string | null;
+  cover_url: string | null;
+  club_members: { count: number }[] | null;
+};
 
 export async function ClubsGrid() {
   const t = await getTranslations("home");
   const supabase = await createClient();
 
+  // NOT: category/logo/cover + üye sayısı yalnızca kart sunumu için EK çekilir.
   const { data, error } = await supabase
     .from("clubs")
-    .select("id, name, description")
+    .select(
+      "id, name, description, category, logo_url, cover_url, club_members(count)",
+    )
     .order("name", { ascending: true });
 
   if (error) {
     console.error("[Dashboard] Kulüpler çekme hatası:", error);
   }
 
-  const clubs = (data ?? []) as Club[];
+  const clubs: Club[] = ((data ?? []) as unknown as ClubQueryRow[]).map((c) => ({
+    id: c.id,
+    name: c.name,
+    description: c.description,
+    category: c.category,
+    logo_url: c.logo_url,
+    cover_url: c.cover_url,
+    memberCount: c.club_members?.[0]?.count ?? 0,
+  }));
 
   if (clubs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-zinc-900/30 px-6 py-16 text-center">
-        <div className="flex size-12 items-center justify-center rounded-2xl bg-white/5 text-zinc-400">
-          <Inbox className="size-6" />
-        </div>
-        <p className="mt-4 text-sm font-medium text-zinc-300">
-          {t("activeClubsEmptyTitle")}
-        </p>
-        <p className="mt-1 text-sm text-zinc-500">
-          {t("activeClubsEmptyBody")}
-        </p>
-      </div>
+      <EmptyState
+        icon={Inbox}
+        title={t("activeClubsEmptyTitle")}
+        description={t("activeClubsEmptyBody")}
+      />
     );
   }
 
-  return (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-      {clubs.map((club) => (
-        <ClubCard key={club.id} club={club} />
-      ))}
-    </div>
-  );
+  return <ClubsCollection clubs={clubs} />;
 }

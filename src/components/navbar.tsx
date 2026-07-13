@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { CalendarDays, ShieldCheck, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { NavLinks } from "@/components/nav-links";
+import { NavMobile } from "@/components/nav-mobile";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { UserMenu } from "@/components/user-menu";
 
 export const dynamic = "force-dynamic";
@@ -48,61 +50,43 @@ export async function Navbar() {
   const isSuperAdmin = role.toString().trim().toUpperCase() === "SUPER_ADMIN";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/5 bg-zinc-950/70 backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Sol: logo + linkler */}
-        <div className="flex items-center gap-8">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+        {/* Sol: logo + masaüstü linkler */}
+        <div className="flex items-center gap-6">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 font-semibold tracking-tight text-white transition-opacity hover:opacity-90"
+            className="flex items-center gap-2 font-semibold tracking-tight text-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-lg"
           >
-            <span
-              className="flex size-8 items-center justify-center rounded-lg text-xs font-bold text-white"
-              style={{ backgroundColor: "#841515" }}
-            >
+            <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
               KKK
             </span>
             <span className="hidden sm:inline">{t("brand")}</span>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
-            <Link
-              href="/clubs"
-              className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:text-zinc-200"
-            >
-              <Users className="size-4" />
-              {t("communities")}
-            </Link>
-            <Link
-              href="/events"
-              className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:text-zinc-200"
-            >
-              <CalendarDays className="size-4" />
-              {t("events")}
-            </Link>
+            <NavLinks />
           </nav>
         </div>
 
-        {/* Sağ: admin butonu + avatar menü */}
-        <div className="flex items-center gap-3">
-          {isSuperAdmin && (
-            <Link
-              href="/admin"
-              className="hidden items-center gap-1.5 rounded-lg border border-[#841515] bg-[#841515]/10 px-3 py-1.5 text-sm font-medium text-[#e7a3a3] transition-colors hover:bg-[#841515] hover:text-white sm:flex"
-            >
-              <ShieldCheck className="size-4" />
-              {t("adminPanel")}
-            </Link>
-          )}
-
+        {/* Sağ: tema + dil + (bildirim yeri) + avatar; mobilde hamburger */}
+        <div className="flex items-center gap-1 sm:gap-1.5">
           <ThemeSwitcher />
+          <LanguageSwitcher />
+
+          {/* Bildirim yeri: ileride buraya bildirim zili gelecek (şimdilik boş). */}
+
+          <div className="mx-1 hidden h-6 w-px bg-border sm:block" />
 
           <UserMenu
             fullName={fullName}
             email={email}
             role={role}
+            isSuperAdmin={isSuperAdmin}
             initials={getInitials(fullName, email)}
           />
+
+          <NavMobile />
         </div>
       </div>
     </header>

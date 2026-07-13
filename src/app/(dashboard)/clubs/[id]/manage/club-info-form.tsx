@@ -169,14 +169,14 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
       </div>
 
       {/* Bilet sistemi */}
-      <div className="space-y-4 rounded-lg border border-white/5 bg-white/[0.02] p-4">
+      <div className="space-y-4 rounded-lg border border-border bg-muted/40 p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="inline-flex items-center gap-2 text-sm font-medium text-white">
-              <Ticket className="size-4 text-[#e7a3a3]" />
+            <p className="inline-flex items-center gap-2 text-sm font-medium">
+              <Ticket className="size-4 text-primary" />
               {t("ticketSystem")}
             </p>
-            <p className="mt-1 text-xs text-zinc-400">
+            <p className="mt-1 text-xs text-muted-foreground">
               {t("ticketSystemDesc")}
             </p>
           </div>
@@ -188,13 +188,13 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
             disabled={loading}
             onClick={() => setTicketEnabled((v) => !v)}
             className={cn(
-              "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50",
-              ticketEnabled ? "bg-[#841515]" : "bg-white/15",
+              "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-50",
+              ticketEnabled ? "bg-primary" : "bg-input",
             )}
           >
             <span
               className={cn(
-                "inline-block size-4 transform rounded-full bg-white transition-transform",
+                "inline-block size-4 transform rounded-full bg-white shadow-sm transition-transform",
                 ticketEnabled ? "translate-x-6" : "translate-x-1",
               )}
             />
@@ -203,7 +203,8 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
 
         <div className="space-y-2">
           <Label htmlFor="iban">
-            {t("iban")} {ticketEnabled && <span className="text-[#e7a3a3]">*</span>}
+            {t("iban")}{" "}
+            {ticketEnabled && <span className="text-primary">*</span>}
           </Label>
           <Input
             id="iban"
@@ -216,15 +217,16 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
         </div>
       </div>
 
-      <Button
-        type="submit"
-        disabled={loading}
-        className="gap-2 font-medium text-white hover:opacity-90"
-        style={{ backgroundColor: "#841515" }}
-      >
-        {loading ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-        {loading ? t("saving") : t("save")}
-      </Button>
+      <div className="flex justify-end">
+        <Button type="submit" disabled={loading} className="gap-2 font-medium">
+          {loading ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Save className="size-4" />
+          )}
+          {loading ? t("saving") : t("save")}
+        </Button>
+      </div>
     </form>
   );
 }
@@ -309,7 +311,7 @@ function ImageUploadField({
       <Label>{label}</Label>
       <div
         className={cn(
-          "relative flex items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-white/[0.02]",
+          "relative flex items-center justify-center overflow-hidden rounded-lg border border-border bg-muted/40",
           kind === "logo" ? "size-28" : "aspect-[16/6] w-full",
         )}
       >
@@ -321,7 +323,7 @@ function ImageUploadField({
             className="size-full object-cover"
           />
         ) : (
-          <span className="inline-flex flex-col items-center gap-1 text-zinc-600">
+          <span className="inline-flex flex-col items-center gap-1 text-muted-foreground">
             <ImageIcon className="size-6" />
             <span className="text-xs">{t("imageNone")}</span>
           </span>
@@ -342,7 +344,7 @@ function ImageUploadField({
         disabled={disabled || uploading}
         size="sm"
         variant="outline"
-        className="gap-1.5 border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white"
+        className="gap-1.5"
       >
         {uploading ? (
           <Loader2 className="size-4 animate-spin" />

@@ -1,14 +1,10 @@
-import { getLocale, getTranslations } from "next-intl/server";
-import { CalendarDays, Clock, Flame, MapPin } from "lucide-react";
+import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { ArrowRight, CalendarDays, CalendarX } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { RSVPButton } from "@/components/shared/rsvp-button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { SectionHeading } from "@/components/shared/section-heading";
+import { EmptyState } from "@/components/shared/empty-state";
+import { EventCard, type EventCardData } from "@/components/shared/event-card";
 
 type Attendee = { user_id: string };
 
@@ -28,11 +24,6 @@ function clubName(clubs: UpcomingEvent["clubs"]): string | null {
 
 export async function UpcomingEvents() {
   const t = await getTranslations("home");
-  const locale = await getLocale();
-  const dateFormatter = new Intl.DateTimeFormat(locale, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
   const supabase = await createClient();
 
   const {
@@ -41,11 +32,13 @@ export async function UpcomingEvents() {
 
   const { data, error } = await supabase
     .from("events")
-    .select("id, title, event_date, location, clubs(name), event_attendees(user_id)")
+    .select(
+      "id, title, event_date, location, clubs(name), event_attendees(user_id)",
+    )
     .eq("status", "APPROVED")
     .gte("event_date", new Date().toISOString())
     .order("event_date", { ascending: true })
-    .limit(5);
+    .limit(8);
 
   if (error) {
     console.error("[Dashboard] Yaklaşan etkinlikler çekme hatası:", error);
@@ -55,74 +48,60 @@ export async function UpcomingEvents() {
 
   return (
     <section className="mb-12">
-      <div className="mb-5 flex items-center gap-2.5">
-        <span className="flex size-8 items-center justify-center rounded-lg bg-[#841515]/15 text-[#e7a3a3]">
-          <CalendarDays className="size-4" />
-        </span>
-        <h2 className="text-xl font-semibold tracking-tight text-white">
-          {t("upcomingTitle")}
-        </h2>
-      </div>
+      <SectionHeading
+        icon={CalendarDays}
+        title={t("upcomingTitle")}
+        action={
+          events.length > 0 ? (
+            <Link
+              href="/events"
+              className="inline-flex items-center gap-1 rounded-md text-sm font-medium text-primary transition-colors hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {t("seeAll")}
+              <ArrowRight className="size-4" />
+            </Link>
+          ) : undefined
+        }
+      />
 
       {events.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-white/10 bg-zinc-900/30 px-5 py-6 text-sm text-zinc-500">
-          {t("noUpcoming")}
-        </p>
+        <EmptyState icon={CalendarX} title={t("noUpcoming")} />
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {events.map((ev) => {
-            const name = clubName(ev.clubs);
-            const attendees = ev.event_attendees ?? [];
-            const attendeeCount = attendees.length;
-            const isAttending = user
-              ? attendees.some((a) => a.user_id === user.id)
-              : false;
-
-            return (
-              <Card
-                key={ev.id}
-                className="flex flex-col border-white/5 bg-zinc-900/50 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-[#841515]/50 hover:shadow-[0_8px_30px_-8px_rgba(132,21,21,0.45)]"
-              >
-                <CardHeader>
-                  {name && (
-                    <p className="text-xs lowercase tracking-wide text-zinc-500">
-                      {t("organizer", { name })}
-                    </p>
-                  )}
-                  <CardTitle className="text-base font-semibold text-white">
-                    {ev.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <div className="space-y-1.5 text-xs text-zinc-400">
-                    <span className="flex items-center gap-1.5">
-                      <Clock className="size-3.5 text-[#e7a3a3]" />
-                      {dateFormatter.format(new Date(ev.event_date))}
-                    </span>
-                    {ev.location && (
-                      <span className="flex items-center gap-1.5">
-                        <MapPin className="size-3.5 text-[#e7a3a3]" />
-                        {ev.location}
-                      </span>
-                    )}
-                  </div>
-                </CardContent>
-                <CardFooter className="flex items-center justify-between gap-2">
-                  <span className="flex items-center gap-1.5 text-xs font-medium text-zinc-300">
-                    <Flame className="size-3.5 text-orange-400" />
-                    {t("attendeeCount", { count: attendeeCount })}
-                  </span>
-                  {user && (
-                    <RSVPButton
-                      eventId={ev.id}
-                      userId={user.id}
-                      isAttending={isAttending}
-                    />
-                  )}
-                </CardFooter>
-              </Card>
-            );
-          })}
+        // Yatay kaydırılabilir şerit (mobilde swipe). -mx ile kenardan kenara kayar.
+        <div className="-mx-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 [scrollbar-width:thin]">
+          <div className="flex snap-x snap-mandatory gap-4">
+            {events.map((ev) => {
+              const attendees = ev.event_attendees ?? [];
+              const cardData: EventCardData = {
+                id: ev.id,
+                title: ev.title,
+                eventDate: ev.event_date,
+                location: ev.location,
+                clubName: clubName(ev.clubs),
+                attendeeCount: attendees.length,
+              };
+              return (
+                <div
+                  key={ev.id}
+                  className="w-72 shrink-0 snap-start sm:w-80"
+                >
+                  <EventCard
+                    event={cardData}
+                    rsvp={
+                      user
+                        ? {
+                            userId: user.id,
+                            isAttending: attendees.some(
+                              (a) => a.user_id === user.id,
+                            ),
+                          }
+                        : undefined
+                    }
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </section>

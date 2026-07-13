@@ -1,17 +1,19 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ArrowLeft, CalendarDays, QrCode, Settings, Ticket, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarDays,
+  Info,
+  QrCode,
+  Settings,
+  Ticket,
+  Users,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { buttonVariants } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { ClubInfoForm, type ClubInfo } from "./club-info-form";
 import { ManageEvents, type ManageEvent } from "./manage-events";
 import type { EventDocument } from "./event-documents";
@@ -216,36 +218,30 @@ export default async function ClubManagePage({
   const hasTicketing = ticketGroups.length > 0;
 
   return (
-    <main className="dark relative min-h-svh overflow-hidden bg-zinc-950 text-foreground">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(50%_60%_at_50%_0%,rgba(132,21,21,0.18),transparent)]"
-      />
-
-      <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-        <Link
-          href={`/clubs/${id}`}
-          className={cn(
-            buttonVariants({ variant: "ghost", size: "sm" }),
-            "-ml-2 gap-1.5 text-zinc-400 hover:bg-white/5 hover:text-white",
-          )}
-        >
-          <ArrowLeft className="size-4" />
-          {t("back")}
-        </Link>
-
-        <header className="mt-6 mb-8 flex items-center gap-3">
-          <span
-            className="flex size-10 items-center justify-center rounded-xl text-white shadow-lg"
-            style={{ backgroundColor: "#841515" }}
+    <main className="relative">
+      <div className="mx-auto w-full max-w-4xl px-4 pb-14 sm:px-6 lg:px-8">
+        <div className="pt-6">
+          <Link
+            href={`/clubs/${id}`}
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "-ml-2 gap-1.5 text-muted-foreground",
+            )}
           >
+            <ArrowLeft className="size-4" />
+            {t("back")}
+          </Link>
+        </div>
+
+        <header className="mt-4 mb-8 flex items-center gap-3">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
             <Settings className="size-5" />
           </span>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">
+            <h1 className="text-2xl font-bold tracking-tight">
               {t("title", { name: club.name })}
             </h1>
-            <p className="text-sm text-zinc-400">
+            <p className="text-sm text-muted-foreground">
               {t("access", {
                 role: isSuperAdmin
                   ? t("roleSuper")
@@ -257,93 +253,90 @@ export default async function ClubManagePage({
           </div>
         </header>
 
-        <div className="space-y-6">
-          {/* Kulüp bilgisi */}
-          <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold text-white">
-                {t("infoTitle")}
-              </CardTitle>
-              <CardDescription>
-                {t("infoDesc")}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ClubInfoForm club={club} />
-            </CardContent>
-          </Card>
+        <Tabs defaultValue="info">
+          <TabsList>
+            <TabsTab value="info">
+              <Info className="size-4" />
+              {t("tabInfo")}
+            </TabsTab>
+            <TabsTab value="events">
+              <CalendarDays className="size-4" />
+              {t("tabEvents")}
+            </TabsTab>
+            {hasTicketing && (
+              <TabsTab value="tickets">
+                <Ticket className="size-4" />
+                {t("tabTickets")}
+              </TabsTab>
+            )}
+            <TabsTab value="members">
+              <Users className="size-4" />
+              {t("tabMembers")}
+              <span className="rounded-full bg-muted px-1.5 text-xs text-muted-foreground">
+                {members.length}
+              </span>
+            </TabsTab>
+          </TabsList>
 
-          {/* Etkinlikler */}
-          <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
-                <CalendarDays className="size-4 text-[#e7a3a3]" />
-                {t("eventsTitle")}
-              </CardTitle>
-              <CardDescription>
-                {t("eventsDesc")}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ManageEvents
-                clubId={id}
-                events={events}
-                canAdvisorDecide={canAssignAdmin}
-                ticketEnabled={club.ticket_enabled}
-                userId={user.id}
-                canUploadDocs={canUploadDocs}
-                documentsByEvent={documentsByEvent}
-              />
-            </CardContent>
-          </Card>
+          <TabsPanel value="info" className="space-y-4">
+            <PanelHead title={t("infoTitle")} desc={t("infoDesc")} />
+            <ClubInfoForm club={club} />
+          </TabsPanel>
 
-          {/* Biletler / Dekont onayı */}
+          <TabsPanel value="events" className="space-y-4">
+            <PanelHead title={t("eventsTitle")} desc={t("eventsDesc")} />
+            <ManageEvents
+              clubId={id}
+              events={events}
+              canAdvisorDecide={canAssignAdmin}
+              ticketEnabled={club.ticket_enabled}
+              userId={user.id}
+              canUploadDocs={canUploadDocs}
+              documentsByEvent={documentsByEvent}
+            />
+          </TabsPanel>
+
           {hasTicketing && (
-            <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
-              <CardHeader className="flex flex-row items-start justify-between gap-3">
-                <div>
-                  <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
-                    <Ticket className="size-4 text-[#e7a3a3]" />
-                    {t("ticketsTitle")}
-                  </CardTitle>
-                  <CardDescription>
-                    {t("ticketsDesc")}
-                  </CardDescription>
-                </div>
+            <TabsPanel value="tickets" className="space-y-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <PanelHead title={t("ticketsTitle")} desc={t("ticketsDesc")} />
                 <Link
                   href={`/clubs/${id}/checkin`}
                   className={cn(
                     buttonVariants({ variant: "outline", size: "sm" }),
-                    "gap-1.5 border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white",
+                    "gap-1.5",
                   )}
                 >
                   <QrCode className="size-4" />
                   {t("checkin")}
                 </Link>
-              </CardHeader>
-              <CardContent>
-                <ManageTickets groups={ticketGroups} />
-              </CardContent>
-            </Card>
+              </div>
+              <ManageTickets groups={ticketGroups} />
+            </TabsPanel>
           )}
 
-          {/* Üyeler */}
-          <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
-                <Users className="size-4 text-[#e7a3a3]" />
-                {t("membersTitle", { count: members.length })}
-              </CardTitle>
-              <CardDescription>
-                {t("membersDesc")}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ManageMembers clubId={id} members={members} canAssignAdmin={canAssignAdmin} />
-            </CardContent>
-          </Card>
-        </div>
+          <TabsPanel value="members" className="space-y-4">
+            <PanelHead
+              title={t("membersTitle", { count: members.length })}
+              desc={t("membersDesc")}
+            />
+            <ManageMembers
+              clubId={id}
+              members={members}
+              canAssignAdmin={canAssignAdmin}
+            />
+          </TabsPanel>
+        </Tabs>
       </div>
     </main>
+  );
+}
+
+function PanelHead({ title, desc }: { title: string; desc: string }) {
+  return (
+    <div>
+      <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
+      <p className="text-sm text-muted-foreground">{desc}</p>
+    </div>
   );
 }

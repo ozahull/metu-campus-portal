@@ -111,16 +111,14 @@ export function EventDocuments({
     <div
       className={`mt-3 rounded-md border p-3 ${
         emphasize
-          ? "border-[#841515]/40 bg-[#841515]/10"
-          : "border-white/5 bg-white/[0.02]"
+          ? "border-primary/40 bg-primary/10"
+          : "border-border bg-muted/40"
       }`}
     >
-      <p className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-300">
-        <Paperclip className="size-3.5 text-[#e7a3a3]" />
+      <p className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+        <Paperclip className="size-3.5 text-primary" />
         {t("title")}
-        {emphasize && (
-          <span className="text-[#e7a3a3]">{t("emphasizeNote")}</span>
-        )}
+        {emphasize && <span className="text-primary">{t("emphasizeNote")}</span>}
       </p>
 
       {documents.length > 0 && (
@@ -128,14 +126,16 @@ export function EventDocuments({
           {documents.map((doc) => (
             <li
               key={doc.id}
-              className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-white/5 bg-zinc-900/40 px-3 py-2"
+              className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-2"
             >
               <div className="flex min-w-0 items-center gap-2">
-                <FileText className="size-4 shrink-0 text-zinc-500" />
+                <FileText className="size-4 shrink-0 text-muted-foreground" />
                 <div className="min-w-0">
-                  <p className="truncate text-sm text-zinc-200">{doc.file_name}</p>
+                  <p className="truncate text-sm">{doc.file_name}</p>
                   {doc.note && (
-                    <p className="truncate text-xs text-zinc-500">{doc.note}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {doc.note}
+                    </p>
                   )}
                 </div>
               </div>
@@ -145,13 +145,15 @@ export function EventDocuments({
                     href={doc.signedUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2.5 py-1 text-xs text-zinc-300 hover:bg-white/5 hover:text-white"
+                    className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                   >
                     <ExternalLink className="size-3.5" />
                     {t("open")}
                   </a>
                 ) : (
-                  <span className="text-xs text-zinc-600">{t("noLink")}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {t("noLink")}
+                  </span>
                 )}
                 {doc.canDelete && (
                   <Button
@@ -159,7 +161,7 @@ export function EventDocuments({
                     disabled={loading}
                     size="icon-sm"
                     variant="ghost"
-                    className="text-zinc-400 hover:bg-red-500/10 hover:text-red-400"
+                    className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                     aria-label={t("deleteAria")}
                   >
                     <Trash2 className="size-4" />
@@ -193,7 +195,7 @@ export function EventDocuments({
             disabled={loading}
             size="sm"
             variant="outline"
-            className="gap-1.5 border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white"
+            className="gap-1.5"
           >
             {loading ? (
               <Loader2 className="size-4 animate-spin" />
@@ -202,7 +204,7 @@ export function EventDocuments({
             )}
             {t("upload")}
           </Button>
-          <p className="text-xs text-zinc-500">{t("hint")}</p>
+          <p className="text-xs text-muted-foreground">{t("hint")}</p>
         </div>
       )}
     </div>

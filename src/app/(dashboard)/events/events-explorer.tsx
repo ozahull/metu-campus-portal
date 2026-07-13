@@ -1,17 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
-import { ArrowRight, Clock, Flame, MapPin, Search, SearchX } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Search, SearchX } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { EmptyState } from "@/components/shared/empty-state";
+import { EventCard, type EventCardData } from "@/components/shared/event-card";
 
 export type EventRow = {
   id: string;
@@ -25,19 +19,10 @@ export type EventRow = {
 };
 
 const selectClass =
-  "h-11 rounded-lg border border-white/10 bg-zinc-900/60 px-3 text-sm text-white outline-none focus-visible:border-[#841515] [&>option]:bg-zinc-900";
+  "h-11 rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none transition-colors focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring [&>option]:bg-card";
 
 export function EventsExplorer({ events }: { events: EventRow[] }) {
   const t = useTranslations("events");
-  const locale = useLocale();
-  const dateFormatter = useMemo(
-    () =>
-      new Intl.DateTimeFormat(locale, {
-        dateStyle: "medium",
-        timeStyle: "short",
-      }),
-    [locale],
-  );
   const [query, setQuery] = useState("");
   const [club, setClub] = useState("");
   const [category, setCategory] = useState("");
@@ -70,88 +55,65 @@ export function EventsExplorer({ events }: { events: EventRow[] }) {
     <div>
       <div className="mb-8 flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             placeholder={t("searchPlaceholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="h-11 border-white/10 bg-zinc-900/60 pl-10 text-base text-white placeholder:text-zinc-500"
+            className="h-11 pl-10 text-base"
           />
         </div>
-        <select className={selectClass} value={club} onChange={(e) => setClub(e.target.value)} aria-label={t("clubFilter")}>
+        <select
+          className={selectClass}
+          value={club}
+          onChange={(e) => setClub(e.target.value)}
+          aria-label={t("clubFilter")}
+        >
           <option value="">{t("allClubs")}</option>
           {clubs.map(([id, name]) => (
-            <option key={id} value={id}>{name}</option>
+            <option key={id} value={id}>
+              {name}
+            </option>
           ))}
         </select>
         {categories.length > 0 && (
-          <select className={selectClass} value={category} onChange={(e) => setCategory(e.target.value)} aria-label={t("categoryFilter")}>
+          <select
+            className={selectClass}
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            aria-label={t("categoryFilter")}
+          >
             <option value="">{t("allCategories")}</option>
             {categories.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
           </select>
         )}
       </div>
 
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-zinc-900/30 px-6 py-16 text-center">
-          <div className="flex size-12 items-center justify-center rounded-2xl bg-white/5 text-zinc-400">
-            <SearchX className="size-6" />
-          </div>
-          <p className="mt-4 text-sm font-medium text-zinc-300">
-            {t("emptyTitle")}
-          </p>
-          <p className="mt-1 text-sm text-zinc-500">
-            {t("emptyBody")}
-          </p>
-        </div>
+        <EmptyState
+          icon={SearchX}
+          title={t("emptyTitle")}
+          description={t("emptyBody")}
+        />
       ) : (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((e) => (
-            <Card
-              key={e.id}
-              className="group flex flex-col border-white/5 bg-zinc-900/50 transition-all duration-300 hover:-translate-y-1 hover:border-[#841515]/50 hover:shadow-[0_8px_30px_-8px_rgba(132,21,21,0.45)]"
-            >
-              <CardHeader>
-                <p className="text-xs text-zinc-500">
-                  {e.club_name ?? "—"}
-                  {e.category ? ` · ${e.category}` : ""}
-                </p>
-                <CardTitle className="text-base font-semibold text-white">
-                  {e.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1">
-                <div className="space-y-1.5 text-xs text-zinc-400">
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="size-3.5 text-[#e7a3a3]" />
-                    {dateFormatter.format(new Date(e.event_date))}
-                  </span>
-                  {e.location && (
-                    <span className="flex items-center gap-1.5">
-                      <MapPin className="size-3.5 text-[#e7a3a3]" />
-                      {e.location}
-                    </span>
-                  )}
-                  <span className="flex items-center gap-1.5">
-                    <Flame className="size-3.5 text-orange-400" />
-                    {t("attendees", { count: e.attendees })}
-                  </span>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Link
-                  href={`/events/${e.id}`}
-                  className="inline-flex items-center gap-1 text-sm font-medium text-[#e7a3a3] transition-colors hover:text-white"
-                >
-                  {t("viewDetail")}
-                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-                </Link>
-              </CardFooter>
-            </Card>
-          ))}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((e) => {
+            const cardData: EventCardData = {
+              id: e.id,
+              title: e.title,
+              eventDate: e.event_date,
+              location: e.location,
+              clubName: e.club_name,
+              category: e.category,
+              attendeeCount: e.attendees,
+            };
+            return <EventCard key={e.id} event={cardData} />;
+          })}
         </div>
       )}
     </div>

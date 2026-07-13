@@ -1,6 +1,15 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import {
+  BarChart3,
+  Building2,
+  ClipboardCheck,
+  ShieldCheck,
+  UserCog,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { PageShell } from "@/components/shared/page-shell";
+import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
 import { NewClubForm } from "./new-club-form";
 import { AdminAssignments, type Option } from "./admin-assignments";
 import {
@@ -159,35 +168,66 @@ export default async function AdminPage() {
   const memberGrowth = (growthRows as MemberGrowthPoint[] | null) ?? [];
 
   return (
-    <main className="dark relative min-h-svh overflow-hidden bg-zinc-950 px-4 py-12 text-foreground">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(50%_60%_at_50%_0%,rgba(132,21,21,0.22),transparent)]"
-      />
-      <div className="mx-auto w-full max-w-4xl space-y-8">
-        <header>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
-            {t("title")}
-          </h1>
-          <p className="mt-1 text-sm text-zinc-400">
-            {t("subtitle")}
-          </p>
-        </header>
-
-        <div className="flex justify-center">
-          <NewClubForm />
+    <PageShell>
+      <header className="mb-8 flex items-center gap-3">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+          <ShieldCheck className="size-5" />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
+      </header>
 
-        <AdminAssignments clubs={clubOptions} users={userOptions} />
+      <Tabs defaultValue="approvals">
+        <TabsList>
+          <TabsTab value="approvals">
+            <ClipboardCheck className="size-4" />
+            {t("tabApprovals")}
+            {pending.length > 0 && (
+              <span className="rounded-full bg-primary/15 px-1.5 text-xs text-primary">
+                {pending.length}
+              </span>
+            )}
+          </TabsTab>
+          <TabsTab value="clubs">
+            <Building2 className="size-4" />
+            {t("tabClubs")}
+          </TabsTab>
+          <TabsTab value="assignments">
+            <UserCog className="size-4" />
+            {t("tabAssignments")}
+          </TabsTab>
+          <TabsTab value="analytics">
+            <BarChart3 className="size-4" />
+            {t("tabAnalytics")}
+          </TabsTab>
+        </TabsList>
 
-        <AdminApprovals pending={pending} clubs={clubSettings} userId={user.id} />
+        <TabsPanel value="approvals">
+          <AdminApprovals
+            pending={pending}
+            clubs={clubSettings}
+            userId={user.id}
+          />
+        </TabsPanel>
 
-        <AdminAnalytics
-          overview={overview}
-          clubs={clubStats}
-          growth={memberGrowth}
-        />
-      </div>
-    </main>
+        <TabsPanel value="clubs">
+          <NewClubForm />
+        </TabsPanel>
+
+        <TabsPanel value="assignments">
+          <AdminAssignments clubs={clubOptions} users={userOptions} />
+        </TabsPanel>
+
+        <TabsPanel value="analytics">
+          <AdminAnalytics
+            overview={overview}
+            clubs={clubStats}
+            growth={memberGrowth}
+          />
+        </TabsPanel>
+      </Tabs>
+    </PageShell>
   );
 }

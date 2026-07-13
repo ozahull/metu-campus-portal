@@ -53,13 +53,10 @@ export function NewClubForm() {
   }
 
   return (
-    <Card className="w-full max-w-lg border-white/10 bg-zinc-900/70 shadow-2xl shadow-black/40 backdrop-blur">
+    <Card className="w-full max-w-lg">
       <CardHeader className="space-y-3">
         <div className="flex items-center gap-3">
-          <div
-            className="flex size-10 items-center justify-center rounded-xl text-white shadow-lg"
-            style={{ backgroundColor: "#841515" }}
-          >
+          <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
             <ShieldCheck className="size-5" />
           </div>
           <div>
@@ -104,8 +101,7 @@ export function NewClubForm() {
             type="submit"
             size="lg"
             disabled={loading || name.trim().length === 0}
-            className="w-full gap-2 font-medium text-white hover:opacity-90"
-            style={{ backgroundColor: "#841515" }}
+            className="w-full gap-2 font-medium"
           >
             {loading ? (
               <Loader2 className="size-4 animate-spin" />

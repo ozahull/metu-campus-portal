@@ -52,7 +52,11 @@ export type MemberGrowthPoint = {
   new_members: number;
 };
 
-const METU_RED = "#841515";
+// Grafik renkleri tema token'larından (CSS değişkenleri) türetilir — recharts
+// SVG'de var(...) çözülür, böylece açık/koyu temada da doğru okunur.
+const CHART_PRIMARY = "var(--primary)";
+const CHART_AXIS = "var(--muted-foreground)";
+const CHART_GRID = "var(--border)";
 
 const metricDefs: {
   key: keyof Overview;
@@ -97,8 +101,8 @@ export function AdminAnalytics({
   return (
     <section className="space-y-6">
       <header className="flex items-center gap-2">
-        <BarChart3 className="size-5 text-[#e7a3a3]" />
-        <h2 className="text-xl font-bold tracking-tight text-white">{t("heading")}</h2>
+        <BarChart3 className="size-5 text-primary" />
+        <h2 className="text-xl font-bold tracking-tight">{t("heading")}</h2>
       </header>
 
       {/* Metrik kartları */}
@@ -106,17 +110,14 @@ export function AdminAnalytics({
         {metricDefs.map(({ key, labelKey, icon: Icon }) => (
           <Card
             key={key}
-            className="border-white/5 bg-zinc-900/50 backdrop-blur transition-colors hover:border-[#841515]/40"
+            className="transition-colors hover:border-primary/40"
           >
             <CardContent className="flex flex-col gap-2 p-4">
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-400">
-                <Icon className="size-3.5 text-[#e7a3a3]" />
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                <Icon className="size-3.5 text-primary" />
                 {t(labelKey)}
               </span>
-              <span
-                className="text-3xl font-bold tracking-tight"
-                style={{ color: METU_RED }}
-              >
+              <span className="text-3xl font-bold tracking-tight text-primary">
                 {overview ? overview[key].toLocaleString("tr-TR") : "—"}
               </span>
             </CardContent>
@@ -125,10 +126,10 @@ export function AdminAnalytics({
       </div>
 
       {/* Üye büyüme grafiği */}
-      <Card className="border-white/10 bg-zinc-900/70 shadow-2xl shadow-black/40 backdrop-blur">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
-            <TrendingUp className="size-5 text-[#e7a3a3]" />
+          <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+            <TrendingUp className="size-5 text-primary" />
             {t("growthTitle")}
           </CardTitle>
           <CardDescription>
@@ -150,42 +151,42 @@ export function AdminAnalytics({
                 >
                   <defs>
                     <linearGradient id="memberFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={METU_RED} stopOpacity={0.5} />
-                      <stop offset="100%" stopColor={METU_RED} stopOpacity={0} />
+                      <stop offset="0%" stopColor={CHART_PRIMARY} stopOpacity={0.4} />
+                      <stop offset="100%" stopColor={CHART_PRIMARY} stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="rgba(255,255,255,0.06)"
+                    stroke={CHART_GRID}
                     vertical={false}
                   />
                   <XAxis
                     dataKey="month"
-                    tick={{ fill: "#a1a1aa", fontSize: 12 }}
+                    tick={{ fill: CHART_AXIS, fontSize: 12 }}
                     tickLine={false}
-                    axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
+                    axisLine={{ stroke: CHART_GRID }}
                   />
                   <YAxis
                     allowDecimals={false}
-                    tick={{ fill: "#a1a1aa", fontSize: 12 }}
+                    tick={{ fill: CHART_AXIS, fontSize: 12 }}
                     tickLine={false}
                     axisLine={false}
                     width={36}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#18181b",
-                      border: "1px solid rgba(255,255,255,0.1)",
+                      backgroundColor: "var(--popover)",
+                      border: "1px solid var(--border)",
                       borderRadius: 8,
-                      color: "#fff",
+                      color: "var(--popover-foreground)",
                     }}
-                    labelStyle={{ color: "#a1a1aa" }}
+                    labelStyle={{ color: "var(--muted-foreground)" }}
                     formatter={(value) => [value as number, t("tooltipNewMember")]}
                   />
                   <Area
                     type="monotone"
                     dataKey="new_members"
-                    stroke={METU_RED}
+                    stroke={CHART_PRIMARY}
                     strokeWidth={2}
                     fill="url(#memberFill)"
                   />
@@ -197,10 +198,10 @@ export function AdminAnalytics({
       </Card>
 
       {/* Kulüp performans tablosu */}
-      <Card className="border-white/10 bg-zinc-900/70 shadow-2xl shadow-black/40 backdrop-blur">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
-            <Users2 className="size-5 text-[#e7a3a3]" />
+          <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+            <Users2 className="size-5 text-primary" />
             {t("clubsTitle")}
           </CardTitle>
           <CardDescription>
@@ -214,7 +215,7 @@ export function AdminAnalytics({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/10 text-left text-xs text-zinc-400">
+                  <tr className="border-b border-border text-left text-xs text-muted-foreground">
                     <th className="py-2 pr-3 font-medium">{t("colClub")}</th>
                     <th className="px-3 py-2 text-right font-medium">{t("colMember")}</th>
                     <th className="px-3 py-2 text-right font-medium">{t("colEvent")}</th>
@@ -226,21 +227,19 @@ export function AdminAnalytics({
                   {clubs.map((c) => (
                     <tr
                       key={c.club_id}
-                      className="border-b border-white/5 last:border-0"
+                      className="border-b border-border transition-colors last:border-0 hover:bg-muted/40"
                     >
-                      <td className="py-2.5 pr-3 font-medium text-white">
-                        {c.club_name}
-                      </td>
-                      <td className="px-3 py-2.5 text-right text-zinc-300">
+                      <td className="py-2.5 pr-3 font-medium">{c.club_name}</td>
+                      <td className="px-3 py-2.5 text-right text-muted-foreground">
                         {Number(c.member_count).toLocaleString("tr-TR")}
                       </td>
-                      <td className="px-3 py-2.5 text-right text-zinc-300">
+                      <td className="px-3 py-2.5 text-right text-muted-foreground">
                         {Number(c.event_count).toLocaleString("tr-TR")}
                       </td>
-                      <td className="px-3 py-2.5 text-right text-zinc-300">
+                      <td className="px-3 py-2.5 text-right text-muted-foreground">
                         {Number(c.approved_event_count).toLocaleString("tr-TR")}
                       </td>
-                      <td className="py-2.5 pl-3 text-right text-zinc-300">
+                      <td className="py-2.5 pl-3 text-right text-muted-foreground">
                         {Number(c.total_checkins).toLocaleString("tr-TR")}
                       </td>
                     </tr>
@@ -263,11 +262,11 @@ function EmptyState({
   text: string;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 bg-white/[0.02] px-6 py-10 text-center">
-      <div className="flex size-10 items-center justify-center rounded-xl bg-white/5 text-zinc-400">
+    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/40 px-6 py-10 text-center">
+      <div className="flex size-10 items-center justify-center rounded-xl bg-muted text-muted-foreground">
         <Icon className="size-5" />
       </div>
-      <p className="mt-3 text-sm text-zinc-500">{text}</p>
+      <p className="mt-3 text-sm text-muted-foreground">{text}</p>
     </div>
   );
 }

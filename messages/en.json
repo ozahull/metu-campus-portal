@@ -59,6 +59,7 @@
     }
   },
   "auth": {
+    "tagline": "Discover campus communities, join events, and manage your own club.",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "login": {
@@ -135,6 +136,9 @@
     "noUpcoming": "No events are currently scheduled.",
     "organizer": "organized by: {name}",
     "attendeeCount": "{count} attending",
+    "seeAll": "See all",
+    "statClubs": "Clubs joined",
+    "statEvents": "Upcoming RSVPs",
     "activeClubs": "Active Clubs",
     "activeClubsEmptyTitle": "No active clubs yet",
     "activeClubsEmptyBody": "They'll appear here as new communities are added."
@@ -222,6 +226,10 @@
     "emptyBody": "Try a different keyword.",
     "noDescription": "No description has been added for this club yet.",
     "cardExplore": "View Club",
+    "allCategories": "All",
+    "memberCount": "{count} members",
+    "tabEvents": "Events",
+    "tabMembers": "Members",
     "back": "Back",
     "notFoundTitle": "Club not found",
     "notFoundBody": "The club you're looking for doesn't exist or may have been removed.",
@@ -244,6 +252,10 @@
   "manage": {
     "shell": {
       "back": "Back to Club",
+      "tabInfo": "Info",
+      "tabEvents": "Events",
+      "tabTickets": "Tickets",
+      "tabMembers": "Members",
       "title": "{name} · Management",
       "roleSuper": "Super admin",
       "roleAdvisor": "Advisor",
@@ -411,7 +423,11 @@
     "page": {
       "title": "Admin Panel",
       "subtitle": "Super admin · clubs, admins, and advisors",
-      "unnamedUser": "(Unnamed user)"
+      "unnamedUser": "(Unnamed user)",
+      "tabClubs": "Clubs",
+      "tabApprovals": "Approvals",
+      "tabAssignments": "Assignments",
+      "tabAnalytics": "Analytics"
     },
     "newClub": {
       "title": "Add New Club",

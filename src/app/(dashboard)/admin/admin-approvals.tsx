@@ -118,12 +118,12 @@ export function AdminApprovals({
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       {/* Okul onay kuyruğu */}
-      <Card className="border-white/10 bg-zinc-900/70 shadow-2xl shadow-black/40 backdrop-blur">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
-            <ShieldQuestion className="size-5 text-[#e7a3a3]" />
+          <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+            <ShieldQuestion className="size-5 text-primary" />
             {t("queueTitle")}
-            <span className="ml-auto rounded-full bg-white/5 px-2 py-0.5 text-xs font-medium text-zinc-400">
+            <span className="ml-auto rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
               {pending.length}
             </span>
           </CardTitle>
@@ -133,28 +133,30 @@ export function AdminApprovals({
         </CardHeader>
         <CardContent>
           {pending.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 bg-white/[0.02] px-6 py-10 text-center">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-white/5 text-zinc-400">
+            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/40 px-6 py-10 text-center">
+              <div className="flex size-10 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                 <Inbox className="size-5" />
               </div>
-              <p className="mt-3 text-sm text-zinc-500">{t("emptyQueue")}</p>
+              <p className="mt-3 text-sm text-muted-foreground">
+                {t("emptyQueue")}
+              </p>
             </div>
           ) : (
             <ul className="space-y-2">
               {pending.map((ev) => {
                 const busy = busyId === ev.id;
                 return (
-                  <li key={ev.id} className="rounded-lg border border-white/5 bg-white/[0.02] p-4">
-                    <p className="text-xs text-zinc-500">{ev.club_name ?? "—"}</p>
-                    <h4 className="font-semibold text-white">{ev.title}</h4>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-400">
+                  <li key={ev.id} className="rounded-lg border border-border bg-muted/40 p-4">
+                    <p className="text-xs text-muted-foreground">{ev.club_name ?? "—"}</p>
+                    <h4 className="font-semibold">{ev.title}</h4>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1.5">
-                        <Clock className="size-3.5 text-[#e7a3a3]" />
+                        <Clock className="size-3.5 text-primary" />
                         {dateFormatter.format(new Date(ev.event_date))}
                       </span>
                       {ev.location && (
                         <span className="inline-flex items-center gap-1.5">
-                          <MapPin className="size-3.5 text-[#e7a3a3]" />
+                          <MapPin className="size-3.5 text-primary" />
                           {ev.location}
                         </span>
                       )}
@@ -165,14 +167,14 @@ export function AdminApprovals({
                       canUpload={false}
                       documents={ev.documents}
                     />
-                    <div className="mt-3 flex flex-wrap gap-2 border-t border-white/5 pt-3">
-                      <Button onClick={() => decide(ev, "approve")} disabled={busy} size="sm" className="gap-1.5 bg-emerald-600 font-medium text-white hover:bg-emerald-600/90">
+                    <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
+                      <Button onClick={() => decide(ev, "approve")} disabled={busy} size="sm" className="gap-1.5 bg-success font-medium text-success-foreground hover:bg-success/90">
                         <Check className="size-4" /> {t("approve")}
                       </Button>
-                      <Button onClick={() => decide(ev, "changes")} disabled={busy} size="sm" variant="outline" className="gap-1.5 border-orange-500/40 bg-transparent text-orange-300 hover:bg-orange-500/10">
+                      <Button onClick={() => decide(ev, "changes")} disabled={busy} size="sm" variant="outline" className="gap-1.5 border-orange-500/40 text-orange-700 hover:bg-orange-500/10 dark:text-orange-300">
                         <MessageSquareWarning className="size-4" /> {t("requestChanges")}
                       </Button>
-                      <Button onClick={() => decide(ev, "reject")} disabled={busy} size="sm" variant="outline" className="gap-1.5 border-red-500/40 bg-transparent text-red-300 hover:bg-red-500/10">
+                      <Button onClick={() => decide(ev, "reject")} disabled={busy} size="sm" variant="destructive" className="gap-1.5">
                         <X className="size-4" /> {t("reject")}
                       </Button>
                     </div>
@@ -185,9 +187,9 @@ export function AdminApprovals({
       </Card>
 
       {/* Onay ayarı (danışman kapısı aç/kapat) */}
-      <Card className="border-white/10 bg-zinc-900/70 shadow-2xl shadow-black/40 backdrop-blur">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-white">
+          <CardTitle className="text-lg font-semibold">
             {t("settingsTitle")}
           </CardTitle>
           <CardDescription>
@@ -196,15 +198,15 @@ export function AdminApprovals({
         </CardHeader>
         <CardContent>
           {clubs.length === 0 ? (
-            <p className="text-sm text-zinc-500">{t("noClubs")}</p>
+            <p className="text-sm text-muted-foreground">{t("noClubs")}</p>
           ) : (
             <ul className="space-y-2">
               {clubs.map((club) => {
                 const busy = busyId === club.id;
                 const on = club.requires_advisor_approval;
                 return (
-                  <li key={club.id} className="flex items-center justify-between gap-3 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5">
-                    <span className="truncate text-sm font-medium text-zinc-200">{club.name}</span>
+                  <li key={club.id} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/40 px-3 py-2.5">
+                    <span className="truncate text-sm font-medium">{club.name}</span>
                     <Button
                       onClick={() => toggleSetting(club)}
                       disabled={busy}
@@ -212,8 +214,8 @@ export function AdminApprovals({
                       variant="outline"
                       className={
                         on
-                          ? "gap-1.5 border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-                          : "gap-1.5 border-white/15 bg-transparent text-zinc-400 hover:bg-white/5 hover:text-white"
+                          ? "gap-1.5 border-success/40 bg-success/15 text-success hover:bg-success/25"
+                          : "gap-1.5"
                       }
                     >
                       {busy && <Loader2 className="size-4 animate-spin" />}

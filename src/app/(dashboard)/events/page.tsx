@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { CalendarDays } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { PageShell } from "@/components/shared/page-shell";
 import { EventsExplorer, type EventRow } from "./events-explorer";
 
 export const dynamic = "force-dynamic";
@@ -55,29 +56,20 @@ export default async function EventsPage() {
   );
 
   return (
-    <main className="relative min-h-svh overflow-hidden bg-zinc-950 text-foreground">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(50%_60%_at_50%_0%,rgba(132,21,21,0.18),transparent)]"
-      />
+    <PageShell>
+      <header className="mb-8 flex items-center gap-3">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <CalendarDays className="size-5" />
+        </span>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            {t("title")}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
+        </div>
+      </header>
 
-      <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
-        <header className="mb-8 flex items-center gap-2.5">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-[#841515]/15 text-[#e7a3a3]">
-            <CalendarDays className="size-5" />
-          </span>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              {t("title")}
-            </h1>
-            <p className="mt-1 text-sm text-zinc-400">
-              {t("subtitle")}
-            </p>
-          </div>
-        </header>
-
-        <EventsExplorer events={events} />
-      </div>
-    </main>
+      <EventsExplorer events={events} />
+    </PageShell>
   );
 }

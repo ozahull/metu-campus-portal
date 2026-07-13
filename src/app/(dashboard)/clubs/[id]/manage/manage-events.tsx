@@ -300,19 +300,14 @@ export function ManageEvents({
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button
-          onClick={openCreate}
-          size="sm"
-          className="gap-1.5 font-medium text-white hover:opacity-90"
-          style={{ backgroundColor: "#841515" }}
-        >
+        <Button onClick={openCreate} size="sm" className="gap-1.5 font-medium">
           <Plus className="size-4" />
           {t("add")}
         </Button>
       </div>
 
       {events.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-white/10 bg-white/[0.02] px-5 py-8 text-center text-sm text-zinc-500">
+        <p className="rounded-lg border border-dashed border-border bg-muted/40 px-5 py-8 text-center text-sm text-muted-foreground">
           {t("empty")}
         </p>
       ) : (
@@ -323,34 +318,34 @@ export function ManageEvents({
             return (
               <li
                 key={ev.id}
-                className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
+                className="rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/40"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="font-semibold text-white">{ev.title}</h4>
+                      <h4 className="font-semibold">{ev.title}</h4>
                       <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${meta.cls}`}>
                         {t(`status.${ev.status}`)}
                       </span>
                     </div>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-400">
+                    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1.5">
-                        <Clock className="size-3.5 text-[#e7a3a3]" />
+                        <Clock className="size-3.5 text-primary" />
                         {dateFormatter.format(new Date(ev.event_date))}
                       </span>
                       {ev.location && (
                         <span className="inline-flex items-center gap-1.5">
-                          <MapPin className="size-3.5 text-[#e7a3a3]" />
+                          <MapPin className="size-3.5 text-primary" />
                           {ev.location}
                         </span>
                       )}
                     </div>
                   </div>
                   <div className="flex shrink-0 gap-1">
-                    <Button onClick={() => openEdit(ev)} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-white/5 hover:text-white" aria-label={t("editAria")}>
+                    <Button onClick={() => openEdit(ev)} size="icon-sm" variant="ghost" aria-label={t("editAria")}>
                       <Pencil className="size-4" />
                     </Button>
-                    <Button onClick={() => handleDelete(ev)} size="icon-sm" variant="ghost" className="text-zinc-400 hover:bg-red-500/10 hover:text-red-400" aria-label={t("deleteAria")}>
+                    <Button onClick={() => handleDelete(ev)} size="icon-sm" variant="ghost" className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label={t("deleteAria")}>
                       <Trash2 className="size-4" />
                     </Button>
                   </div>
@@ -358,14 +353,14 @@ export function ManageEvents({
 
                 {/* Revizyon notu + tekrar gönder */}
                 {ev.status === "CHANGES_REQUESTED" && (
-                  <div className="mt-3 rounded-md border border-orange-500/20 bg-orange-500/5 p-3">
+                  <div className="mt-3 rounded-md border border-orange-500/25 bg-orange-500/10 p-3">
                     {ev.review_note && (
-                      <p className="flex items-start gap-2 text-xs text-orange-200/90">
+                      <p className="flex items-start gap-2 text-xs text-orange-700 dark:text-orange-300">
                         <MessageSquareWarning className="mt-0.5 size-3.5 shrink-0" />
                         {ev.review_note}
                       </p>
                     )}
-                    <Button onClick={() => resubmit(ev)} disabled={busy} size="sm" variant="outline" className="mt-2 gap-1.5 border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white">
+                    <Button onClick={() => resubmit(ev)} disabled={busy} size="sm" variant="outline" className="mt-2 gap-1.5">
                       {busy ? <Loader2 className="size-4 animate-spin" /> : <RotateCw className="size-4" />}
                       {t("resubmit")}
                     </Button>
@@ -374,14 +369,14 @@ export function ManageEvents({
 
                 {/* Danışman kararları */}
                 {canAdvisorDecide && ev.status === "PENDING_ADVISOR" && (
-                  <div className="mt-3 flex flex-wrap gap-2 border-t border-white/5 pt-3">
-                    <Button onClick={() => advisorDecide(ev, "approve")} disabled={busy} size="sm" className="gap-1.5 bg-emerald-600 font-medium text-white hover:bg-emerald-600/90">
+                  <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
+                    <Button onClick={() => advisorDecide(ev, "approve")} disabled={busy} size="sm" className="gap-1.5 bg-success font-medium text-success-foreground hover:bg-success/90">
                       <Check className="size-4" /> {t("approve")}
                     </Button>
-                    <Button onClick={() => advisorDecide(ev, "changes")} disabled={busy} size="sm" variant="outline" className="gap-1.5 border-orange-500/40 bg-transparent text-orange-300 hover:bg-orange-500/10">
+                    <Button onClick={() => advisorDecide(ev, "changes")} disabled={busy} size="sm" variant="outline" className="gap-1.5 border-orange-500/40 text-orange-700 hover:bg-orange-500/10 dark:text-orange-300">
                       <MessageSquareWarning className="size-4" /> {t("requestChanges")}
                     </Button>
-                    <Button onClick={() => advisorDecide(ev, "reject")} disabled={busy} size="sm" variant="outline" className="gap-1.5 border-red-500/40 bg-transparent text-red-300 hover:bg-red-500/10">
+                    <Button onClick={() => advisorDecide(ev, "reject")} disabled={busy} size="sm" variant="destructive" className="gap-1.5">
                       <X className="size-4" /> {t("reject")}
                     </Button>
                   </div>
@@ -402,10 +397,10 @@ export function ManageEvents({
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="dark border-white/10 bg-zinc-900 text-foreground sm:max-w-md">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-white">
-              <CalendarPlus className="size-5 text-[#e7a3a3]" />
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarPlus className="size-5 text-primary" />
               {editing ? t("dialogEditTitle") : t("dialogCreateTitle")}
             </DialogTitle>
             <DialogDescription>
@@ -424,7 +419,7 @@ export function ManageEvents({
             </div>
             <div className="space-y-2">
               <Label htmlFor="ev-date">{t("fieldDate")}</Label>
-              <Input id="ev-date" type="datetime-local" className="[color-scheme:dark]" value={eventDate} onChange={(e) => setEventDate(e.target.value)} disabled={loading} required />
+              <Input id="ev-date" type="datetime-local" className="[color-scheme:light] dark:[color-scheme:dark]" value={eventDate} onChange={(e) => setEventDate(e.target.value)} disabled={loading} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="ev-loc">{t("fieldLocation")}</Label>
@@ -432,9 +427,9 @@ export function ManageEvents({
             </div>
 
             {ticketEnabled && (
-              <div className="space-y-4 rounded-lg border border-white/5 bg-white/[0.02] p-4">
-                <p className="inline-flex items-center gap-2 text-sm font-medium text-white">
-                  <Ticket className="size-4 text-[#e7a3a3]" />
+              <div className="space-y-4 rounded-lg border border-border bg-muted/40 p-4">
+                <p className="inline-flex items-center gap-2 text-sm font-medium">
+                  <Ticket className="size-4 text-primary" />
                   {t("ticketSettings")}
                 </p>
 
@@ -446,10 +441,10 @@ export function ManageEvents({
                     disabled={loading}
                     aria-pressed={!isPaid}
                     className={cn(
-                      "rounded-lg border px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50",
+                      "rounded-lg border px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
                       !isPaid
-                        ? "border-[#841515]/60 bg-[#841515]/15 text-white"
-                        : "border-white/10 bg-transparent text-zinc-400 hover:bg-white/5",
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-card text-muted-foreground hover:bg-accent",
                     )}
                   >
                     {t("free")}
@@ -460,10 +455,10 @@ export function ManageEvents({
                     disabled={loading}
                     aria-pressed={isPaid}
                     className={cn(
-                      "rounded-lg border px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50",
+                      "rounded-lg border px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
                       isPaid
-                        ? "border-[#841515]/60 bg-[#841515]/15 text-white"
-                        : "border-white/10 bg-transparent text-zinc-400 hover:bg-white/5",
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-card text-muted-foreground hover:bg-accent",
                     )}
                   >
                     {t("paid")}
@@ -474,7 +469,7 @@ export function ManageEvents({
                   <>
                     <div className="space-y-2">
                       <Label htmlFor="ev-price">
-                        {t("price")} <span className="text-[#e7a3a3]">*</span>
+                        {t("price")} <span className="text-primary">*</span>
                       </Label>
                       <Input id="ev-price" type="number" min="0" step="0.01" inputMode="decimal" placeholder={t("pricePlaceholder")} value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} disabled={loading} />
                     </div>
@@ -484,8 +479,8 @@ export function ManageEvents({
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="ev-deadline">{t("deadline")}</Label>
-                      <Input id="ev-deadline" type="datetime-local" className="[color-scheme:dark]" value={ticketDeadline} onChange={(e) => setTicketDeadline(e.target.value)} disabled={loading} />
-                      <p className="text-xs text-zinc-500">{t("deadlineHint")}</p>
+                      <Input id="ev-deadline" type="datetime-local" className="[color-scheme:light] dark:[color-scheme:dark]" value={ticketDeadline} onChange={(e) => setTicketDeadline(e.target.value)} disabled={loading} />
+                      <p className="text-xs text-muted-foreground">{t("deadlineHint")}</p>
                     </div>
                   </>
                 )}
@@ -493,10 +488,10 @@ export function ManageEvents({
             )}
 
             <DialogFooter className="gap-2 sm:gap-2">
-              <Button type="button" variant="outline" disabled={loading} onClick={() => setOpen(false)} className="border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white">
+              <Button type="button" variant="outline" disabled={loading} onClick={() => setOpen(false)}>
                 {t("cancel")}
               </Button>
-              <Button type="submit" disabled={loading} className="gap-2 font-medium text-white hover:opacity-90" style={{ backgroundColor: "#841515" }}>
+              <Button type="submit" disabled={loading} className="gap-2 font-medium">
                 {loading && <Loader2 className="size-4 animate-spin" />}
                 {editing ? t("saveEdit") : t("create")}
               </Button>

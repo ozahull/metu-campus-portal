@@ -3,11 +3,10 @@ import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import {
   ArrowLeft,
+  AtSign,
   CalendarDays,
   Clock,
-  Flame,
-  AtSign,
-  Inbox,
+  Info,
   Mail,
   MapPin,
   MessageCircle,
@@ -20,13 +19,10 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { buttonVariants } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
+import { EmptyState } from "@/components/shared/empty-state";
 import { cn } from "@/lib/utils";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { RSVPButton } from "@/components/shared/rsvp-button";
 import { JoinButton } from "./join-button";
 
@@ -151,285 +147,302 @@ export default async function ClubDetailPage({
   }
 
   const events = (eventsRaw ?? []) as ClubEvent[];
+  const initials = club?.name.slice(0, 2).toUpperCase() ?? "";
+  const hasContact = Boolean(
+    club?.contact_email ||
+      club?.contact_phone ||
+      club?.whatsapp_url ||
+      club?.instagram_url,
+  );
 
   return (
-    <main className="dark relative min-h-svh overflow-hidden bg-zinc-950 text-foreground">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(50%_60%_at_50%_0%,rgba(132,21,21,0.18),transparent)]"
-      />
-
-      <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-        {/* Geri dön */}
-        <Link
-          href="/dashboard"
-          className={cn(
-            buttonVariants({ variant: "ghost", size: "sm" }),
-            "-ml-2 gap-1.5 text-zinc-400 hover:bg-white/5 hover:text-white",
-          )}
-        >
-          <ArrowLeft className="size-4" />
-          {t("back")}
-        </Link>
+    <main className="relative">
+      <div className="mx-auto w-full max-w-5xl px-4 pb-14 sm:px-6 lg:px-8">
+        <div className="pt-6">
+          <Link
+            href="/clubs"
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "-ml-2 gap-1.5 text-muted-foreground",
+            )}
+          >
+            <ArrowLeft className="size-4" />
+            {t("back")}
+          </Link>
+        </div>
 
         {!club ? (
-          // Kulüp bulunamadı durumu
-          <div className="mt-16 flex flex-col items-center justify-center text-center">
-            <div className="flex size-14 items-center justify-center rounded-2xl bg-white/5 text-zinc-400">
-              <SearchX className="size-7" />
-            </div>
-            <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">
-              {t("notFoundTitle")}
-            </h1>
-            <p className="mt-2 max-w-sm text-sm text-zinc-400">
-              {t("notFoundBody")}
-            </p>
-            <Link
-              href="/dashboard"
-              className={cn(
-                buttonVariants({ size: "lg" }),
-                "mt-6 gap-2 font-medium text-white hover:opacity-90",
-              )}
-              style={{ backgroundColor: "#841515" }}
-            >
-              <ArrowLeft className="size-4" />
-              {t("backToDashboard")}
-            </Link>
+          <div className="mt-16">
+            <EmptyState
+              icon={SearchX}
+              title={t("notFoundTitle")}
+              description={t("notFoundBody")}
+              action={
+                <Link
+                  href="/dashboard"
+                  className={cn(buttonVariants({ size: "lg" }), "gap-2")}
+                >
+                  <ArrowLeft className="size-4" />
+                  {t("backToDashboard")}
+                </Link>
+              }
+            />
           </div>
         ) : (
           <>
-            {/* Kapak görseli */}
-            {club.cover_url && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={club.cover_url}
-                alt={t("coverAlt", { name: club.name })}
-                className="mt-6 h-44 w-full rounded-2xl border border-white/10 object-cover sm:h-56"
-              />
-            )}
+            {/* Kapak banner'ı */}
+            <div className="mt-4 h-40 w-full overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/30 via-muted to-muted sm:h-52">
+              {club.cover_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={club.cover_url}
+                  alt={t("coverAlt", { name: club.name })}
+                  className="size-full object-cover"
+                />
+              )}
+            </div>
 
-            {/* Başlık */}
-            <header className="mt-8 mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-              <div className="flex items-end gap-4">
-                {club.logo_url && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={club.logo_url}
-                    alt={t("logoAlt", { name: club.name })}
-                    className="size-16 shrink-0 rounded-2xl border border-white/10 object-cover"
+            {/* Üste binen logo + başlık + aksiyonlar */}
+            <div className="relative -mt-12 px-1 sm:px-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div className="flex items-end gap-4">
+                  <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-4 border-background bg-muted text-xl font-bold text-foreground shadow-sm sm:size-24">
+                    {club.logo_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={club.logo_url}
+                        alt={t("logoAlt", { name: club.name })}
+                        className="size-full object-cover"
+                      />
+                    ) : (
+                      initials
+                    )}
+                  </div>
+                  <div className="pb-1">
+                    <Badge variant="primary">
+                      <Users className="size-3" />
+                      {club.category ?? t("defaultCategory")}
+                    </Badge>
+                    <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+                      {club.name}
+                    </h1>
+                  </div>
+                </div>
+
+                <div className="flex shrink-0 items-center gap-2 pb-1">
+                  {canManage && (
+                    <Link
+                      href={`/clubs/${club.id}/manage`}
+                      className={cn(
+                        buttonVariants({ variant: "outline", size: "lg" }),
+                        "gap-2",
+                      )}
+                    >
+                      <Settings className="size-4" />
+                      {t("manage")}
+                    </Link>
+                  )}
+                  <JoinButton
+                    clubId={club.id}
+                    userId={user.id}
+                    isMember={isMember}
                   />
-                )}
-                <div>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[#841515]/30 bg-[#841515]/10 px-3 py-1 text-xs font-medium text-[#e7a3a3]">
-                    <Users className="size-3.5" />
-                    {club.category ?? t("defaultCategory")}
-                  </span>
-                  <h1
-                    className="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl"
-                    style={{ textShadow: "0 0 40px rgba(132,21,21,0.45)" }}
-                  >
-                    {club.name}
-                  </h1>
-                  <div className="mt-4 h-px w-24 bg-gradient-to-r from-[#841515] to-transparent" />
                 </div>
               </div>
-
-              <div className="flex shrink-0 items-center gap-2">
-                {canManage && (
-                  <Link
-                    href={`/clubs/${club.id}/manage`}
-                    className={cn(
-                      buttonVariants({ variant: "outline", size: "lg" }),
-                      "gap-2 border-white/15 bg-transparent text-zinc-200 hover:border-[#841515] hover:bg-[#841515] hover:text-white",
-                    )}
-                  >
-                    <Settings className="size-4" />
-                    {t("manage")}
-                  </Link>
-                )}
-                <JoinButton clubId={club.id} userId={user.id} isMember={isMember} />
-              </div>
-            </header>
-
-            {/* Açıklama kartı */}
-            <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-white">
-                  {t("about")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-base leading-relaxed text-zinc-300 whitespace-pre-line">
-                  {club.description?.trim()
-                    ? club.description
-                    : t("noDescription")}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Vizyon */}
-            {club.vision?.trim() && (
-              <Card className="mt-6 border-white/5 bg-zinc-900/50 backdrop-blur">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
-                    <Target className="size-4 text-[#e7a3a3]" />
-                    {t("vision")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-base leading-relaxed text-zinc-300 whitespace-pre-line">
-                    {club.vision}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* İletişim & sosyal */}
-            {(club.contact_email ||
-              club.contact_phone ||
-              club.whatsapp_url ||
-              club.instagram_url) && (
-              <div className="mt-6 flex flex-wrap gap-2">
-                {club.contact_email && (
-                  <a href={`mailto:${club.contact_email}`} className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/50 px-3 text-sm text-zinc-200 transition-colors hover:border-[#841515] hover:text-white">
-                    <Mail className="size-4 text-[#e7a3a3]" />
-                    {club.contact_email}
-                  </a>
-                )}
-                {club.contact_phone && (
-                  <a href={`tel:${club.contact_phone}`} className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/50 px-3 text-sm text-zinc-200 transition-colors hover:border-[#841515] hover:text-white">
-                    <Phone className="size-4 text-[#e7a3a3]" />
-                    {club.contact_phone}
-                  </a>
-                )}
-                {club.whatsapp_url && (
-                  <a href={club.whatsapp_url} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/50 px-3 text-sm text-zinc-200 transition-colors hover:border-[#841515] hover:text-white">
-                    <MessageCircle className="size-4 text-[#e7a3a3]" />
-                    {t("whatsapp")}
-                  </a>
-                )}
-                {club.instagram_url && (
-                  <a href={club.instagram_url} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/50 px-3 text-sm text-zinc-200 transition-colors hover:border-[#841515] hover:text-white">
-                    <AtSign className="size-4 text-[#e7a3a3]" />
-                    {t("instagram")}
-                  </a>
-                )}
-              </div>
-            )}
-
-            {/* Etkinlikler + üyeler bölümleri */}
-            <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-              <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base font-semibold text-white">
-                    <CalendarDays className="size-4 text-[#e7a3a3]" />
-                    {t("upcomingEvents")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {events.length > 0 ? (
-                    <ul className="space-y-3">
-                      {events.map((ev) => {
-                        const attendees = ev.event_attendees ?? [];
-                        const isAttending = attendees.some(
-                          (a) => a.user_id === user.id,
-                        );
-                        return (
-                          <li
-                            key={ev.id}
-                            className="rounded-lg border border-white/5 bg-white/[0.02] p-4 transition-colors hover:border-[#841515]/40 hover:bg-white/[0.04]"
-                          >
-                            <h3 className="font-semibold text-white">
-                              {ev.title}
-                            </h3>
-                            {ev.description && (
-                              <p className="mt-1 text-sm text-zinc-400">
-                                {ev.description}
-                              </p>
-                            )}
-                            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-zinc-400">
-                              <span className="inline-flex items-center gap-1.5">
-                                <Clock className="size-3.5 text-[#e7a3a3]" />
-                                {dateFormatter.format(new Date(ev.event_date))}
-                              </span>
-                              {ev.location && (
-                                <span className="inline-flex items-center gap-1.5">
-                                  <MapPin className="size-3.5 text-[#e7a3a3]" />
-                                  {ev.location}
-                                </span>
-                              )}
-                            </div>
-                            <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/5 pt-3">
-                              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-300">
-                                <Flame className="size-3.5 text-orange-400" />
-                                {t("attendeeCount", { count: attendees.length })}
-                              </span>
-                              <RSVPButton
-                                eventId={ev.id}
-                                userId={user.id}
-                                isAttending={isAttending}
-                              />
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 bg-white/[0.02] px-6 py-10 text-center">
-                      <div className="flex size-10 items-center justify-center rounded-xl bg-white/5 text-zinc-400">
-                        <Inbox className="size-5" />
-                      </div>
-                      <p className="mt-3 text-sm text-zinc-500">
-                        {t("noEvents")}
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base font-semibold text-white">
-                    <Users className="size-4 text-[#e7a3a3]" />
-                    {t("membersTitle")}
-                    <span className="ml-auto rounded-full bg-white/5 px-2 py-0.5 text-xs font-medium text-zinc-400">
-                      {members.length}
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {members.length > 0 ? (
-                    <ul className="space-y-2">
-                      {members.map((m) => (
-                        <li
-                          key={m.id}
-                          className="flex items-center gap-3 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5 transition-colors hover:bg-white/[0.05]"
-                        >
-                          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white/5 text-zinc-300">
-                            <UserRound className="size-4" />
-                          </span>
-                          <span className="text-sm font-medium text-zinc-200">
-                            {m.full_name ?? t("unnamedMember")}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/10 bg-white/[0.02] px-6 py-10 text-center">
-                      <div className="flex size-10 items-center justify-center rounded-xl bg-white/5 text-zinc-400">
-                        <Inbox className="size-5" />
-                      </div>
-                      <p className="mt-3 text-sm text-zinc-500">
-                        {t("noMembers")}
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
             </div>
+
+            {/* Sekmeler: Hakkında | Etkinlikler | Üyeler */}
+            <Tabs defaultValue="about" className="mt-8">
+              <TabsList>
+                <TabsTab value="about">
+                  <Info className="size-4" />
+                  {t("about")}
+                </TabsTab>
+                <TabsTab value="events">
+                  <CalendarDays className="size-4" />
+                  {t("tabEvents")}
+                  <span className="rounded-full bg-muted px-1.5 text-xs text-muted-foreground">
+                    {events.length}
+                  </span>
+                </TabsTab>
+                <TabsTab value="members">
+                  <Users className="size-4" />
+                  {t("tabMembers")}
+                  <span className="rounded-full bg-muted px-1.5 text-xs text-muted-foreground">
+                    {members.length}
+                  </span>
+                </TabsTab>
+              </TabsList>
+
+              {/* Hakkında */}
+              <TabsPanel value="about" className="space-y-6">
+                <section className="rounded-xl border border-border bg-card p-5">
+                  <h2 className="text-lg font-semibold tracking-tight">
+                    {t("about")}
+                  </h2>
+                  <p className="mt-3 leading-relaxed whitespace-pre-line text-muted-foreground">
+                    {club.description?.trim()
+                      ? club.description
+                      : t("noDescription")}
+                  </p>
+                </section>
+
+                {club.vision?.trim() && (
+                  <section className="rounded-xl border border-border bg-card p-5">
+                    <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+                      <Target className="size-4 text-primary" />
+                      {t("vision")}
+                    </h2>
+                    <p className="mt-3 leading-relaxed whitespace-pre-line text-muted-foreground">
+                      {club.vision}
+                    </p>
+                  </section>
+                )}
+
+                {hasContact && (
+                  <div className="flex flex-wrap gap-2">
+                    {club.contact_email && (
+                      <ContactChip
+                        href={`mailto:${club.contact_email}`}
+                        icon={<Mail className="size-4 text-primary" />}
+                        label={club.contact_email}
+                      />
+                    )}
+                    {club.contact_phone && (
+                      <ContactChip
+                        href={`tel:${club.contact_phone}`}
+                        icon={<Phone className="size-4 text-primary" />}
+                        label={club.contact_phone}
+                      />
+                    )}
+                    {club.whatsapp_url && (
+                      <ContactChip
+                        href={club.whatsapp_url}
+                        external
+                        icon={<MessageCircle className="size-4 text-primary" />}
+                        label={t("whatsapp")}
+                      />
+                    )}
+                    {club.instagram_url && (
+                      <ContactChip
+                        href={club.instagram_url}
+                        external
+                        icon={<AtSign className="size-4 text-primary" />}
+                        label={t("instagram")}
+                      />
+                    )}
+                  </div>
+                )}
+              </TabsPanel>
+
+              {/* Etkinlikler */}
+              <TabsPanel value="events">
+                {events.length > 0 ? (
+                  <ul className="space-y-3">
+                    {events.map((ev) => {
+                      const attendees = ev.event_attendees ?? [];
+                      const isAttending = attendees.some(
+                        (a) => a.user_id === user.id,
+                      );
+                      return (
+                        <li
+                          key={ev.id}
+                          className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/40"
+                        >
+                          <Link
+                            href={`/events/${ev.id}`}
+                            className="font-semibold tracking-tight transition-colors hover:text-primary"
+                          >
+                            {ev.title}
+                          </Link>
+                          {ev.description && (
+                            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                              {ev.description}
+                            </p>
+                          )}
+                          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
+                            <span className="inline-flex items-center gap-1.5">
+                              <Clock className="size-3.5 text-primary" />
+                              {dateFormatter.format(new Date(ev.event_date))}
+                            </span>
+                            {ev.location && (
+                              <span className="inline-flex items-center gap-1.5">
+                                <MapPin className="size-3.5 text-primary" />
+                                {ev.location}
+                              </span>
+                            )}
+                          </div>
+                          <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3">
+                            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                              <Users className="size-3.5" />
+                              {t("attendeeCount", { count: attendees.length })}
+                            </span>
+                            <RSVPButton
+                              eventId={ev.id}
+                              userId={user.id}
+                              isAttending={isAttending}
+                            />
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <EmptyState icon={CalendarDays} title={t("noEvents")} />
+                )}
+              </TabsPanel>
+
+              {/* Üyeler */}
+              <TabsPanel value="members">
+                {members.length > 0 ? (
+                  <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {members.map((m) => (
+                      <li
+                        key={m.id}
+                        className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/40"
+                      >
+                        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                          <UserRound className="size-4" />
+                        </span>
+                        <span className="truncate text-sm font-medium">
+                          {m.full_name ?? t("unnamedMember")}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <EmptyState icon={Users} title={t("noMembers")} />
+                )}
+              </TabsPanel>
+            </Tabs>
           </>
         )}
       </div>
     </main>
+  );
+}
+
+function ContactChip({
+  href,
+  icon,
+  label,
+  external,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  external?: boolean;
+}) {
+  return (
+    <a
+      href={href}
+      {...(external
+        ? { target: "_blank", rel: "noopener noreferrer" }
+        : {})}
+      className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-card px-3 text-sm text-foreground transition-colors hover:border-primary/50 hover:text-primary"
+    >
+      {icon}
+      {label}
+    </a>
   );
 }

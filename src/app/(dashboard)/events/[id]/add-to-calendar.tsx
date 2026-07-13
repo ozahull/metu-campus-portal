@@ -66,7 +66,7 @@ export function AddToCalendar({ title, description, location, startISO, endISO }
         href={googleUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/15 bg-transparent px-3 text-sm font-medium text-zinc-200 transition-colors hover:border-[#841515] hover:bg-[#841515] hover:text-white"
+        className="inline-flex h-9 items-center gap-2 rounded-lg border border-border bg-card px-3 text-sm font-medium text-foreground transition-colors hover:border-primary hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <CalendarPlus className="size-4" />
         {t("googleCalendar")}
@@ -75,7 +75,7 @@ export function AddToCalendar({ title, description, location, startISO, endISO }
         onClick={downloadIcs}
         variant="outline"
         size="lg"
-        className="gap-2 border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white"
+        className="gap-2"
       >
         <Download className="size-4" />
         {t("downloadIcs")}

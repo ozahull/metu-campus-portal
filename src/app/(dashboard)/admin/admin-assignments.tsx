@@ -19,7 +19,7 @@ import {
 export type Option = { id: string; label: string };
 
 const selectClass =
-  "h-9 w-full rounded-lg border border-white/10 bg-zinc-950/60 px-3 text-sm text-white outline-none focus-visible:border-[#841515] [&>option]:bg-zinc-900";
+  "h-9 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none transition-colors focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring [&>option]:bg-card";
 
 export function AdminAssignments({
   clubs,
@@ -57,10 +57,10 @@ export function AdminAssignments({
   }
 
   return (
-    <Card className="border-white/10 bg-zinc-900/70 shadow-2xl shadow-black/40 backdrop-blur">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
-          <GraduationCap className="size-5 text-[#e7a3a3]" />
+        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+          <GraduationCap className="size-5 text-primary" />
           {t("title")}
         </CardTitle>
         <CardDescription>
@@ -87,8 +87,8 @@ export function AdminAssignments({
               ))}
             </select>
           </div>
-          <div className="sm:col-span-2">
-            <Button type="submit" disabled={advBusy} className="gap-2 font-medium text-white hover:opacity-90" style={{ backgroundColor: "#841515" }}>
+          <div className="flex justify-end sm:col-span-2">
+            <Button type="submit" disabled={advBusy} className="gap-2 font-medium">
               {advBusy && <Loader2 className="size-4 animate-spin" />}
               {t("submit")}
             </Button>

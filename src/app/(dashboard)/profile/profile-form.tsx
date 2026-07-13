@@ -76,10 +76,10 @@ export function ProfileForm({
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
-            <UserRound className="size-4 text-[#e7a3a3]" />
+          <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+            <UserRound className="size-4 text-primary" />
             {t("nameCard.title")}
           </CardTitle>
           <CardDescription>{t("nameCard.description")}</CardDescription>
@@ -90,18 +90,20 @@ export function ProfileForm({
               <Label htmlFor="full-name">{t("nameCard.label")}</Label>
               <Input id="full-name" value={name} onChange={(e) => setName(e.target.value)} disabled={nameBusy} required />
             </div>
-            <Button type="submit" disabled={nameBusy} className="gap-2 font-medium text-white hover:opacity-90" style={{ backgroundColor: "#841515" }}>
-              {nameBusy && <Loader2 className="size-4 animate-spin" />}
-              {tCommon("save")}
-            </Button>
+            <div className="flex justify-end">
+              <Button type="submit" disabled={nameBusy} className="gap-2 font-medium">
+                {nameBusy && <Loader2 className="size-4 animate-spin" />}
+                {tCommon("save")}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
 
-      <Card className="border-white/5 bg-zinc-900/50 backdrop-blur">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold text-white">
-            <KeyRound className="size-4 text-[#e7a3a3]" />
+          <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+            <KeyRound className="size-4 text-primary" />
             {t("passwordCard.title")}
           </CardTitle>
           <CardDescription>{t("passwordCard.description")}</CardDescription>
@@ -132,10 +134,12 @@ export function ProfileForm({
                 </button>
               </div>
             </div>
-            <Button type="submit" disabled={pwBusy} className="gap-2 font-medium text-white hover:opacity-90" style={{ backgroundColor: "#841515" }}>
-              {pwBusy && <Loader2 className="size-4 animate-spin" />}
-              {t("passwordCard.submit")}
-            </Button>
+            <div className="flex justify-end">
+              <Button type="submit" disabled={pwBusy} className="gap-2 font-medium">
+                {pwBusy && <Loader2 className="size-4 animate-spin" />}
+                {t("passwordCard.submit")}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>

@@ -1,16 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ArrowLeft, CalendarClock, Flame, MapPin, Ticket, Users } from "lucide-react";
+import { ArrowLeft, CalendarClock, MapPin, Ticket, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { buttonVariants } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { RSVPButton } from "@/components/shared/rsvp-button";
 import { AddToCalendar } from "./add-to-calendar";
 import { TicketFlow, type MyTicket } from "./ticket-flow";
@@ -101,85 +96,72 @@ export default async function EventDetailPage({
   }
 
   return (
-    <main className="relative min-h-svh overflow-hidden bg-zinc-950 text-foreground">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 bg-[radial-gradient(50%_60%_at_50%_0%,rgba(132,21,21,0.18),transparent)]"
-      />
-
-      <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
-        <Link
-          href="/events"
-          className={cn(
-            buttonVariants({ variant: "ghost", size: "sm" }),
-            "-ml-2 gap-1.5 text-zinc-400 hover:bg-white/5 hover:text-white",
-          )}
-        >
-          <ArrowLeft className="size-4" />
-          {t("backToList")}
-        </Link>
-
-        <header className="mt-6 mb-8">
-          {club && (
-            <Link
-              href={`/clubs/${club.id}`}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#841515]/30 bg-[#841515]/10 px-3 py-1 text-xs font-medium text-[#e7a3a3] transition-colors hover:bg-[#841515]/20"
-            >
-              <Users className="size-3.5" />
-              {club.name}
-            </Link>
-          )}
-          <h1
-            className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl"
-            style={{ textShadow: "0 0 40px rgba(132,21,21,0.45)" }}
-          >
-            {data.title}
-          </h1>
-
-          {/* Ücret rozeti — açıklamadan ayrı, belirgin */}
-          <div className="mt-4">
-            {isPaid ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#841515]/50 bg-[#841515]/15 px-3.5 py-1.5 text-sm font-semibold text-white">
-                <Ticket className="size-4 text-[#e7a3a3]" />
-                {t("priceBadge", { price: formatPrice(priceNum, locale) ?? t("free") })}
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm font-medium text-zinc-300">
-                <Ticket className="size-4 text-zinc-500" />
-                {t("free")}
-              </span>
+    <main className="relative">
+      <div className="mx-auto w-full max-w-3xl px-4 pb-14 sm:px-6 lg:px-8">
+        <div className="pt-6">
+          <Link
+            href="/events"
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "-ml-2 gap-1.5 text-muted-foreground",
             )}
-          </div>
-        </header>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="flex items-center gap-2.5 rounded-lg border border-white/5 bg-zinc-900/50 px-4 py-3 text-sm text-zinc-200">
-            <CalendarClock className="size-4 shrink-0 text-[#e7a3a3]" />
-            {dateFormatter.format(new Date(data.event_date))}
-          </div>
-          {data.location && (
-            <div className="flex items-center gap-2.5 rounded-lg border border-white/5 bg-zinc-900/50 px-4 py-3 text-sm text-zinc-200">
-              <MapPin className="size-4 shrink-0 text-[#e7a3a3]" />
-              {data.location}
-            </div>
-          )}
+          >
+            <ArrowLeft className="size-4" />
+            {t("backToList")}
+          </Link>
         </div>
 
-        {data.description?.trim() && (
-          <Card className="mt-6 border-white/5 bg-zinc-900/50 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold text-white">
-                {t("about")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-base leading-relaxed text-zinc-300 whitespace-pre-line">
-                {data.description}
-              </p>
-            </CardContent>
-          </Card>
-        )}
+        <header className="mt-4 mb-6">
+          <div className="flex flex-wrap items-center gap-2">
+            {club && (
+              <Link
+                href={`/clubs/${club.id}`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+              >
+                <Users className="size-3.5" />
+                {club.name}
+              </Link>
+            )}
+            {isPaid ? (
+              <Badge variant="primary">
+                <Ticket className="size-3" />
+                {t("priceBadge", {
+                  price: formatPrice(priceNum, locale) ?? t("free"),
+                })}
+              </Badge>
+            ) : (
+              <Badge>
+                <Ticket className="size-3" />
+                {t("free")}
+              </Badge>
+            )}
+          </div>
+          <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+            {data.title}
+          </h1>
+        </header>
 
+        {/* Bilgi şeridi: tarih · konum · katılımcı */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card px-4 py-3 text-sm">
+            <CalendarClock className="size-4 shrink-0 text-primary" />
+            <span className="min-w-0">
+              {dateFormatter.format(new Date(data.event_date))}
+            </span>
+          </div>
+          {data.location && (
+            <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card px-4 py-3 text-sm">
+              <MapPin className="size-4 shrink-0 text-primary" />
+              <span className="min-w-0 truncate">{data.location}</span>
+            </div>
+          )}
+          <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card px-4 py-3 text-sm">
+            <Users className="size-4 shrink-0 text-primary" />
+            {t("attendingCount", { count: attendees.length })}
+          </div>
+        </div>
+
+        {/* Katılım / bilet CTA'sı — belirgin */}
         {ticketingOn ? (
           <div className="mt-6">
             <TicketFlow
@@ -192,17 +174,33 @@ export default async function EventDetailPage({
             />
           </div>
         ) : (
-          <div className="mt-6 flex flex-col gap-4 rounded-xl border border-white/5 bg-zinc-900/50 p-5 sm:flex-row sm:items-center sm:justify-between">
-            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-300">
-              <Flame className="size-4 text-orange-400" />
+          <div className="mt-6 flex flex-col gap-4 rounded-xl border border-primary/25 bg-primary/[0.06] p-5 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-sm font-medium">
               {t("attendingCount", { count: attendees.length })}
             </span>
-            <RSVPButton eventId={data.id} userId={user.id} isAttending={isAttending} />
+            <RSVPButton
+              eventId={data.id}
+              userId={user.id}
+              isAttending={isAttending}
+            />
           </div>
         )}
 
+        {data.description?.trim() && (
+          <section className="mt-6 rounded-xl border border-border bg-card p-5">
+            <h2 className="text-lg font-semibold tracking-tight">
+              {t("about")}
+            </h2>
+            <p className="mt-3 leading-relaxed whitespace-pre-line text-muted-foreground">
+              {data.description}
+            </p>
+          </section>
+        )}
+
         <div className="mt-6">
-          <p className="mb-2 text-sm font-medium text-zinc-400">{t("addToCalendar")}</p>
+          <p className="mb-2 text-sm font-medium text-muted-foreground">
+            {t("addToCalendar")}
+          </p>
           <AddToCalendar
             title={data.title}
             description={data.description}

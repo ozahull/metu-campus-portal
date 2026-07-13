@@ -66,7 +66,7 @@ export function JoinButton({ clubId, userId, isMember }: JoinButtonProps) {
         disabled={loading}
         variant="outline"
         size="lg"
-        className="gap-2 border-white/15 bg-transparent text-zinc-200 hover:border-white/30 hover:bg-white/5 hover:text-white"
+        className="gap-2"
       >
         {loading ? (
           <Loader2 className="size-4 animate-spin" />
@@ -83,8 +83,7 @@ export function JoinButton({ clubId, userId, isMember }: JoinButtonProps) {
       onClick={handleClick}
       disabled={loading}
       size="lg"
-      className="gap-2 font-medium text-white hover:opacity-90"
-      style={{ backgroundColor: "#841515" }}
+      className="gap-2 font-medium"
     >
       {loading ? (
         <Loader2 className="size-4 animate-spin" />

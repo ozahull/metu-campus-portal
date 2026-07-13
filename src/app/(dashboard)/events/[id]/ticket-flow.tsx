@@ -135,16 +135,14 @@ export function TicketFlow({
   // --- Henüz bilet yok: satın al ---
   if (!ticket) {
     return (
-      <div className="rounded-xl border border-white/5 bg-zinc-900/50 p-5">
+      <div className="rounded-xl border border-primary/25 bg-primary/[0.06] p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-sm text-zinc-400">{t("label")}</p>
-            <p className="text-2xl font-bold tracking-tight text-white">
-              {priceLabel}
-            </p>
+            <p className="text-sm text-muted-foreground">{t("label")}</p>
+            <p className="text-2xl font-bold tracking-tight">{priceLabel}</p>
           </div>
           {closed ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-zinc-400">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1.5 text-sm text-muted-foreground">
               <Ban className="size-4" />
               {t("salesClosed")}
             </span>
@@ -152,8 +150,8 @@ export function TicketFlow({
             <Button
               onClick={buyTicket}
               disabled={loading}
-              className="gap-1.5 font-medium text-white hover:opacity-90"
-              style={{ backgroundColor: "#841515" }}
+              size="lg"
+              className="gap-1.5 font-medium"
             >
               {loading ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -170,10 +168,10 @@ export function TicketFlow({
 
   // --- Bilet var: duruma göre ---
   return (
-    <div className="rounded-xl border border-white/5 bg-zinc-900/50 p-5">
+    <div className="rounded-xl border border-border bg-card p-5">
       <div className="flex items-center justify-between gap-3">
-        <p className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
-          <TicketIcon className="size-4 text-[#e7a3a3]" />
+        <p className="inline-flex items-center gap-2 text-sm font-medium">
+          <TicketIcon className="size-4 text-primary" />
           {t("yourTicket")}
         </p>
         {meta && (
@@ -189,20 +187,18 @@ export function TicketFlow({
       {(ticket.status === "PENDING_PAYMENT" || ticket.status === "REJECTED") && (
         <div className="mt-4 space-y-4">
           {ticket.status === "REJECTED" && (
-            <p className="rounded-md border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs text-red-200/90">
+            <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
               {t("rejectedNote")}
             </p>
           )}
 
-          <div className="rounded-lg border border-white/5 bg-white/[0.02] p-4">
-            <p className="text-xs text-zinc-400">{t("amountDue")}</p>
-            <p className="text-lg font-semibold text-white">
-              {priceLabel}
-            </p>
+          <div className="rounded-lg border border-border bg-muted/40 p-4">
+            <p className="text-xs text-muted-foreground">{t("amountDue")}</p>
+            <p className="text-lg font-semibold">{priceLabel}</p>
             <div className="mt-3 flex items-center justify-between gap-2">
               <div className="min-w-0">
-                <p className="text-xs text-zinc-400">{t("iban")}</p>
-                <p className="truncate font-mono text-sm text-zinc-200">
+                <p className="text-xs text-muted-foreground">{t("iban")}</p>
+                <p className="truncate font-mono text-sm">
                   {clubIban ?? t("noIban")}
                 </p>
               </div>
@@ -211,7 +207,7 @@ export function TicketFlow({
                   onClick={copyIban}
                   size="icon-sm"
                   variant="ghost"
-                  className="shrink-0 text-zinc-400 hover:bg-white/5 hover:text-white"
+                  className="shrink-0"
                   aria-label={t("copyIban")}
                 >
                   <Copy className="size-4" />
@@ -233,8 +229,8 @@ export function TicketFlow({
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={loading}
-                className="gap-1.5 font-medium text-white hover:opacity-90"
-                style={{ backgroundColor: "#841515" }}
+                size="lg"
+                className="gap-1.5 font-medium"
               >
                 {loading ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -248,14 +244,15 @@ export function TicketFlow({
                   onClick={cancelTicket}
                   disabled={loading}
                   variant="outline"
-                  className="gap-1.5 border-white/15 bg-transparent text-zinc-300 hover:bg-white/5 hover:text-white"
+                  size="lg"
+                  className="gap-1.5"
                 >
                   <X className="size-4" />
                   {t("cancelRequest")}
                 </Button>
               )}
             </div>
-            <p className="mt-2 text-xs text-zinc-500">
+            <p className="mt-2 text-xs text-muted-foreground">
               {t("uploadHint")}
             </p>
           </div>
@@ -264,21 +261,19 @@ export function TicketFlow({
 
       {/* Onay bekliyor */}
       {ticket.status === "SUBMITTED" && (
-        <p className="mt-4 text-sm text-zinc-400">
+        <p className="mt-4 text-sm text-muted-foreground">
           {t("submittedNote")}
         </p>
       )}
 
-      {/* Onaylandı → QR */}
+      {/* Onaylandı → QR (tarama için beyaz zemin şart; tema-bağımsız). */}
       {ticket.status === "APPROVED" && (
         <div className="mt-4 flex flex-col items-center gap-3">
           <div className="rounded-2xl bg-white p-4">
             <QRCodeSVG value={ticket.token} size={196} level="M" />
           </div>
-          <p className="font-mono text-lg tracking-[0.3em] text-white">
-            {ticket.token}
-          </p>
-          <p className="inline-flex items-center gap-1.5 text-sm text-emerald-300">
+          <p className="font-mono text-lg tracking-[0.3em]">{ticket.token}</p>
+          <p className="inline-flex items-center gap-1.5 text-sm text-success">
             <BadgeCheck className="size-4" />
             {t("qrHint")}
           </p>
@@ -287,7 +282,7 @@ export function TicketFlow({
 
       {/* Check-in yapıldı */}
       {ticket.status === "CHECKED_IN" && (
-        <p className="mt-4 inline-flex items-center gap-1.5 text-sm text-violet-300">
+        <p className="mt-4 inline-flex items-center gap-1.5 text-sm text-success">
           <BadgeCheck className="size-4" />
           {t("checkedInNote")}
         </p>

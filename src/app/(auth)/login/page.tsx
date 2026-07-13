@@ -54,12 +54,9 @@ function LoginCard() {
   }
 
   return (
-    <Card className="w-full max-w-sm border-white/10 bg-zinc-900/70 shadow-2xl shadow-black/40 backdrop-blur">
+    <Card className="w-full max-w-sm shadow-xl">
       <CardHeader className="space-y-3 text-center">
-        <div
-          className="mx-auto flex size-12 items-center justify-center rounded-2xl text-white shadow-lg"
-          style={{ backgroundColor: "#841515" }}
-        >
+        <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
           <span className="text-lg font-semibold tracking-tight">KKK</span>
         </div>
         <CardTitle className="text-xl font-semibold tracking-tight text-balance">
@@ -138,8 +135,7 @@ function LoginCard() {
             type="submit"
             size="lg"
             disabled={loading || email.trim().length === 0 || password.length === 0}
-            className="w-full gap-2 font-medium text-white hover:opacity-90"
-            style={{ backgroundColor: "#841515" }}
+            className="w-full gap-2 font-medium"
           >
             {loading && <Loader2 className="size-4 animate-spin" />}
             {loading ? t("login.submitting") : t("login.submit")}

@@ -56,11 +56,11 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
       {groups.map((g) => (
         <div
           key={g.eventId}
-          className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
+          className="rounded-lg border border-border bg-card p-4"
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h4 className="font-semibold text-white">{g.title}</h4>
-            <span className="text-xs text-zinc-400">
+            <h4 className="font-semibold">{g.title}</h4>
+            <span className="text-xs text-muted-foreground">
               {t("approved", { count: g.approvedCount })}
               {g.capacity !== null && t("capacity", { count: g.capacity })}
               {" · "}
@@ -69,7 +69,7 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
           </div>
 
           {g.pending.length === 0 ? (
-            <p className="mt-3 text-xs text-zinc-500">
+            <p className="mt-3 text-xs text-muted-foreground">
               {t("noPending")}
             </p>
           ) : (
@@ -79,10 +79,10 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
                 return (
                   <li
                     key={ticket.id}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-white/5 bg-zinc-900/40 px-3 py-2.5"
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-muted/40 px-3 py-2.5"
                   >
-                    <span className="inline-flex items-center gap-2 text-sm text-zinc-200">
-                      <User className="size-4 text-zinc-500" />
+                    <span className="inline-flex items-center gap-2 text-sm">
+                      <User className="size-4 text-muted-foreground" />
                       {ticket.full_name ?? t("unnamedUser")}
                     </span>
                     <div className="flex items-center gap-1.5">
@@ -91,19 +91,21 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
                           href={ticket.receiptSignedUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2.5 py-1 text-xs text-zinc-300 hover:bg-white/5 hover:text-white"
+                          className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                         >
                           <ExternalLink className="size-3.5" />
                           {t("receipt")}
                         </a>
                       ) : (
-                        <span className="text-xs text-zinc-600">{t("noReceipt")}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {t("noReceipt")}
+                        </span>
                       )}
                       <Button
                         onClick={() => decide(ticket.id, "approve")}
                         disabled={busy}
                         size="sm"
-                        className="gap-1.5 bg-emerald-600 font-medium text-white hover:bg-emerald-600/90"
+                        className="gap-1.5 bg-success font-medium text-success-foreground hover:bg-success/90"
                       >
                         {busy ? (
                           <Loader2 className="size-4 animate-spin" />
@@ -116,8 +118,8 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
                         onClick={() => decide(ticket.id, "reject")}
                         disabled={busy}
                         size="sm"
-                        variant="outline"
-                        className="gap-1.5 border-red-500/40 bg-transparent text-red-300 hover:bg-red-500/10"
+                        variant="destructive"
+                        className="gap-1.5"
                       >
                         <X className="size-4" />
                         {t("reject")}

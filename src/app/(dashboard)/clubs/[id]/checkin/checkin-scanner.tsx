@@ -147,39 +147,39 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
         <div
           className={`flex items-center gap-3 rounded-xl border p-4 ${
             result.ok
-              ? "border-emerald-500/30 bg-emerald-500/10"
-              : "border-red-500/30 bg-red-500/10"
+              ? "border-success/30 bg-success/10"
+              : "border-destructive/30 bg-destructive/10"
           }`}
         >
           {result.ok ? (
-            <BadgeCheck className="size-6 shrink-0 text-emerald-300" />
+            <BadgeCheck className="size-6 shrink-0 text-success" />
           ) : (
-            <XCircle className="size-6 shrink-0 text-red-300" />
+            <XCircle className="size-6 shrink-0 text-destructive" />
           )}
           <div className="min-w-0">
             {result.ok ? (
               <>
-                <p className="font-semibold text-emerald-200">
+                <p className="font-semibold text-success">
                   {t("checkedInResult", { name: result.name ?? t("resultUser") })}
                 </p>
                 {result.event && (
-                  <p className="truncate text-sm text-emerald-300/80">
+                  <p className="truncate text-sm text-success/80">
                     {result.event}
                   </p>
                 )}
               </>
             ) : (
-              <p className="font-semibold text-red-200">{result.message}</p>
+              <p className="font-semibold text-destructive">{result.message}</p>
             )}
           </div>
         </div>
       )}
 
       {/* Kamera */}
-      <div className="rounded-xl border border-white/5 bg-zinc-900/50 p-5">
+      <div className="rounded-xl border border-border bg-card p-5">
         <div className="flex items-center justify-between gap-3">
-          <p className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
-            <Camera className="size-4 text-[#e7a3a3]" />
+          <p className="inline-flex items-center gap-2 text-sm font-medium">
+            <Camera className="size-4 text-primary" />
             {t("qrTitle")}
           </p>
           {scanning ? (
@@ -189,7 +189,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
               }}
               size="sm"
               variant="outline"
-              className="gap-1.5 border-white/15 bg-transparent text-zinc-200 hover:bg-white/5 hover:text-white"
+              className="gap-1.5"
             >
               <CameraOff className="size-4" />
               {t("stop")}
@@ -202,8 +202,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
               }}
               disabled={processing}
               size="sm"
-              className="gap-1.5 font-medium text-white hover:opacity-90"
-              style={{ backgroundColor: "#841515" }}
+              className="gap-1.5 font-medium"
             >
               {processing ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -223,20 +222,20 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
           }`}
         />
         {!scanning && (
-          <p className="mt-3 text-xs text-zinc-500">
+          <p className="mt-3 text-xs text-muted-foreground">
             {t("cameraHint")}
           </p>
         )}
       </div>
 
       {/* İsimle arama yedeği */}
-      <div className="rounded-xl border border-white/5 bg-zinc-900/50 p-5">
-        <p className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
-          <Search className="size-4 text-[#e7a3a3]" />
+      <div className="rounded-xl border border-border bg-card p-5">
+        <p className="inline-flex items-center gap-2 text-sm font-medium">
+          <Search className="size-4 text-primary" />
           {t("findTitle")}
         </p>
         <div className="relative mt-3">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-500" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -247,17 +246,17 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
 
         <ul className="mt-3 space-y-2">
           {filtered.length === 0 ? (
-            <li className="rounded-lg border border-dashed border-white/10 bg-white/[0.02] px-4 py-6 text-center text-sm text-zinc-500">
+            <li className="rounded-lg border border-dashed border-border bg-muted/40 px-4 py-6 text-center text-sm text-muted-foreground">
               {t("noApproved")}
             </li>
           ) : (
             filtered.map((ticket) => (
               <li
                 key={ticket.token}
-                className="flex items-center justify-between gap-3 rounded-md border border-white/5 bg-white/[0.02] px-3 py-2.5"
+                className="flex items-center justify-between gap-3 rounded-md border border-border bg-muted/40 px-3 py-2.5"
               >
-                <span className="inline-flex min-w-0 items-center gap-2 text-sm text-zinc-200">
-                  <User className="size-4 shrink-0 text-zinc-500" />
+                <span className="inline-flex min-w-0 items-center gap-2 text-sm">
+                  <User className="size-4 shrink-0 text-muted-foreground" />
                   <span className="truncate">
                     {ticket.full_name ?? t("unnamedUser")}
                   </span>
@@ -267,7 +266,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
                   disabled={processing}
                   size="sm"
                   variant="outline"
-                  className="shrink-0 gap-1.5 border-emerald-500/40 bg-transparent text-emerald-300 hover:bg-emerald-500/10"
+                  className="shrink-0 gap-1.5 border-success/40 text-success hover:bg-success/10"
                 >
                   {processing ? (
                     <Loader2 className="size-4 animate-spin" />

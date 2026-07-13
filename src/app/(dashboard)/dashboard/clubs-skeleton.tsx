@@ -1,24 +1,24 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-/** Kulüpler yüklenirken gösterilen skeleton ızgarası. */
+/** Kulüpler yüklenirken gösterilen skeleton ızgarası (yeni kart iskeletine uyar). */
 export function ClubsSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}
-          className="rounded-xl border border-white/5 bg-zinc-900/50 p-6"
+          className="overflow-hidden rounded-xl border border-border bg-card"
         >
-          <div className="flex items-center gap-2">
-            <Skeleton className="size-8 rounded-lg bg-white/5" />
-            <Skeleton className="h-5 w-32 bg-white/5" />
+          <Skeleton className="h-24 w-full rounded-none" />
+          <div className="px-4">
+            <Skeleton className="-mt-7 size-14 rounded-xl border-2 border-card" />
           </div>
-          <div className="mt-4 space-y-2">
-            <Skeleton className="h-3 w-full bg-white/5" />
-            <Skeleton className="h-3 w-5/6 bg-white/5" />
-            <Skeleton className="h-3 w-2/3 bg-white/5" />
+          <div className="space-y-2 p-4 pt-2.5">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-4 w-20 rounded-full" />
+            <Skeleton className="h-3 w-full" />
+            <Skeleton className="h-3 w-2/3" />
           </div>
-          <Skeleton className="mt-6 h-9 w-full bg-white/5" />
         </div>
       ))}
     </div>

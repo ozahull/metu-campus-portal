@@ -74,7 +74,7 @@ export function RSVPButton({
         size="sm"
         variant="outline"
         className={cn(
-          "gap-1.5 border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200",
+          "gap-1.5 border-success/40 bg-success/15 text-success hover:bg-success/25 hover:text-success",
           className,
         )}
       >
@@ -95,7 +95,7 @@ export function RSVPButton({
       size="sm"
       variant="outline"
       className={cn(
-        "gap-1.5 border-[#841515]/60 bg-transparent text-zinc-200 hover:border-[#841515] hover:bg-[#841515] hover:text-white",
+        "gap-1.5 border-primary/50 bg-transparent text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground",
         className,
       )}
     >

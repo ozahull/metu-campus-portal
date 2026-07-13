@@ -1,394 +1,562 @@
-// Supabase veritabanı tip tanımları.
-//
-// NOT: Bu dosya normalde `supabase gen types typescript` ile üretilir. Üretim
-// için ayrıcalıklı erişim (access token / DB şifresi) bu ortamda bulunmadığından
-// supabase/migrations şemasına BİREBİR uygun olarak elle yazılmıştır. Şema
-// değiştiğinde güncellenmeli; mümkünse şu komutla yeniden üretilmelidir:
-//   npx supabase gen types typescript --project-id <ref> > src/types/database.ts
-
 export type Json =
   | string
   | number
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[];
+  | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
-      profiles: {
-        Row: {
-          id: string;
-          full_name: string | null;
-          email: string | null;
-          role: string;
-        };
-        Insert: {
-          id: string;
-          full_name?: string | null;
-          email?: string | null;
-          role?: string;
-        };
-        Update: {
-          id?: string;
-          full_name?: string | null;
-          email?: string | null;
-          role?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "profiles_id_fkey";
-            columns: ["id"];
-            isOneToOne: true;
-            referencedRelation: "users";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      clubs: {
-        Row: {
-          id: string;
-          name: string;
-          description: string | null;
-          advisor_id: string | null;
-          vision: string | null;
-          logo_url: string | null;
-          cover_url: string | null;
-          category: string | null;
-          contact_email: string | null;
-          contact_phone: string | null;
-          whatsapp_url: string | null;
-          instagram_url: string | null;
-          requires_advisor_approval: boolean;
-          iban: string | null;
-          ticket_enabled: boolean;
-        };
-        Insert: {
-          id?: string;
-          name: string;
-          description?: string | null;
-          advisor_id?: string | null;
-          vision?: string | null;
-          logo_url?: string | null;
-          cover_url?: string | null;
-          category?: string | null;
-          contact_email?: string | null;
-          contact_phone?: string | null;
-          whatsapp_url?: string | null;
-          instagram_url?: string | null;
-          requires_advisor_approval?: boolean;
-          iban?: string | null;
-          ticket_enabled?: boolean;
-        };
-        Update: {
-          id?: string;
-          name?: string;
-          description?: string | null;
-          advisor_id?: string | null;
-          vision?: string | null;
-          logo_url?: string | null;
-          cover_url?: string | null;
-          category?: string | null;
-          contact_email?: string | null;
-          contact_phone?: string | null;
-          whatsapp_url?: string | null;
-          instagram_url?: string | null;
-          requires_advisor_approval?: boolean;
-          iban?: string | null;
-          ticket_enabled?: boolean;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "clubs_advisor_id_fkey";
-            columns: ["advisor_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       club_members: {
         Row: {
-          club_id: string;
-          user_id: string;
-          role: string;
-          created_at: string;
-        };
+          club_id: string
+          created_at: string
+          role: string
+          user_id: string
+        }
         Insert: {
-          club_id: string;
-          user_id: string;
-          role?: string;
-          created_at?: string;
-        };
+          club_id: string
+          created_at?: string
+          role?: string
+          user_id: string
+        }
         Update: {
-          club_id?: string;
-          user_id?: string;
-          role?: string;
-          created_at?: string;
-        };
+          club_id?: string
+          created_at?: string
+          role?: string
+          user_id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "club_members_club_id_fkey";
-            columns: ["club_id"];
-            isOneToOne: false;
-            referencedRelation: "clubs";
-            referencedColumns: ["id"];
+            foreignKeyName: "club_members_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "club_members_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
+            foreignKeyName: "club_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
-        ];
-      };
-      events: {
+        ]
+      }
+      clubs: {
         Row: {
-          id: string;
-          club_id: string;
-          title: string;
-          description: string | null;
-          event_date: string;
-          location: string | null;
-          status: string;
-          review_note: string | null;
-          reviewed_by: string | null;
-          reviewed_at: string | null;
-          ticket_price: number | null;
-          ticket_capacity: number | null;
-          ticket_deadline: string | null;
-        };
+          advisor_id: string | null
+          category: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          cover_url: string | null
+          description: string | null
+          iban: string | null
+          id: string
+          instagram_url: string | null
+          logo_url: string | null
+          name: string
+          requires_advisor_approval: boolean
+          ticket_enabled: boolean
+          vision: string | null
+          whatsapp_url: string | null
+        }
         Insert: {
-          id?: string;
-          club_id: string;
-          title: string;
-          description?: string | null;
-          event_date: string;
-          location?: string | null;
-          status?: string;
-          review_note?: string | null;
-          reviewed_by?: string | null;
-          reviewed_at?: string | null;
-          ticket_price?: number | null;
-          ticket_capacity?: number | null;
-          ticket_deadline?: string | null;
-        };
+          advisor_id?: string | null
+          category?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          cover_url?: string | null
+          description?: string | null
+          iban?: string | null
+          id?: string
+          instagram_url?: string | null
+          logo_url?: string | null
+          name: string
+          requires_advisor_approval?: boolean
+          ticket_enabled?: boolean
+          vision?: string | null
+          whatsapp_url?: string | null
+        }
         Update: {
-          id?: string;
-          club_id?: string;
-          title?: string;
-          description?: string | null;
-          event_date?: string;
-          location?: string | null;
-          status?: string;
-          review_note?: string | null;
-          reviewed_by?: string | null;
-          reviewed_at?: string | null;
-          ticket_price?: number | null;
-          ticket_capacity?: number | null;
-          ticket_deadline?: string | null;
-        };
+          advisor_id?: string | null
+          category?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          cover_url?: string | null
+          description?: string | null
+          iban?: string | null
+          id?: string
+          instagram_url?: string | null
+          logo_url?: string | null
+          name?: string
+          requires_advisor_approval?: boolean
+          ticket_enabled?: boolean
+          vision?: string | null
+          whatsapp_url?: string | null
+        }
         Relationships: [
           {
-            foreignKeyName: "events_club_id_fkey";
-            columns: ["club_id"];
-            isOneToOne: false;
-            referencedRelation: "clubs";
-            referencedColumns: ["id"];
+            foreignKeyName: "clubs_advisor_id_fkey"
+            columns: ["advisor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       event_attendees: {
         Row: {
-          event_id: string;
-          user_id: string;
-          created_at: string;
-        };
+          created_at: string
+          event_id: string
+          user_id: string
+        }
         Insert: {
-          event_id: string;
-          user_id: string;
-          created_at?: string;
-        };
+          created_at?: string
+          event_id: string
+          user_id: string
+        }
         Update: {
-          event_id?: string;
-          user_id?: string;
-          created_at?: string;
-        };
+          created_at?: string
+          event_id?: string
+          user_id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "event_attendees_event_id_fkey";
-            columns: ["event_id"];
-            isOneToOne: false;
-            referencedRelation: "events";
-            referencedColumns: ["id"];
+            foreignKeyName: "event_attendees_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "event_attendees_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
+            foreignKeyName: "event_attendees_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
       event_documents: {
         Row: {
-          id: string;
-          event_id: string;
-          uploaded_by: string;
-          file_url: string;
-          file_name: string;
-          note: string | null;
-          created_at: string;
-        };
-        // Kolon-grant: yalnızca içerik kolonları yazılabilir.
+          created_at: string
+          event_id: string
+          file_name: string
+          file_url: string
+          id: string
+          note: string | null
+          uploaded_by: string
+        }
         Insert: {
-          event_id: string;
-          uploaded_by: string;
-          file_url: string;
-          file_name: string;
-          note?: string | null;
-        };
+          created_at?: string
+          event_id: string
+          file_name: string
+          file_url: string
+          id?: string
+          note?: string | null
+          uploaded_by: string
+        }
         Update: {
-          event_id?: string;
-          uploaded_by?: string;
-          file_url?: string;
-          file_name?: string;
-          note?: string | null;
-        };
+          created_at?: string
+          event_id?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          note?: string | null
+          uploaded_by?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "event_documents_event_id_fkey";
-            columns: ["event_id"];
-            isOneToOne: false;
-            referencedRelation: "events";
-            referencedColumns: ["id"];
+            foreignKeyName: "event_documents_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "event_documents_uploaded_by_fkey";
-            columns: ["uploaded_by"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
+            foreignKeyName: "event_documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
-        ];
-      };
+        ]
+      }
+      events: {
+        Row: {
+          club_id: string
+          description: string | null
+          event_date: string
+          id: string
+          location: string | null
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          ticket_capacity: number | null
+          ticket_deadline: string | null
+          ticket_price: number | null
+          title: string
+        }
+        Insert: {
+          club_id: string
+          description?: string | null
+          event_date: string
+          id?: string
+          location?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          ticket_capacity?: number | null
+          ticket_deadline?: string | null
+          ticket_price?: number | null
+          title: string
+        }
+        Update: {
+          club_id?: string
+          description?: string | null
+          event_date?: string
+          id?: string
+          location?: string | null
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          ticket_capacity?: number | null
+          ticket_deadline?: string | null
+          ticket_price?: number | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          email: string | null
+          full_name: string | null
+          id: string
+          role: string
+        }
+        Insert: {
+          email?: string | null
+          full_name?: string | null
+          id: string
+          role?: string
+        }
+        Update: {
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          role?: string
+        }
+        Relationships: []
+      }
       tickets: {
         Row: {
-          id: string;
-          event_id: string;
-          user_id: string;
-          token: string;
-          status: string;
-          receipt_url: string | null;
-          reviewed_by: string | null;
-          reviewed_at: string | null;
-          checked_in_at: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        // Kolon-grant: yalnızca event_id + user_id yazılabilir (talep açma).
+          checked_in_at: string | null
+          created_at: string
+          event_id: string
+          id: string
+          receipt_url: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
         Insert: {
-          event_id: string;
-          user_id: string;
-        };
+          checked_in_at?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          receipt_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          token?: string
+          updated_at?: string
+          user_id: string
+        }
         Update: {
-          event_id?: string;
-          user_id?: string;
-        };
+          checked_in_at?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          receipt_url?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "tickets_event_id_fkey";
-            columns: ["event_id"];
-            isOneToOne: false;
-            referencedRelation: "events";
-            referencedColumns: ["id"];
+            foreignKeyName: "tickets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "tickets_user_id_fkey";
-            columns: ["user_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
+            foreignKeyName: "tickets_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
-        ];
-      };
-    };
-    Views: Record<string, never>;
+          {
+            foreignKeyName: "tickets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
     Functions: {
-      is_super_admin: {
-        Args: Record<PropertyKey, never>;
-        Returns: boolean;
-      };
-      is_club_admin: {
-        Args: { p_club_id: string };
-        Returns: boolean;
-      };
-      is_club_advisor: {
-        Args: { p_club_id: string };
-        Returns: boolean;
-      };
-      event_submit: {
-        Args: { p_event_id: string };
-        Returns: string;
-      };
-      event_advisor_decision: {
-        Args: { p_event_id: string; p_decision: string; p_note?: string };
-        Returns: string;
-      };
-      event_school_decision: {
-        Args: { p_event_id: string; p_decision: string; p_note?: string };
-        Returns: string;
-      };
-      ticket_submit_receipt: {
-        Args: { p_ticket_id: string; p_receipt_url: string };
-        Returns: undefined;
-      };
-      ticket_approve: {
-        Args: { p_ticket_id: string; p_decision: string; p_note?: string };
-        Returns: undefined;
-      };
-      ticket_checkin: {
-        Args: { p_token: string };
-        Returns: {
-          ticket_id: string;
-          full_name: string | null;
-          event_title: string;
-        }[];
-      };
-      analytics_overview: {
-        Args: Record<PropertyKey, never>;
-        Returns: {
-          total_clubs: number;
-          total_members: number;
-          total_events: number;
-          approved_events: number;
-          total_tickets: number;
-          total_checkins: number;
-        }[];
-      };
       analytics_clubs: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          club_id: string;
-          club_name: string;
-          member_count: number;
-          event_count: number;
-          approved_event_count: number;
-          total_checkins: number;
-        }[];
-      };
+          approved_event_count: number
+          club_id: string
+          club_name: string
+          event_count: number
+          member_count: number
+          total_checkins: number
+        }[]
+      }
       analytics_member_growth: {
-        Args: Record<PropertyKey, never>;
+        Args: never
         Returns: {
-          month: string;
-          new_members: number;
-        }[];
-      };
-    };
-    Enums: Record<string, never>;
-    CompositeTypes: Record<string, never>;
-  };
-};
+          month: string
+          new_members: number
+        }[]
+      }
+      analytics_overview: {
+        Args: never
+        Returns: {
+          approved_events: number
+          total_checkins: number
+          total_clubs: number
+          total_events: number
+          total_members: number
+          total_tickets: number
+        }[]
+      }
+      event_advisor_decision: {
+        Args: { p_decision: string; p_event_id: string; p_note?: string }
+        Returns: string
+      }
+      event_school_decision: {
+        Args: { p_decision: string; p_event_id: string; p_note?: string }
+        Returns: string
+      }
+      event_submit: { Args: { p_event_id: string }; Returns: string }
+      is_club_admin: { Args: { p_club_id: string }; Returns: boolean }
+      is_club_advisor: { Args: { p_club_id: string }; Returns: boolean }
+      is_super_admin: { Args: never; Returns: boolean }
+      ticket_approve: {
+        Args: { p_decision: string; p_note?: string; p_ticket_id: string }
+        Returns: undefined
+      }
+      ticket_checkin: {
+        Args: { p_token: string }
+        Returns: {
+          event_title: string
+          full_name: string
+          ticket_id: string
+        }[]
+      }
+      ticket_submit_receipt: {
+        Args: { p_receipt_url: string; p_ticket_id: string }
+        Returns: undefined
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {},
+  },
+} as const

@@ -487,6 +487,15 @@ export type Database = {
           total_tickets: number
         }[]
       }
+      club_announce: {
+        Args: {
+          p_body: string
+          p_club_id: string
+          p_link?: string
+          p_title: string
+        }
+        Returns: number
+      }
       event_advisor_decision: {
         Args: { p_decision: string; p_event_id: string; p_note?: string }
         Returns: string

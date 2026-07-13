@@ -269,7 +269,10 @@
       "ticketsDesc": "Review receipts and approve or reject them.",
       "checkin": "Door Check-in",
       "membersTitle": "Members ({count})",
-      "membersDesc": "Manage members; assign admins or remove them from the club."
+      "membersDesc": "Manage members; assign admins or remove them from the club.",
+      "tabAnnounce": "Announce",
+      "announceTitle": "Send Announcement",
+      "announceDesc": "Publish an announcement that reaches club members as a notification."
     },
     "info": {
       "clubName": "Club Name",
@@ -412,6 +415,23 @@
         "deleteConfirm": "Do you want to delete the document \"{name}\"?",
         "deleteError": "Could not delete: {message}",
         "deleted": "Document deleted."
+      }
+    },
+    "announce": {
+      "title": "Send Announcement",
+      "desc": "Delivered to club members as a notification. Max 3 announcements per hour.",
+      "fieldTitle": "Title",
+      "titlePlaceholder": "e.g. We're meeting tonight!",
+      "fieldBody": "Message",
+      "bodyPlaceholder": "Write your announcement…",
+      "fieldLink": "Link (optional)",
+      "linkPlaceholder": "https://instagram.com/p/…",
+      "submit": "Send Announcement",
+      "submitting": "Sending…",
+      "toasts": {
+        "titleRequired": "Title and message are required.",
+        "sent": "Announcement sent to {count} members",
+        "error": "Could not send: {message}"
       }
     }
   },

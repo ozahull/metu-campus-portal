@@ -269,7 +269,10 @@
       "ticketsDesc": "Dekontları inceleyip onaylayın veya reddedin.",
       "checkin": "Kapı Kontrol",
       "membersTitle": "Üyeler ({count})",
-      "membersDesc": "Üyeleri yönetin; yönetici atayın veya kulüpten çıkarın."
+      "membersDesc": "Üyeleri yönetin; yönetici atayın veya kulüpten çıkarın.",
+      "tabAnnounce": "Duyuru",
+      "announceTitle": "Duyuru Gönder",
+      "announceDesc": "Kulüp üyelerine bildirim olarak ulaşacak bir duyuru yayınlayın."
     },
     "info": {
       "clubName": "Kulüp Adı",
@@ -412,6 +415,23 @@
         "deleteConfirm": "\"{name}\" belgesini silmek istiyor musunuz?",
         "deleteError": "Silinemedi: {message}",
         "deleted": "Belge silindi."
+      }
+    },
+    "announce": {
+      "title": "Duyuru Gönder",
+      "desc": "Kulüp üyelerine bildirim olarak iletilir. Saatte en fazla 3 duyuru.",
+      "fieldTitle": "Başlık",
+      "titlePlaceholder": "Örn. Bu akşam buluşuyoruz!",
+      "fieldBody": "Mesaj",
+      "bodyPlaceholder": "Duyurunuzu yazın…",
+      "fieldLink": "Bağlantı (opsiyonel)",
+      "linkPlaceholder": "https://instagram.com/p/…",
+      "submit": "Duyuruyu Gönder",
+      "submitting": "Gönderiliyor…",
+      "toasts": {
+        "titleRequired": "Başlık ve mesaj gerekli.",
+        "sent": "Duyuru {count} üyeye gönderildi",
+        "error": "Gönderilemedi: {message}"
       }
     }
   },

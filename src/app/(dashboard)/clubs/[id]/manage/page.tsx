@@ -5,6 +5,7 @@ import {
   ArrowLeft,
   CalendarDays,
   Info,
+  Megaphone,
   QrCode,
   Settings,
   Ticket,
@@ -15,6 +16,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { ClubInfoForm, type ClubInfo } from "./club-info-form";
+import { ClubAnnounceForm } from "./club-announce-form";
 import { ManageEvents, type ManageEvent } from "./manage-events";
 import type { EventDocument } from "./event-documents";
 import { ManageMembers, type RosterMember } from "./manage-members";
@@ -276,6 +278,10 @@ export default async function ClubManagePage({
                 {members.length}
               </span>
             </TabsTab>
+            <TabsTab value="announce">
+              <Megaphone className="size-4" />
+              {t("tabAnnounce")}
+            </TabsTab>
           </TabsList>
 
           <TabsPanel value="info" className="space-y-4">
@@ -325,6 +331,11 @@ export default async function ClubManagePage({
               members={members}
               canAssignAdmin={canAssignAdmin}
             />
+          </TabsPanel>
+
+          <TabsPanel value="announce" className="space-y-4">
+            <PanelHead title={t("announceTitle")} desc={t("announceDesc")} />
+            <ClubAnnounceForm clubId={id} />
           </TabsPanel>
         </Tabs>
       </div>

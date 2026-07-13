@@ -82,20 +82,20 @@ export default function RegisterPage() {
       return;
     }
 
-    // Oturum hemen açıldıysa (e-posta onayı kapalıysa) profili yaz ve devam et.
-    // upsert: profil satırı yoksa oluşturur, varsa günceller.
-    // NOT: email'i BİLEREK göndermiyoruz — email'i signup'ta handle_new_user
-    // trigger'ı (SECURITY DEFINER) yazar. İstemci email yazamaz: upsert'ün
-    // ON CONFLICT yolu SET email = excluded.email üretir, bu da profiles.email
-    // kolonunda SELECT ister; email SELECT ise gizlilik (KVKK) gereği kapalı.
+    // Oturum hemen açıldıysa (e-posta onayı kapalıysa) profil satırının
+    // full_name'ini güncelle ve devam et. Profil satırı signup'ta HER ZAMAN
+    // handle_new_user trigger'ı (SECURITY DEFINER) ile oluşur — bu yüzden
+    // INSERT/upsert gerekmez, yalnızca UPDATE.
+    // NOT: profiles'a istemciden upsert YASAK — PostgREST upsert'ü
+    // "DO UPDATE SET id = excluded.id, ..." üretir, bu da id kolonunda UPDATE
+    // yetkisi ister; id'de UPDATE yetkisi bilinçli olarak YOK
+    // (20260713190000_tighten_profiles_grants). email'i de yazmıyoruz — trigger
+    // zaten metadata'dan yazar ve email kolonu gizlilik (KVKK) gereği kapalı.
     if (data.session && data.user) {
-      const { error: profileError } = await supabase.from("profiles").upsert(
-        {
-          id: data.user.id,
-          full_name: fullName,
-        },
-        { onConflict: "id" },
-      );
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ full_name: fullName })
+        .eq("id", data.user.id);
 
       if (profileError) {
         setLoading(false);

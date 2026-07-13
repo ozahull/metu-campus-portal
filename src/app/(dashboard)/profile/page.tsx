@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { NotificationPreferences } from "@/components/notification-preferences";
 import { ProfileForm } from "./profile-form";
 
 export const dynamic = "force-dynamic";
@@ -55,6 +56,14 @@ export default async function ProfilePage() {
     user.email ??
     "";
 
+  // Bildirim tercihi (satır yoksa varsayılan MEMBER_CLUBS).
+  const { data: pref } = await supabase
+    .from("notification_preferences")
+    .select("scope")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const notifScope = pref?.scope ?? "MEMBER_CLUBS";
+
   // Üye olunan kulüpler
   const { data: membershipRaw } = await supabase
     .from("club_members")
@@ -91,6 +100,10 @@ export default async function ProfilePage() {
       </header>
 
       <ProfileForm userId={user.id} initialName={profile?.full_name ?? ""} />
+
+      <div className="mt-6">
+        <NotificationPreferences initialScope={notifScope} />
+      </div>
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Kulüplerim */}

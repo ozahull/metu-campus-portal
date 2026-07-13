@@ -5,7 +5,9 @@ import { NavLinks } from "@/components/nav-links";
 import { NavMobile } from "@/components/nav-mobile";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { NotificationBell } from "@/components/notification-bell";
 import { UserMenu } from "@/components/user-menu";
+import type { AppNotification } from "@/lib/notification-meta";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +51,18 @@ export async function Navbar() {
   const role = profile?.role ?? "USER";
   const isSuperAdmin = role.toString().trim().toUpperCase() === "SUPER_ADMIN";
 
+  // Zil için ilk veri: son 10 bildirim + okunmamış sayısı (RLS: yalnız kendi
+  // satırları). Sonrası istemcide realtime + 60 sn polling ile canlı güncellenir.
+  const { data: notifRaw } = await supabase
+    .from("notifications")
+    .select("id, type, title, body, link, read_at, created_at")
+    .order("created_at", { ascending: false })
+    .limit(10);
+  const { count: unreadCount } = await supabase
+    .from("notifications")
+    .select("id", { count: "exact", head: true })
+    .is("read_at", null);
+
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-4 sm:px-6 lg:px-8">
@@ -75,7 +89,11 @@ export async function Navbar() {
           <ThemeSwitcher />
           <LanguageSwitcher />
 
-          {/* Bildirim yeri: ileride buraya bildirim zili gelecek (şimdilik boş). */}
+          <NotificationBell
+            userId={user.id}
+            initialItems={(notifRaw ?? []) as AppNotification[]}
+            initialUnread={unreadCount ?? 0}
+          />
 
           <div className="mx-1 hidden h-6 w-px bg-border sm:block" />
 

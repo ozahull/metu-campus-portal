@@ -29,6 +29,37 @@
     "signingOut": "Çıkış yapılıyor…",
     "language": "Dil"
   },
+  "notifications": {
+    "title": "Bildirimler",
+    "bellAria": "Bildirimler ({count} okunmamış)",
+    "empty": "Henüz bildiriminiz yok.",
+    "markAllRead": "Tümünü okundu işaretle",
+    "seeAll": "Tümünü gör",
+    "groupToday": "Bugün",
+    "groupWeek": "Bu hafta",
+    "groupOlder": "Daha eski",
+    "type": {
+      "EVENT_APPROVED": "Etkinliğiniz onaylandı",
+      "EVENT_NEW": "Yeni etkinlik",
+      "EVENT_REMINDER": "Etkinlik hatırlatıcısı",
+      "CLUB_ANNOUNCEMENT": "Duyuru",
+      "MEMBERSHIP": "Kulübe hoş geldiniz"
+    },
+    "prefs": {
+      "title": "Bildirim Tercihleri",
+      "desc": "Hangi bildirimleri almak istediğinizi seçin.",
+      "MEMBER_CLUBS": "Üye olduğum kulüpler",
+      "MEMBER_CLUBS_desc": "Yalnızca üyesi (veya danışmanı) olduğunuz kulüplerden.",
+      "ALL": "Tümü",
+      "ALL_desc": "Tüm kampüs bildirimlerini alın.",
+      "NONE": "Sessiz",
+      "NONE_desc": "Hiç bildirim almayın.",
+      "toasts": {
+        "saved": "Bildirim tercihi güncellendi",
+        "error": "Güncellenemedi: {message}"
+      }
+    }
+  },
   "profile": {
     "title": "Profilim",
     "nameCard": {

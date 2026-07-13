@@ -29,6 +29,37 @@
     "signingOut": "Signing out…",
     "language": "Language"
   },
+  "notifications": {
+    "title": "Notifications",
+    "bellAria": "Notifications ({count} unread)",
+    "empty": "You have no notifications yet.",
+    "markAllRead": "Mark all as read",
+    "seeAll": "See all",
+    "groupToday": "Today",
+    "groupWeek": "This week",
+    "groupOlder": "Older",
+    "type": {
+      "EVENT_APPROVED": "Your event was approved",
+      "EVENT_NEW": "New event",
+      "EVENT_REMINDER": "Event reminder",
+      "CLUB_ANNOUNCEMENT": "Announcement",
+      "MEMBERSHIP": "Welcome to the club"
+    },
+    "prefs": {
+      "title": "Notification Preferences",
+      "desc": "Choose which notifications you want to receive.",
+      "MEMBER_CLUBS": "My clubs",
+      "MEMBER_CLUBS_desc": "Only from clubs you're a member (or advisor) of.",
+      "ALL": "All",
+      "ALL_desc": "Receive all campus notifications.",
+      "NONE": "Silent",
+      "NONE_desc": "Don't receive any notifications.",
+      "toasts": {
+        "saved": "Notification preference updated",
+        "error": "Could not update: {message}"
+      }
+    }
+  },
   "profile": {
     "title": "My Profile",
     "nameCard": {

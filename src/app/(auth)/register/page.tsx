@@ -84,11 +84,14 @@ export default function RegisterPage() {
 
     // Oturum hemen açıldıysa (e-posta onayı kapalıysa) profili yaz ve devam et.
     // upsert: profil satırı yoksa oluşturur, varsa günceller.
+    // NOT: email'i BİLEREK göndermiyoruz — email'i signup'ta handle_new_user
+    // trigger'ı (SECURITY DEFINER) yazar. İstemci email yazamaz: upsert'ün
+    // ON CONFLICT yolu SET email = excluded.email üretir, bu da profiles.email
+    // kolonunda SELECT ister; email SELECT ise gizlilik (KVKK) gereği kapalı.
     if (data.session && data.user) {
       const { error: profileError } = await supabase.from("profiles").upsert(
         {
           id: data.user.id,
-          email: normalizedEmail,
           full_name: fullName,
         },
         { onConflict: "id" },

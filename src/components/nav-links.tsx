@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { CalendarDays, Home, Users } from "lucide-react";
+import { CalendarClock, CalendarDays, Home, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/dashboard", key: "home", icon: Home },
   { href: "/clubs", key: "communities", icon: Users },
   { href: "/events", key: "events", icon: CalendarDays },
+  { href: "/calendar", key: "calendar", icon: CalendarClock },
 ] as const;
 
 /**

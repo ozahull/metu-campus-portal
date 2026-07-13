@@ -16,12 +16,19 @@ export type EventRow = {
   club_name: string | null;
   category: string | null;
   attendees: number;
+  attending: boolean;
 };
 
 const selectClass =
   "h-11 rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none transition-colors focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring [&>option]:bg-card";
 
-export function EventsExplorer({ events }: { events: EventRow[] }) {
+export function EventsExplorer({
+  events,
+  userId,
+}: {
+  events: EventRow[];
+  userId: string;
+}) {
   const t = useTranslations("events");
   const [query, setQuery] = useState("");
   const [club, setClub] = useState("");
@@ -112,7 +119,13 @@ export function EventsExplorer({ events }: { events: EventRow[] }) {
               category: e.category,
               attendeeCount: e.attendees,
             };
-            return <EventCard key={e.id} event={cardData} />;
+            return (
+              <EventCard
+                key={e.id}
+                event={cardData}
+                rsvp={{ userId, isAttending: e.attending }}
+              />
+            );
           })}
         </div>
       )}

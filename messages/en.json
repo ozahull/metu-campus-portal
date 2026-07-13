@@ -13,6 +13,7 @@
     "home": "Home",
     "communities": "Communities",
     "events": "Events",
+    "calendar": "My Calendar",
     "adminPanel": "Admin Panel",
     "openMenu": "Open menu",
     "closeMenu": "Close menu"
@@ -257,6 +258,15 @@
         "copyFailed": "Could not copy."
       }
     }
+  },
+  "calendar": {
+    "title": "My Calendar",
+    "subtitle": "Your upcoming RSVPs, week by week.",
+    "weekToggle": "Week selection",
+    "thisWeek": "This week",
+    "nextWeek": "Next week",
+    "conflict": "Conflict",
+    "empty": "You have no attendance planned for this week."
   },
   "rsvp": {
     "attending": "Attending",

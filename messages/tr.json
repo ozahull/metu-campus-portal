@@ -13,6 +13,7 @@
     "home": "Ana Sayfa",
     "communities": "Topluluklar",
     "events": "Etkinlikler",
+    "calendar": "Takvimim",
     "adminPanel": "Yönetim Paneli",
     "openMenu": "Menüyü aç",
     "closeMenu": "Menüyü kapat"
@@ -257,6 +258,15 @@
         "copyFailed": "Kopyalanamadı."
       }
     }
+  },
+  "calendar": {
+    "title": "Takvimim",
+    "subtitle": "RSVP verdiğin yaklaşan etkinlikler, haftalık.",
+    "weekToggle": "Hafta seçimi",
+    "thisWeek": "Bu hafta",
+    "nextWeek": "Gelecek hafta",
+    "conflict": "Çakışma",
+    "empty": "Bu hafta için planlanmış katılımın yok."
   },
   "rsvp": {
     "attending": "Katılıyorsunuz",

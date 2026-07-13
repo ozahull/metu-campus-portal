@@ -48,6 +48,7 @@ export default async function EventsPage() {
   const events: EventRow[] = ((data ?? []) as unknown as EventQueryRow[]).map(
     (e) => {
       const club = Array.isArray(e.clubs) ? e.clubs[0] : e.clubs;
+      const att = e.event_attendees ?? [];
       return {
         id: e.id,
         title: e.title,
@@ -56,7 +57,8 @@ export default async function EventsPage() {
         club_id: e.club_id,
         club_name: club?.name ?? null,
         category: club?.category ?? null,
-        attendees: e.event_attendees?.length ?? 0,
+        attendees: att.length,
+        attending: att.some((a) => a.user_id === user.id),
       };
     },
   );
@@ -75,7 +77,7 @@ export default async function EventsPage() {
         </div>
       </header>
 
-      <EventsExplorer events={events} />
+      <EventsExplorer events={events} userId={user.id} />
     </PageShell>
   );
 }

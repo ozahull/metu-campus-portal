@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Check, CalendarCheck, Loader2 } from "lucide-react";
@@ -24,49 +24,46 @@ export function RSVPButton({
 }: RSVPButtonProps) {
   const router = useRouter();
   const t = useTranslations("rsvp");
+  // Optimistic durum: tıklamada anında değişir; sunucu tazelemesi (router.refresh)
+  // sonrası prop güncellenince senkronlanır. Hata olursa geri alınır.
+  const [attending, setAttending] = useState(isAttending);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    setAttending(isAttending);
+  }, [isAttending]);
+
   async function handleClick() {
+    const next = !attending;
+    setAttending(next); // optimistic
     setLoading(true);
     const supabase = createClient();
 
-    if (isAttending) {
-      // Katılımı geri çek
-      const { error } = await supabase
-        .from("event_attendees")
-        .delete()
-        .eq("event_id", eventId)
-        .eq("user_id", userId);
-
-      setLoading(false);
-
-      if (error) {
-        toast.error(t("cancelError", { message: error.message }));
-        return;
-      }
-
-      toast.success(t("cancelSuccess"));
-      router.refresh();
-      return;
-    }
-
-    // Etkinliğe katıl
-    const { error } = await supabase
-      .from("event_attendees")
-      .insert({ event_id: eventId, user_id: userId });
+    const { error } = next
+      ? await supabase
+          .from("event_attendees")
+          .insert({ event_id: eventId, user_id: userId })
+      : await supabase
+          .from("event_attendees")
+          .delete()
+          .eq("event_id", eventId)
+          .eq("user_id", userId);
 
     setLoading(false);
 
     if (error) {
-      toast.error(t("attendError", { message: error.message }));
+      setAttending(!next); // geri al
+      toast.error(
+        t(next ? "attendError" : "cancelError", { message: error.message }),
+      );
       return;
     }
 
-    toast.success(t("attendSuccess"));
+    toast.success(t(next ? "attendSuccess" : "cancelSuccess"));
     router.refresh();
   }
 
-  if (isAttending) {
+  if (attending) {
     return (
       <Button
         onClick={handleClick}

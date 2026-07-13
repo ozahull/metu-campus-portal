@@ -10,9 +10,18 @@
   },
   "nav": {
     "brand": "METU Campus Portal",
+    "home": "Home",
     "communities": "Communities",
     "events": "Events",
-    "adminPanel": "Admin Panel"
+    "adminPanel": "Admin Panel",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
   },
   "userMenu": {
     "profile": "My Profile",

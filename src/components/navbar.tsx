@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { CalendarDays, ShieldCheck, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import { UserMenu } from "@/components/user-menu";
 
 export const dynamic = "force-dynamic";
@@ -93,6 +94,8 @@ export async function Navbar() {
               {t("adminPanel")}
             </Link>
           )}
+
+          <ThemeSwitcher />
 
           <UserMenu
             fullName={fullName}

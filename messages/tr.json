@@ -10,9 +10,18 @@
   },
   "nav": {
     "brand": "ODTÜ Kampüs Portalı",
+    "home": "Ana Sayfa",
     "communities": "Topluluklar",
     "events": "Etkinlikler",
-    "adminPanel": "Yönetim Paneli"
+    "adminPanel": "Yönetim Paneli",
+    "openMenu": "Menüyü aç",
+    "closeMenu": "Menüyü kapat"
+  },
+  "theme": {
+    "toggle": "Temayı değiştir",
+    "light": "Açık",
+    "dark": "Koyu",
+    "system": "Sistem"
   },
   "userMenu": {
     "profile": "Profilim",

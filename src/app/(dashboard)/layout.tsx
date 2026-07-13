@@ -7,7 +7,7 @@ export default function DashboardLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="dark min-h-svh bg-zinc-950 text-foreground">
+    <div className="min-h-svh bg-background text-foreground">
       <Navbar />
       {children}
     </div>

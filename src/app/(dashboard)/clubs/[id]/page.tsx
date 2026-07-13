@@ -223,7 +223,7 @@ export default async function ClubDetailPage({
                       <Users className="size-3" />
                       {club.category ?? t("defaultCategory")}
                     </Badge>
-                    <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+                    <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
                       {club.name}
                     </h1>
                   </div>

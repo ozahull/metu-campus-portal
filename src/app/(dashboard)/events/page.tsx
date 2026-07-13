@@ -62,7 +62,7 @@ export default async function EventsPage() {
           <CalendarDays className="size-5" />
         </span>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
             {t("title")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>

@@ -83,7 +83,7 @@ export default async function ProfilePage() {
   return (
     <PageShell>
       <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{displayName}</p>
       </header>
 

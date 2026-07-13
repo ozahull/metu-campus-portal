@@ -74,8 +74,10 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.21 0.006 285);
 
-  /* Marka kırmızısı — #841515'e yakın derin/doygun kırmızı. */
-  --primary: oklch(0.42 0.15 27);
+  /* Marka kırmızısı (METU). Hue/chroma #841515 kimliğinde; lightness küçük
+     yüzeylerde (rozet/ikon) siyaha yakın okunmasın diye 0.48'e alındı —
+     beyaz metinle kontrast ~7:1 (WCAG AAA). */
+  --primary: oklch(0.48 0.15 27);
   --primary-foreground: oklch(0.985 0.005 27);
 
   --secondary: oklch(0.965 0.004 285);
@@ -98,9 +100,9 @@
 
   --border: oklch(0.92 0.004 285);
   --input: oklch(0.92 0.004 285);
-  --ring: oklch(0.42 0.15 27);
+  --ring: oklch(0.48 0.15 27);
 
-  --chart-1: oklch(0.42 0.15 27);
+  --chart-1: oklch(0.48 0.15 27);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.72 0.15 75);
   --chart-4: oklch(0.55 0.16 264);
@@ -108,12 +110,12 @@
 
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.21 0.006 285);
-  --sidebar-primary: oklch(0.42 0.15 27);
+  --sidebar-primary: oklch(0.48 0.15 27);
   --sidebar-primary-foreground: oklch(0.985 0.005 27);
   --sidebar-accent: oklch(0.955 0.006 285);
   --sidebar-accent-foreground: oklch(0.28 0.006 285);
   --sidebar-border: oklch(0.92 0.004 285);
-  --sidebar-ring: oklch(0.42 0.15 27);
+  --sidebar-ring: oklch(0.48 0.15 27);
 }
 
 .dark {

@@ -19,11 +19,19 @@ export function NotificationItem({
   onActivate: (n: AppNotification) => void;
 }) {
   const t = useTranslations("notifications");
+  const tb = useTranslations("badges");
   const locale = useLocale();
   const Icon = notificationIcon(n.type);
   const isAnnounce = n.type === "CLUB_ANNOUNCEMENT";
+  const isBadge = n.type === "BADGE_EARNED";
   const primary = isAnnounce ? n.title : t(`type.${n.type}`);
-  const secondary = isAnnounce ? n.body : n.title;
+  // BADGE_EARNED'te title = rozet kodu; kod → isim çevirisi. Duyuruda gövde,
+  // diğer sistem tiplerinde başlık alanı (etkinlik/kulüp adı) alt satırdır.
+  const secondary = isAnnounce
+    ? n.body
+    : isBadge
+      ? tb(`${n.title}.name`)
+      : n.title;
   const unread = !n.read_at;
 
   return (

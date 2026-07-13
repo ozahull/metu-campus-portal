@@ -30,6 +30,7 @@ import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { formatDateTime } from "@/lib/datetime";
 import { cn } from "@/lib/utils";
 import { RSVPButton } from "@/components/shared/rsvp-button";
+import { BadgeIconRow } from "@/components/badges";
 import { JoinButton } from "./join-button";
 
 export const dynamic = "force-dynamic";
@@ -129,6 +130,19 @@ export default async function ClubDetailPage({
 
   // Mevcut kullanıcı bu kulübe üye mi?
   const isMember = members.some((m) => m.id === user.id);
+
+  // Üyelerin rozetleri (üye listesinde küçük ikonlar).
+  const badgesByUser: Record<string, string[]> = {};
+  const memberIds = members.map((m) => m.id);
+  if (memberIds.length > 0) {
+    const { data: ub } = await supabase
+      .from("user_badges")
+      .select("user_id, badge_code")
+      .in("user_id", memberIds);
+    for (const row of (ub ?? []) as { user_id: string; badge_code: string }[]) {
+      (badgesByUser[row.user_id] ??= []).push(row.badge_code);
+    }
+  }
 
   // Kullanıcının rolünü çek (etkinlik ekleme yetkisi için).
   const { data: profile } = await supabase
@@ -486,9 +500,10 @@ export default async function ClubDetailPage({
                         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
                           <UserRound className="size-4" />
                         </span>
-                        <span className="truncate text-sm font-medium">
+                        <span className="min-w-0 flex-1 truncate text-sm font-medium">
                           {m.full_name ?? t("unnamedMember")}
                         </span>
+                        <BadgeIconRow codes={badgesByUser[m.id] ?? []} />
                       </li>
                     ))}
                   </ul>

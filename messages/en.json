@@ -44,7 +44,8 @@
       "EVENT_REMINDER": "Event reminder",
       "CLUB_ANNOUNCEMENT": "Announcement",
       "MEMBERSHIP": "Welcome to the club",
-      "EVENT_PHOTOS": "Event photos"
+      "EVENT_PHOTOS": "Event photos",
+      "BADGE_EARNED": "You earned a badge"
     },
     "prefs": {
       "title": "Notification Preferences",
@@ -59,6 +60,31 @@
         "saved": "Notification preference updated",
         "error": "Could not update: {message}"
       }
+    }
+  },
+  "badges": {
+    "title": "Badges",
+    "desc": "Badges you've earned through participation.",
+    "earned": "Earned",
+    "FIRST_EVENT": {
+      "name": "First Event",
+      "hint": "Check in to an event."
+    },
+    "FIVE_EVENTS": {
+      "name": "5 Events",
+      "hint": "Check in to 5 different events."
+    },
+    "TEN_EVENTS": {
+      "name": "10 Events",
+      "hint": "Check in to 10 different events."
+    },
+    "FOUNDING_MEMBER": {
+      "name": "Founding Member",
+      "hint": "Be among a club's first 10 members."
+    },
+    "CLUB_LEADER": {
+      "name": "Club Leader",
+      "hint": "Serve as a club president."
     }
   },
   "profile": {

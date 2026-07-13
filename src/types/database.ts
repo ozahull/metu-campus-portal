@@ -39,6 +39,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          code: string
+          created_at: string
+          sort_order: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          sort_order?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       club_members: {
         Row: {
           club_id: string
@@ -488,6 +506,42 @@ export type Database = {
           },
           {
             foreignKeyName: "tickets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_badges: {
+        Row: {
+          awarded_at: string
+          badge_code: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          awarded_at?: string
+          badge_code: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          awarded_at?: string
+          badge_code?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_code_fkey"
+            columns: ["badge_code"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "user_badges_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"

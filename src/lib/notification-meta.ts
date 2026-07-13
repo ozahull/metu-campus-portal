@@ -4,6 +4,7 @@
 // (etkinlik/kulüp adı, duyuru içeriği) — çeviriye tabi değildir.
 
 import {
+  Award,
   Bell,
   CalendarCheck,
   CalendarPlus,
@@ -31,6 +32,7 @@ const ICONS: Record<string, LucideIcon> = {
   CLUB_ANNOUNCEMENT: Megaphone,
   MEMBERSHIP: UserRoundCheck,
   EVENT_PHOTOS: Images,
+  BADGE_EARNED: Award,
 };
 
 export function notificationIcon(type: string): LucideIcon {

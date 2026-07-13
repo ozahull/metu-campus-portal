@@ -44,7 +44,8 @@
       "EVENT_REMINDER": "Etkinlik hatırlatıcısı",
       "CLUB_ANNOUNCEMENT": "Duyuru",
       "MEMBERSHIP": "Kulübe hoş geldiniz",
-      "EVENT_PHOTOS": "Etkinlik fotoğrafları"
+      "EVENT_PHOTOS": "Etkinlik fotoğrafları",
+      "BADGE_EARNED": "Yeni rozet kazandın"
     },
     "prefs": {
       "title": "Bildirim Tercihleri",
@@ -59,6 +60,31 @@
         "saved": "Bildirim tercihi güncellendi",
         "error": "Güncellenemedi: {message}"
       }
+    }
+  },
+  "badges": {
+    "title": "Rozetler",
+    "desc": "Katılımınla kazandığın rozetler.",
+    "earned": "Kazanıldı",
+    "FIRST_EVENT": {
+      "name": "İlk Etkinlik",
+      "hint": "Bir etkinliğe giriş yap."
+    },
+    "FIVE_EVENTS": {
+      "name": "5 Etkinlik",
+      "hint": "5 farklı etkinliğe giriş yap."
+    },
+    "TEN_EVENTS": {
+      "name": "10 Etkinlik",
+      "hint": "10 farklı etkinliğe giriş yap."
+    },
+    "FOUNDING_MEMBER": {
+      "name": "Kurucu Üye",
+      "hint": "Bir kulübün ilk 10 üyesinden ol."
+    },
+    "CLUB_LEADER": {
+      "name": "Kulüp Lideri",
+      "hint": "Bir kulüpte başkanlık yap."
     }
   },
   "profile": {

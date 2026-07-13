@@ -2,17 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { ArrowRight, CalendarClock, Inbox, Users } from "lucide-react";
+import { Award, ArrowRight, CalendarClock, Inbox, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/datetime";
 import { PageShell } from "@/components/shared/page-shell";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { NotificationPreferences } from "@/components/notification-preferences";
+import { BadgeShowcase } from "@/components/badges";
 import { ProfileForm } from "./profile-form";
 
 export const dynamic = "force-dynamic";
@@ -36,6 +38,7 @@ type RsvpRow = {
 
 export default async function ProfilePage() {
   const t = await getTranslations("profile");
+  const tBadges = await getTranslations("badges");
   const locale = await getLocale();
   const supabase = await createClient();
 
@@ -63,6 +66,13 @@ export default async function ProfilePage() {
     .eq("user_id", user.id)
     .maybeSingle();
   const notifScope = pref?.scope ?? "MEMBER_CLUBS";
+
+  // Kazanılan rozetler (vitrin).
+  const { data: badgeRows } = await supabase
+    .from("user_badges")
+    .select("badge_code")
+    .eq("user_id", user.id);
+  const earnedBadges = (badgeRows ?? []).map((b) => b.badge_code);
 
   // Üye olunan kulüpler
   const { data: membershipRaw } = await supabase
@@ -104,6 +114,19 @@ export default async function ProfilePage() {
       <div className="mt-6">
         <NotificationPreferences initialScope={notifScope} />
       </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+            <Award className="size-4 text-primary" />
+            {tBadges("title")}
+          </CardTitle>
+          <CardDescription>{tBadges("desc")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <BadgeShowcase earned={earnedBadges} />
+        </CardContent>
+      </Card>
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Kulüplerim */}

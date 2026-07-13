@@ -259,6 +259,14 @@
       }
     }
   },
+  "fair": {
+    "title": "Kulüp Fuarı",
+    "subtitle": "İlgi alanlarını seç, sana uygun kulüpleri keşfet ve tek dokunuşla katıl.",
+    "pickInterests": "İlgi alanların",
+    "forYou": "Sana Göre",
+    "noMatch": "Seçtiğin ilgi alanlarına uygun kulüp bulunamadı.",
+    "noCategories": "Henüz kategori tanımlı kulüp yok."
+  },
   "calendar": {
     "title": "Takvimim",
     "subtitle": "RSVP verdiğin yaklaşan etkinlikler, haftalık.",
@@ -544,6 +552,15 @@
       "tabApprovals": "Onay Kuyruğu",
       "tabAssignments": "Atamalar",
       "tabAnalytics": "Analitik"
+    },
+    "fairMode": {
+      "title": "Kulüp Fuarı Modu",
+      "desc": "Açıkken ana sayfa keşif moduna geçer: öğrencilere ilgi alanı seçtirir ve uygun kulüpleri öne çıkarır. Kayıt haftası için idealdir.",
+      "toasts": {
+        "on": "Kulüp Fuarı modu açıldı",
+        "off": "Kulüp Fuarı modu kapatıldı",
+        "error": "Güncellenemedi: {message}"
+      }
     },
     "newClub": {
       "title": "Yeni Kulüp Ekle",

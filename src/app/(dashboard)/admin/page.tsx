@@ -12,6 +12,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PageShell } from "@/components/shared/page-shell";
 import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
 import { NewClubForm } from "./new-club-form";
+import { FairModeToggle } from "./fair-mode-toggle";
 import { AdminAssignments, type Option } from "./admin-assignments";
 import {
   AdminApprovals,
@@ -173,6 +174,14 @@ export default async function AdminPage() {
   const clubStats = (clubStatsRows as ClubStat[] | null) ?? [];
   const memberGrowth = (growthRows as MemberGrowthPoint[] | null) ?? [];
 
+  // Kulüp Fuarı modu ayarı.
+  const { data: fairRow } = await supabase
+    .from("app_settings")
+    .select("value")
+    .eq("key", "fair_mode_enabled")
+    .maybeSingle();
+  const fairEnabled = fairRow?.value === "true";
+
   return (
     <PageShell>
       <header className="mb-8 flex items-center gap-3">
@@ -218,7 +227,8 @@ export default async function AdminPage() {
           />
         </TabsPanel>
 
-        <TabsPanel value="clubs">
+        <TabsPanel value="clubs" className="space-y-6">
+          <FairModeToggle initialEnabled={fairEnabled} />
           <NewClubForm />
         </TabsPanel>
 

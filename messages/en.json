@@ -259,6 +259,14 @@
       }
     }
   },
+  "fair": {
+    "title": "Club Fair",
+    "subtitle": "Pick your interests, discover clubs that fit, and join with one tap.",
+    "pickInterests": "Your interests",
+    "forYou": "For You",
+    "noMatch": "No clubs match your selected interests.",
+    "noCategories": "No clubs with categories defined yet."
+  },
   "calendar": {
     "title": "My Calendar",
     "subtitle": "Your upcoming RSVPs, week by week.",
@@ -544,6 +552,15 @@
       "tabApprovals": "Approvals",
       "tabAssignments": "Assignments",
       "tabAnalytics": "Analytics"
+    },
+    "fairMode": {
+      "title": "Club Fair Mode",
+      "desc": "When on, the home page switches to discovery mode: students pick interests and matching clubs are highlighted. Ideal for registration week.",
+      "toasts": {
+        "on": "Club Fair mode enabled",
+        "off": "Club Fair mode disabled",
+        "error": "Could not update: {message}"
+      }
     },
     "newClub": {
       "title": "Add New Club",

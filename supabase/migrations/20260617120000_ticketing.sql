@@ -17,7 +17,7 @@ create table if not exists public.tickets (
   id uuid primary key default gen_random_uuid(),
   event_id uuid not null references public.events(id) on delete cascade,
   user_id uuid not null references public.profiles(id) on delete cascade,
-  token text not null unique default upper(encode(gen_random_bytes(5), 'hex')), -- QR içeriği, okunabilir
+  token text not null unique default upper(encode(extensions.gen_random_bytes(5), 'hex')), -- QR içeriği, okunabilir
   status text not null default 'PENDING_PAYMENT'
     check (status in ('PENDING_PAYMENT','SUBMITTED','APPROVED','REJECTED','CHECKED_IN')),
   receipt_url text,

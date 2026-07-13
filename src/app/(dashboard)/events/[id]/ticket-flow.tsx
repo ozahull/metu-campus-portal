@@ -199,7 +199,9 @@ export function TicketFlow({
             <div className="mt-3 flex items-center justify-between gap-2">
               <div className="min-w-0">
                 <p className="text-xs text-muted-foreground">{t("iban")}</p>
-                <p className="truncate font-mono text-sm">
+                {/* IBAN kırılmaz uzun metin — 360px'te tam görünsün diye
+                    truncate değil break-all (kopyalanabilir). */}
+                <p className="font-mono text-sm break-all">
                   {clubIban ?? t("noIban")}
                 </p>
               </div>
@@ -280,7 +282,9 @@ export function TicketFlow({
           <div className="rounded-2xl bg-white p-4">
             <QRCodeSVG value={ticket.token} size={196} level="M" />
           </div>
-          <p className="font-mono text-lg tracking-[0.3em]">{ticket.token}</p>
+          <p className="break-all text-center font-mono text-lg tracking-[0.3em]">
+            {ticket.token}
+          </p>
           <p className="inline-flex items-center gap-1.5 text-sm text-success">
             <BadgeCheck className="size-4" />
             {t("qrHint")}

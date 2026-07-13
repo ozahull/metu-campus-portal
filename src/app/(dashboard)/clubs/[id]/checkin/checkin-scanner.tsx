@@ -187,9 +187,8 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
               onClick={() => {
                 setScanning(false);
               }}
-              size="sm"
               variant="outline"
-              className="gap-1.5"
+              className="h-11 gap-1.5 px-4 text-sm"
             >
               <CameraOff className="size-4" />
               {t("stop")}
@@ -201,8 +200,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
                 setScanning(true);
               }}
               disabled={processing}
-              size="sm"
-              className="gap-1.5 font-medium"
+              className="h-11 gap-1.5 px-4 text-sm font-medium"
             >
               {processing ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -240,7 +238,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("searchPlaceholder")}
-            className="pl-9"
+            className="h-11 pl-9"
           />
         </div>
 
@@ -253,7 +251,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
             filtered.map((ticket) => (
               <li
                 key={ticket.token}
-                className="flex items-center justify-between gap-3 rounded-md border border-border bg-muted/40 px-3 py-2.5"
+                className="flex items-center justify-between gap-3 rounded-md border border-border bg-muted/40 px-3 py-2"
               >
                 <span className="inline-flex min-w-0 items-center gap-2 text-sm">
                   <User className="size-4 shrink-0 text-muted-foreground" />
@@ -264,9 +262,8 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
                 <Button
                   onClick={() => doCheckin(ticket.token)}
                   disabled={processing}
-                  size="sm"
                   variant="outline"
-                  className="shrink-0 gap-1.5 border-success/40 text-success hover:bg-success/10"
+                  className="h-11 shrink-0 gap-1.5 px-4 text-sm border-success/40 text-success hover:bg-success/10"
                 >
                   {processing ? (
                     <Loader2 className="size-4 animate-spin" />

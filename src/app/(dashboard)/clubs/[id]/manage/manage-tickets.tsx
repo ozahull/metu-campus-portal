@@ -81,9 +81,11 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
                     key={ticket.id}
                     className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-muted/40 px-3 py-2.5"
                   >
-                    <span className="inline-flex items-center gap-2 text-sm">
-                      <User className="size-4 text-muted-foreground" />
-                      {ticket.full_name ?? t("unnamedUser")}
+                    <span className="inline-flex min-w-0 items-center gap-2 text-sm">
+                      <User className="size-4 shrink-0 text-muted-foreground" />
+                      <span className="truncate">
+                        {ticket.full_name ?? t("unnamedUser")}
+                      </span>
                     </span>
                     <div className="flex items-center gap-1.5">
                       {ticket.receiptSignedUrl ? (

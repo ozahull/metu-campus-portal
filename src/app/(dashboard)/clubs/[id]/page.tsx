@@ -7,6 +7,7 @@ import {
   AtSign,
   CalendarDays,
   Clock,
+  ExternalLink,
   Info,
   Mail,
   MapPin,
@@ -164,11 +165,10 @@ export default async function ClubDetailPage({
 
   const events = (eventsRaw ?? []) as ClubEvent[];
   const initials = club?.name.slice(0, 2).toUpperCase() ?? "";
+  // NOT: whatsapp_url genel iletişim listesinde GÖSTERİLMEZ — WhatsApp grup
+  // daveti yalnızca onaylı üyeye özel bir buton olarak sunulur (spam koruması).
   const hasContact = Boolean(
-    club?.contact_email ||
-      club?.contact_phone ||
-      club?.whatsapp_url ||
-      club?.instagram_url,
+    club?.contact_email || club?.contact_phone || club?.instagram_url,
   );
 
   return (
@@ -286,6 +286,37 @@ export default async function ClubDetailPage({
 
               {/* Hakkında */}
               <TabsPanel value="about" className="space-y-6">
+                {/* WhatsApp grup daveti — YALNIZCA onaylı üyeye görünür
+                    (spam koruması). Üye olmayan bu bloğu göremez. */}
+                {isMember && club.whatsapp_url && (
+                  <a
+                    href={club.whatsapp_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between gap-3 rounded-xl border border-success/30 bg-success/10 p-4 transition-colors hover:border-success/50"
+                  >
+                    <span className="flex min-w-0 items-center gap-3">
+                      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-success/15 text-success">
+                        <MessageCircle className="size-5" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-sm font-semibold">
+                          {t("whatsappJoinTitle")}
+                        </span>
+                        <span className="block text-xs text-muted-foreground">
+                          {t("whatsappJoinDesc")}
+                        </span>
+                      </span>
+                    </span>
+                    <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-success px-3 py-2 text-sm font-medium text-success-foreground">
+                      <span className="hidden sm:inline">
+                        {t("whatsappJoin")}
+                      </span>
+                      <ExternalLink className="size-4" />
+                    </span>
+                  </a>
+                )}
+
                 <section className="rounded-xl border border-border bg-card p-5">
                   <h2 className="text-lg font-semibold tracking-tight">
                     {t("about")}
@@ -323,14 +354,6 @@ export default async function ClubDetailPage({
                         href={`tel:${club.contact_phone}`}
                         icon={<Phone className="size-4 text-primary" />}
                         label={club.contact_phone}
-                      />
-                    )}
-                    {club.whatsapp_url && (
-                      <ContactChip
-                        href={club.whatsapp_url}
-                        external
-                        icon={<MessageCircle className="size-4 text-primary" />}
-                        label={t("whatsapp")}
                       />
                     )}
                     {club.instagram_url && (

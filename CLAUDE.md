@@ -3,9 +3,10 @@
 # ODTÜ KKK Kampüs Topluluk & Etkinlik Portalı — Proje Bağlamı
 
 Bu dosya projenin tam bağlamıdır. Yeni özellik eklerken mevcut mimariye,
-isimlendirme düzenine, koyu tema + METU kırmızısı (#841515) tasarım diline
-ve tip güvenliği standartlarına BİREBİR uy. Her değişiklikten sonra
-`npx tsc --noEmit` ile tip kontrolü yap. Arayüz metinleri ve kullanıcıya
+isimlendirme düzenine, iki temalı (açık/koyu) semantik token tasarım diline
+(marka çapası: METU kırmızısı #841515) ve tip güvenliği standartlarına BİREBİR
+uy. HAM/HARDCODED RENK YASAK — yalnızca token'lar (bkz. §8). Her değişiklikten
+sonra `npx tsc --noEmit` ile tip kontrolü yap. Arayüz metinleri ve kullanıcıya
 gösterilen mesajlar Türkçedir.
 
 ================================================================
@@ -22,8 +23,10 @@ Topluluk ve Etkinlik Portalı". Amacı:
 - Yöneticilerin (SUPER_ADMIN) kulüp ve etkinlik oluşturması
 
 Sadece ODTÜ uzantılı e-postalar (@metu.edu.tr ve @ncc.metu.edu.tr) sisteme
-kayıt olabilir. Tasarım dili: premium, minimal, "Apple/Stripe" estetiğinde,
-tamamen KOYU TEMA (zinc-950 zemin) ve METU kırmızısı (#841515) aksanlar.
+kayıt olabilir. Tasarım dili: premium, minimal, "Apple/Stripe" estetiğinde;
+İKİ TEMA (açık + koyu; sistem tercihini izler, navbar'da Sun/Moon switcher ile
+elle değiştirilebilir) ve marka çapası METU kırmızısı (#841515), tümü semantik
+token'lar üzerinden (bkz. §8).
 
 ================================================================
 ## 2. TEKNOLOJİ YIĞINI (Tech Stack)
@@ -44,7 +47,12 @@ tamamen KOYU TEMA (zinc-950 zemin) ve METU kırmızısı (#841515) aksanlar.
   — dil URL'den değil `NEXT_LOCALE` cookie'sinden okunur (src/i18n/config.ts,
   request.ts, locale-actions.ts; çeviriler messages/tr.json + messages/en.json).
   Dil switcher navbar'da; server tarafı `getRequestConfig` ile cookie'yi okur.
-- **Toast:** sonner (theme="dark" sabit, next-themes bağımlılığı kaldırıldı)
+- **Tema:** next-themes (src/components/theme-provider.tsx → attribute="class",
+  defaultTheme="system", enableSystem). Açık tema `:root`, koyu tema `.dark`
+  sınıfıyla çözülür; navbar'da Sun/Moon `ThemeSwitcher` (arayüz yenilemesi Faz A).
+  Root `<html suppressHydrationWarning>` ile SSR flash'ı önlenir.
+- **Toast:** sonner (Toaster `richColors`, `position="top-center"`; temasını
+  next-themes'ten (`useTheme`) alır, token'larla renklenir — bkz. ui/sonner.tsx)
 - **İkonlar:** lucide-react
 - **Deploy:** Vercel (GitHub'a her push otomatik deploy tetikler)
 - **Repo:** github.com/ozahull/metu-campus-portal (branch: main)
@@ -57,7 +65,7 @@ src/
 ├── app/
 │   ├── layout.tsx              # Root layout + <Toaster /> (sonner)
 │   ├── page.tsx                # "/" → redirect("/login")
-│   ├── globals.css            # Tailwind v4 + slate OKLCH temaları
+│   ├── globals.css            # Tailwind v4 + iki temalı OKLCH token'lar (:root/.dark)
 │   │
 │   ├── (auth)/                 # Kimlik doğrulama route grubu
 │   │   ├── login/page.tsx              # E-posta + şifre girişi
@@ -69,7 +77,7 @@ src/
 │   │   └── reset-password/page.tsx     # Yeni şifre belirleme
 │   │
 │   └── (dashboard)/            # Giriş gerektiren alan
-│       ├── layout.tsx                  # <Navbar /> + koyu tema sarmalayıcı
+│       ├── layout.tsx                  # <Navbar /> + token'lı sarmalayıcı (bg-background)
 │       ├── dashboard/
 │       │   ├── page.tsx                # Ana ekran (karşılama + vitrin + kulüpler)
 │       │   ├── upcoming-events.tsx     # Global etkinlik vitrini (server)
@@ -90,7 +98,7 @@ src/
 │   ├── navbar.tsx              # Global üst menü (server, force-dynamic)
 │   ├── user-menu.tsx          # Avatar + dropdown + çıkış (client)
 │   ├── shared/
-│   │   ├── auth-shell.tsx              # Auth sayfaları için koyu kabuk
+│   │   ├── auth-shell.tsx              # Auth sayfaları için tema-duyarlı kabuk
 │   │   ├── club-card.tsx              # Paylaşılan premium kulüp kartı
 │   │   └── rsvp-button.tsx           # Etkinlik katıl/ayrıl (client)
 │   └── ui/                     # shadcn bileşenleri (Base UI tabanlı)
@@ -124,7 +132,9 @@ yoktur).
 - Ad, Soyad, METU E-posta, Şifre (göz aç/kapa özellikli)
 - E-posta @metu.edu.tr veya @ncc.metu.edu.tr ile bitmiyorsa buton pasif
 - `supabase.auth.signUp()` → metadata'ya full_name yazılır
-- Oturum hemen açıldıysa `profiles` tablosuna upsert (id, email, full_name)
+- Profil satırı signup'ta handle_new_user trigger'ıyla otomatik oluşur; oturum
+  hemen açıldıysa yalnızca `profiles.update({ full_name }).eq("id", ...)` yapılır
+  (upsert DEĞİL — §5'teki "profiles'a upsert yasak" kuralı)
 - E-posta onayı açıksa "onay maili gönderildi" bilgisi gösterilir
 
 **Giriş (/login):**
@@ -253,6 +263,17 @@ RLS POLİTİKALARI (versiyonlu — 20260615120600_rls_policies.sql):
   email OKUYAMAZ; isim/rol açıktır. anon profiles'ı hiç okuyamaz. Kullanıcının
   kendi e-postası UI'da auth oturumundan (user.email) alınır, profiles'tan DEĞİL.
   → Yeni sorgu yazarken profiles'tan email SEÇME.
+  YAZMA GRANT'I DARALTMASI (20260713190000_tighten_profiles_grants — canlıya
+  uygulandı): profiles'a authenticated yazma yetkisi tasarıma geri daraltıldı:
+  `grant insert (id, email, full_name)` + `grant update (full_name, email)`.
+  id ve role HİÇBİR yazma yolunda yer almaz (kolon dışı bırakma +
+  prevent_role_escalation trigger = çift koruma). SELECT'e dokunulmadı.
+  ⚠️ KURAL — profiles'a İSTEMCİDEN upsert YASAK: PostgREST `.upsert()` çağrısı
+  ON CONFLICT yolunda "DO UPDATE SET id = excluded.id, ..." üretir, bu da id
+  kolonunda UPDATE yetkisi ister → "permission denied for table profiles".
+  Profil satırı signup'ta handle_new_user trigger'ıyla HER ZAMAN oluştuğu için
+  upsert zaten gereksiz. Yalnızca `.update({ full_name }).eq("id", ...)` kullan
+  (bilinen yazıcılar: register/page.tsx + profile-form.tsx).
 - clubs: SELECT herkes; INSERT/DELETE SUPER_ADMIN; UPDATE
   (is_super_admin() OR is_club_advisor(id) OR is_club_admin(id)) ← Faz 1/1.5.
   advisor_id değişimi prevent_advisor_change ile yalnızca SUPER_ADMIN.
@@ -370,18 +391,62 @@ Hepsi: lib/supabase/client.ts kullanır, hata toleranslıdır (toast.error),
 loading state'i (Loader2 spinner) gösterir.
 
 ================================================================
-## 8. TASARIM SİSTEMİ (Design Language)
+## 8. TASARIM SİSTEMİ (Design Language) — İKİ TEMA, SEMANTİK TOKEN
 ================================================================
 
-- Zemin: bg-zinc-950 ; kartlar: bg-zinc-900/50 + border-white/5 + backdrop-blur
-- METU kırmızısı: #841515 (butonlar, ışımalar, vurgular)
-  - Soluk ton: text-[#e7a3a3], bg-[#841515]/10, border-[#841515]/30
-- Kart hover efekti (premium):
-  `hover:-translate-y-1 hover:border-[#841515]/50
-   hover:shadow-[0_8px_30px_-8px_rgba(132,21,21,0.45)]`
-- Radial ışıma: `bg-[radial-gradient(50%_60%_at_50%_0%,rgba(132,21,21,0.18),transparent)]`
-- Tipografi: tracking-tight, text-balance/text-pretty, beyaz başlık + zinc-400 metin
-- Koyu tema, auth/dashboard sayfalarında `dark` sınıfı ile token'lar koyu çözülür
+⛔ TEK KURAL: HARDCODED/HAM RENK YASAK. `bg-zinc-950`, `text-white`,
+`#841515`, `bg-[#841515]/10`, `rgba(132,21,21,…)` gibi sabit renk sınıfları
+ARTIK KULLANILMAZ. Her renk `src/app/globals.css`'teki semantik OKLCH
+token'larından gelir. Böylece aynı bileşen hem açık hem koyu temada doğru
+çözülür. (Eski koyu-tema-sabit dil arayüz yenilemesi Faz A→B'de kaldırıldı.)
+
+İKİ TEMA ALTYAPISI:
+- next-themes `attribute="class"`: açık tema `:root`, koyu tema `.dark` sınıfı.
+  Varsayılan sistem tercihi; navbar'daki Sun/Moon `ThemeSwitcher` ile değişir.
+- Marka çapası METU kırmızısı ≈ oklch(0.40 0.14 27). primary açık temada derin
+  (0.48), koyu temada parlak (0.56) varyant — her ikisinde beyaz metinle
+  WCAG AA+ kontrast. Nötrler serin gri (hue 285, düşük chroma).
+
+SEMANTİK TOKEN'LAR (Tailwind sınıfı → CSS değişkeni; açık/koyu otomatik):
+- Zemin/metin:  `bg-background` / `text-foreground`
+- Kart:         `bg-card` `text-card-foreground` `border-border`
+                (hover için `--card-hover` / `hover:bg-card-hover`)
+- Marka:        `bg-primary` `text-primary-foreground` `text-primary`
+                `border-primary/30` `bg-primary/10` (opacity ile soluk ton)
+- İkincil/pas.: `bg-secondary` `bg-muted` `text-muted-foreground` `bg-accent`
+- Durum:        `text-success`/`bg-success` (yeşil), `text-warning` (amber),
+                `text-destructive`/`bg-destructive` (kırmızı — hata/sil)
+- Girdi/odak:   `border-input` `ring-ring` (`focus-visible:ring-2 ring-ring`)
+- Popover:      `bg-popover` `text-popover-foreground` (menü/diyalog/toast)
+- Grafik:       `--chart-1..5` (recharts'ta `stroke="var(--primary)"` gibi
+                doğrudan CSS değişkeni verilir — bkz. admin-analytics.tsx)
+- Radius:       `rounded-lg/xl/2xl` `--radius` (0.75rem) türevleri
+
+DESENLER:
+- Kart hover (premium): `transition-colors hover:border-primary/40`
+  (+ istenirse `hover:-translate-y-0.5 hover:shadow-lg`). Işıma/gradyan gerekiyorsa
+  `bg-[radial-gradient(...,color-mix(in oklab,var(--primary) 12%,transparent),transparent)]`
+  gibi token'lı `color-mix` kullan — sabit rgba DEĞİL.
+- Tipografi: `tracking-tight`, `text-balance`/`text-pretty`; başlık
+  `text-foreground`, gövde `text-muted-foreground`.
+- Skeleton (yüklenme): `src/components/shared/skeletons.tsx` ortak iskeletleri
+  (`ClubGridSkeleton`, `EventGridSkeleton` — `grid-cols-1 sm:grid-cols-2
+  lg:grid-cols-3`) + `ui/skeleton` (`bg-muted animate-pulse`). Server veri
+  bekleyen bölümleri `<Suspense fallback={<…Skeleton/>}>` ile sar; route
+  `loading.tsx` dosyaları da aynı iskeletleri kullanır.
+- Boş durum: `shared/empty-state.tsx` (ikon + başlık + açıklama, `border-dashed`).
+- Mobil (arayüz yenilemesi Faz C3): 360px tabanı. Tablolar `overflow-x-auto`
+  sarmalı; grid'ler `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`; uzun adlar
+  `min-w-0 … truncate`; IBAN/token gibi kırılmaz metinler `font-mono break-all`;
+  dokunma hedefleri ≥44px (`h-11`).
+- Onay diyaloğu: geri alınamaz aksiyonlar `shared/confirm-dialog.tsx`
+  (Base UI AlertDialog) ile sarılır — `window.confirm` KULLANMA.
+
+ARAYÜZ YENİLEME FAZLARI (tamam): A (iki temalı token altyapısı + switcher) →
+B (iskelet/navigasyon/tema-duyarlı yeniden tasarım) → C0/C1/C2 (primary
+parlaklık + mikro-etkileşim + skeleton + tipografi + metadata + favicon + onay
+diyaloğu + tarih helper + next/image) → C3 (mobil 360px + check-in dokunma
+hedefleri) → D (bu dokümantasyon).
 
 ================================================================
 ## 9. ŞU AN NEREDEYIZ? (Mevcut Durum)
@@ -510,6 +575,28 @@ FAZ 6 TAMAMLANDI — Okula raporlama / analitik (yalnız SUPER_ADMIN):
   bazlı performans), analytics_member_growth (aylık üye artışı zaman serisi).
 - UI: /admin admin-analytics (özet kartları + kulüp tablosu + büyüme).
 
+i18n TAMAMLANDI — next-intl (cookie tabanlı, tr/en):
+- Path routing YOK: dil `NEXT_LOCALE` cookie'sinden okunur (src/i18n/config.ts,
+  request.ts, locale-actions.ts). Çeviriler messages/tr.json + messages/en.json.
+- Tüm arayüz metni `useTranslations()` / `getTranslations()` t() anahtarlarından.
+  Navbar'da dil switcher; server `getRequestConfig` ile cookie'yi okur.
+
+ARAYÜZ YENİLEMESİ TAMAMLANDI (A→D) — iki temalı tasarım sistemi (bkz. §8):
+- Faz A: iki temalı OKLCH token altyapısı + next-themes + Sun/Moon switcher.
+- Faz B: iskelet/navigasyon/tema-duyarlı yeniden tasarım (hardcoded renk temizliği).
+- Faz C0/C1/C2: primary parlaklık ayarı, mikro-etkileşimler, ortak skeleton'lar,
+  tipografi, sayfa metadata title'ları + favicon, onay diyaloğu (confirm-dialog),
+  ortak tarih helper (src/lib/datetime.ts), next/image geçişi.
+- Faz C3: mobil 360px süpürmesi (tablo overflow-x, grid 1/2/3, truncate,
+  IBAN/token break-all) + QR check-in dokunma hedefleri ≥44px.
+- Faz D: CLAUDE.md bu güncelleme (tasarım sistemi + güncel durum + yol haritası).
+
+KAYIT/GRANT DÜZELTMESİ (20260713190000 + register):
+- Canlı DB'de profiles yazma yetkileri tasarıma geri daraltıldı
+  (20260713190000_tighten_profiles_grants). register/page.tsx'teki profiles
+  `.upsert()` → `.update({ full_name }).eq("id", ...)` yapıldı (upsert id'de
+  UPDATE ister → "permission denied"). Kural §5'te: profiles'a upsert yasak.
+
 ALTYAPI DURUMU (2026-07-13 — YENİ Supabase projesi zmnmdcuvdrvgdkdcaxjj):
 - 19/19 migration TEMİZ bir projeye sırayla UYGULANDI (npx supabase db push).
   Artık "henüz production'a uygulanmadı" uyarısı YOK — Faz 0..6'nın tüm şeması
@@ -535,28 +622,55 @@ DİKKAT EDİLECEKLER (teknik borç / bekleyenler):
   (20260615120700). İsim/rol authenticated'a açık kalır.
 
 ================================================================
-## 10. SIRADA NE VAR? (Yol Haritası / Gelecek İşler)
+## 10. ÜRÜN VİZYONU & YOL HARİTASI
 ================================================================
 
-Önceliklendirilmiş öneriler:
+VİZYON: Kampüs topluluk hayatının TEK merkezi. Öğrenci mobilde yaşar (hedef:
+PWA — telefona kurulabilir, push alır). Roller zinciri net:
+SUPER_ADMIN (okul yönetimi) → danışman (her kulübün hocası) → başkan → üye.
+Instagram/WhatsApp'a karşı konumlanma: etkinlikler akışta kaybolmaz; kampüsün
+TAMAMI tek yerden, kronolojik ve filtrelenebilir görülür. Faz 0-6 + biletleme +
+belge + analitik + i18n + iki temalı arayüz TAMAM; sırada etkileşim ve erişim.
 
-1. **Etkinlikler liste sayfası (/events):** Navbar'daki pasif "Etkinlikler"
-   linkini canlandır; tüm yaklaşan etkinlikleri filtrelenebilir listele.
-2. **Etkinlik detay sayfası (/events/[id]):** katılımcı listesi, takvime ekle,
-   açıklama, konum.
-3. **Kulüp/Etkinlik yönetimi (CRUD):** SUPER_ADMIN için düzenleme & silme;
-   kulüp başkanı (CLUB_ADMIN) rolü ve yetkilendirme.
-4. **Etkinlik onay akışı (status):** şu an her şey 'APPROVED'. PENDING →
-   admin onayı → APPROVED iş akışı kur.
-5. **Profil sayfası (/profile):** kullanıcının üye olduğu kulüpler ve
-   katıldığı etkinlikler; isim/şifre güncelleme.
-6. **Bildirimler:** yeni etkinlik / yaklaşan etkinlik hatırlatmaları.
-7. **Görseller:** kulüp logoları / etkinlik kapak görselleri (Supabase Storage).
-8. **Arama iyileştirme:** kulüp sayısı büyürse Supabase `ilike` ile
-   sunucu-taraflı arama + sayfalama.
-9. **Production sertleştirme:** enforce_metu_domain migration'ı uygula,
-   tüm RLS politikalarını migration olarak versiyonla, types üret
-   (`supabase gen types`).
+--- FAZ 7 — BİLDİRİM SİSTEMİ + PWA (sıradaki BÜYÜK faz) ---
+Kullanıcı tarafı kurulum adımları (VAPID anahtar üretimi, Supabase pg_cron
+etkinleştirme, Edge Function deploy) fazın BAŞINDA listelenecek.
+- DB: `notifications` tablosu (user_id, type, title, body, link, read_at) + RLS
+  (kendi bildirimini okur/işaretler). Üreticiler SECURITY DEFINER RPC/trigger.
+- Navbar: bildirim zili + okunmamış sayacı (badge); açılır liste, tıkla→read_at.
+- Bildirim üreticileri:
+  • etkinlik onaylandı → kulüp başkanına
+  • yeni (APPROVED) etkinlik → kulüp üyelerine
+  • etkinlik hatırlatıcısı → RSVP verenlere, 24 saat kala (pg_cron + Edge Function)
+  • başkan duyurusu → kulüp üyelerine (serbest metin "Instagram'a post attık" tipi,
+    manage panelinden gönderilir)
+- Bildirim tercihleri: üye olduğum kulüpler / tümü / sessiz.
+- PWA: manifest + service worker + Web Push (VAPID). Telefona kurulabilir, push alır.
+
+--- FAZ 7.5 — WhatsApp DAVETİ (küçük) ---
+- clubs.whatsapp_url davet linki, YALNIZCA üye olan öğrenciye "WhatsApp grubuna
+  katıl" butonu olarak gösterilir (spam koruması — üye değilse görünmez).
+  Katılım isteğini WhatsApp'ın kendi akışı yönetir.
+
+--- FAZ 8 — ETKİLEŞİM PAKETİ ---
+- (a) Etkinlik sonrası fotoğraf duvarı: başkan etkinlik bitince 5-10 fotoğraf
+  yükler (storage, event bazlı) → kulüp sayfası yaşayan vitrine döner.
+- (b) Katılım rozetleri: "İlk etkinliğin", "5 etkinlik", "Kurucu üye" profil
+  rozetleri (SIRALAMA TABLOSU YOK — hafif aidiyet, rekabet değil).
+- (c) "Takvimim": öğrencinin RSVP'lerinin haftalık zaman çizelgesi + çakışma
+  uyarısı; tek dokunuş RSVP.
+
+--- FAZ 9 — DÖNEM BAŞI + OKUL DEĞERİ ---
+- (a) Kulüp Fuarı modu: kayıt haftasında ana sayfa keşif moduna geçer, ilgi
+  alanı chip'leriyle kulüp önerisi.
+- (b) Okul yönetimine dönem sonu PDF raporu: kulüp bazında üye büyümesi, etkinlik
+  sayısı, katılım oranları (Faz 6 analitiğinin üstüne) — ürünün OKULA satış argümanı.
+
+BİLİNÇLİ ERTELENENLER (kapsam dışı): uygulama içi mesajlaşma/forum, puan-ödül
+ekonomisi, anket modülü.
+
+TEKNİK ÖN KOŞULLAR (faz dışı, sırada): Vercel deploy; Confirm email + gerçek
+SMTP (Resend); test hesap temizliği; middleware → proxy geçişi.
 
 ================================================================
 ## 11. ÇALIŞMA KURALLARI (Geliştirme Konvansiyonları)
@@ -565,12 +679,23 @@ DİKKAT EDİLECEKLER (teknik borç / bekleyenler):
 - Server Component'lerde veri çekmede `force-dynamic` kullan (rol/oturum
   bayatlamasın); client'ta mutasyon sonrası `router.refresh()`.
 - Button'ı Link olarak kullanırken `buttonVariants()` + `cn()` (asChild YOK).
-- Yeni shadcn bileşeni eklerken `next-themes` bağımlılığına dikkat (sonner'da
-  kaldırılmıştı).
+- Yeni shadcn bileşeni eklerken `next-themes` bağımlılığına dikkat (tema
+  altyapısı next-themes üzerinde — bkz. §2/§8).
 - Embed sorgularında FK varsayımını yorumla belirt; hata loglaması ekle.
 - Gizli anahtarlar .env.local'de; ASLA commit etme (.gitignore'da .env*).
   Vercel'de env değişkenleri Dashboard'dan ayrıca girilmeli:
   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY.
 - Her değişiklik sonrası `npx tsc --noEmit` çalıştır; tip hatası bırakma.
-- Tüm yeni arayüzler koyu tema + #841515 dil ile %100 uyumlu olsun.
-- Dil Türkçe; arayüz metinleri ve kullanıcıya mesajlar Türkçe.
+- RENK: yalnızca semantik token'lar (§8) — hardcoded renk / `#841515` /
+  `bg-zinc-*` / `text-white` YASAK. Yeni arayüz hem açık hem koyu temada test.
+- TARİH/SAAT: her gösterim `src/lib/datetime.ts` `formatDateTime()`'dan geçer
+  (liste/kart "short", detay "long") — sayfa içi elle `toLocaleString` YAZMA.
+- YIKICI/GERİ ALINAMAZ işlemler (sil, üye çıkar, bilet iptal): mutlaka
+  `shared/confirm-dialog.tsx` onay diyaloğuyla sar — `window.confirm` YOK.
+- YENİ SAYFA = metadata. Her route bir `title` verir (root layout template
+  `%s · <marka>` uygular; sayfa `export const metadata`/`generateMetadata`).
+- profiles'a İSTEMCİDEN upsert/insert YASAK — yalnızca `.update({ full_name })`
+  (bkz. §5 grant daraltması). id/role/email istemciden yazılmaz.
+- Dokunulmazlar: iş mantığı/sorgular/RLS/RPC/route'lar, i18n t() anahtarları,
+  Base UI (asChild yok), paket yöneticisi npm.
+- Dil Türkçe; arayüz metinleri ve kullanıcıya mesajlar Türkçe (t() üzerinden).

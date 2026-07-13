@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
 export type EventDocument = {
   id: string;
@@ -38,6 +39,7 @@ export function EventDocuments({
 }) {
   const router = useRouter();
   const t = useTranslations("manage.documents");
+  const tc = useTranslations("confirm");
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -85,9 +87,6 @@ export function EventDocuments({
   }
 
   async function handleDelete(doc: EventDocument) {
-    if (!window.confirm(t("toasts.deleteConfirm", { name: doc.file_name }))) {
-      return;
-    }
     setLoading(true);
     const supabase = createClient();
     const { error } = await supabase
@@ -156,16 +155,23 @@ export function EventDocuments({
                   </span>
                 )}
                 {doc.canDelete && (
-                  <Button
-                    onClick={() => handleDelete(doc)}
-                    disabled={loading}
-                    size="icon-sm"
-                    variant="ghost"
-                    className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                    aria-label={t("deleteAria")}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
+                  <ConfirmDialog
+                    trigger={
+                      <Button
+                        disabled={loading}
+                        size="icon-sm"
+                        variant="ghost"
+                        className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                        aria-label={t("deleteAria")}
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    }
+                    title={tc("deleteDocTitle")}
+                    description={tc("deleteDocBody", { name: doc.file_name })}
+                    confirmLabel={tc("deleteDocConfirm")}
+                    onConfirm={() => handleDelete(doc)}
+                  />
                 )}
               </div>
             </li>

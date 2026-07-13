@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
@@ -6,6 +7,11 @@ import { ClubsCollection } from "@/components/shared/clubs-collection";
 import type { Club } from "@/components/shared/club-card";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("nav");
+  return { title: t("communities") };
+}
 
 type ClubQueryRow = {
   id: string;

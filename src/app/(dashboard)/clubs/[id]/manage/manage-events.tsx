@@ -21,10 +21,12 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { statusMeta } from "@/lib/event-status";
+import { formatDateTime } from "@/lib/datetime";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import {
   Dialog,
   DialogContent,
@@ -78,11 +80,8 @@ export function ManageEvents({
 }) {
   const router = useRouter();
   const t = useTranslations("manage.events");
+  const tc = useTranslations("confirm");
   const locale = useLocale();
-  const dateFormatter = new Intl.DateTimeFormat(locale, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ManageEvent | null>(null);
   const [loading, setLoading] = useState(false);
@@ -233,9 +232,6 @@ export function ManageEvents({
   }
 
   async function handleDelete(ev: ManageEvent) {
-    if (!window.confirm(t("toasts.deleteConfirm", { title: ev.title }))) {
-      return;
-    }
     const supabase = createClient();
     const { error } = await supabase.from("events").delete().eq("id", ev.id);
     if (error) {
@@ -331,7 +327,7 @@ export function ManageEvents({
                     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1.5">
                         <Clock className="size-3.5 text-primary" />
-                        {dateFormatter.format(new Date(ev.event_date))}
+                        {formatDateTime(ev.event_date, locale, "short")}
                       </span>
                       {ev.location && (
                         <span className="inline-flex items-center gap-1.5">
@@ -345,9 +341,17 @@ export function ManageEvents({
                     <Button onClick={() => openEdit(ev)} size="icon-sm" variant="ghost" aria-label={t("editAria")}>
                       <Pencil className="size-4" />
                     </Button>
-                    <Button onClick={() => handleDelete(ev)} size="icon-sm" variant="ghost" className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label={t("deleteAria")}>
-                      <Trash2 className="size-4" />
-                    </Button>
+                    <ConfirmDialog
+                      trigger={
+                        <Button size="icon-sm" variant="ghost" className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label={t("deleteAria")}>
+                          <Trash2 className="size-4" />
+                        </Button>
+                      }
+                      title={tc("deleteEventTitle")}
+                      description={tc("deleteEventBody", { title: ev.title })}
+                      confirmLabel={tc("deleteEventConfirm")}
+                      onConfirm={() => handleDelete(ev)}
+                    />
                   </div>
                 </div>
 

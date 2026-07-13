@@ -419,6 +419,26 @@
     "title": "ODTÜ Kampüs Portalı",
     "description": "ODTÜ KKK Topluluk ve Etkinlik Portalı"
   },
+  "notFound": {
+    "title": "Sayfa bulunamadı",
+    "body": "Aradığınız sayfa taşınmış, kaldırılmış veya hiç var olmamış olabilir.",
+    "cta": "Ana Sayfaya Dön"
+  },
+  "confirm": {
+    "cancel": "Vazgeç",
+    "removeMemberTitle": "Üyeyi çıkar",
+    "removeMemberBody": "{name} kulüpten çıkarılacak. Bu işlem geri alınamaz.",
+    "removeMemberConfirm": "Üyeyi çıkar",
+    "deleteEventTitle": "Etkinliği sil",
+    "deleteEventBody": "\"{title}\" etkinliği ve ilgili tüm veriler kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+    "deleteEventConfirm": "Etkinliği sil",
+    "deleteDocTitle": "Belgeyi sil",
+    "deleteDocBody": "\"{name}\" belgesi kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+    "deleteDocConfirm": "Belgeyi sil",
+    "cancelTicketTitle": "Bileti iptal et",
+    "cancelTicketBody": "Bilet talebiniz iptal edilecek. Dilerseniz daha sonra yeniden talep oluşturabilirsiniz.",
+    "cancelTicketConfirm": "Talebi iptal et"
+  },
   "admin": {
     "page": {
       "title": "Yönetim Paneli",

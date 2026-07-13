@@ -4,6 +4,7 @@ import { Clock, MapPin, Users } from "lucide-react";
 import { RSVPButton } from "@/components/shared/rsvp-button";
 import { DateBadge } from "@/components/shared/date-badge";
 import { Badge } from "@/components/ui/badge";
+import { formatDateTime } from "@/lib/datetime";
 import { cn } from "@/lib/utils";
 
 export type EventCardData = {
@@ -33,10 +34,7 @@ export function EventCard({
   const t = useTranslations("home");
   const locale = useLocale();
   const date = new Date(event.eventDate);
-  const dateLabel = new Intl.DateTimeFormat(locale, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
+  const dateLabel = formatDateTime(date, locale, "short");
 
   return (
     <div

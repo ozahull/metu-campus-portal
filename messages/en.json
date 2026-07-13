@@ -419,6 +419,26 @@
     "title": "METU Campus Portal",
     "description": "METU NCC Community & Event Portal"
   },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you're looking for may have moved, been removed, or never existed.",
+    "cta": "Back to Home"
+  },
+  "confirm": {
+    "cancel": "Cancel",
+    "removeMemberTitle": "Remove member",
+    "removeMemberBody": "{name} will be removed from the club. This cannot be undone.",
+    "removeMemberConfirm": "Remove member",
+    "deleteEventTitle": "Delete event",
+    "deleteEventBody": "\"{title}\" and all related data will be permanently deleted. This cannot be undone.",
+    "deleteEventConfirm": "Delete event",
+    "deleteDocTitle": "Delete document",
+    "deleteDocBody": "\"{name}\" will be permanently deleted. This cannot be undone.",
+    "deleteDocConfirm": "Delete document",
+    "cancelTicketTitle": "Cancel ticket",
+    "cancelTicketBody": "Your ticket request will be cancelled. You can request again later if you wish.",
+    "cancelTicketConfirm": "Cancel request"
+  },
   "admin": {
     "page": {
       "title": "Admin Panel",

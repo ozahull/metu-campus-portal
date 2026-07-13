@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -10,8 +11,26 @@ import { RSVPButton } from "@/components/shared/rsvp-button";
 import { AddToCalendar } from "./add-to-calendar";
 import { TicketFlow, type MyTicket } from "./ticket-flow";
 import { formatPrice } from "@/lib/ticket-status";
+import { formatDateTime } from "@/lib/datetime";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("events")
+    .select("title")
+    .eq("id", id)
+    .maybeSingle<{ title: string }>();
+  if (data?.title) return { title: data.title };
+  const t = await getTranslations("events");
+  return { title: t("title") };
+}
 
 type EventClub = {
   id: string;
@@ -42,10 +61,6 @@ export default async function EventDetailPage({
   const { id } = await params;
   const t = await getTranslations("events");
   const locale = await getLocale();
-  const dateFormatter = new Intl.DateTimeFormat(locale, {
-    dateStyle: "full",
-    timeStyle: "short",
-  });
   const supabase = await createClient();
 
   const {
@@ -146,7 +161,7 @@ export default async function EventDetailPage({
           <div className="flex items-center gap-2.5 rounded-xl border border-border bg-card px-4 py-3 text-sm">
             <CalendarClock className="size-4 shrink-0 text-primary" />
             <span className="min-w-0">
-              {dateFormatter.format(new Date(data.event_date))}
+              {formatDateTime(data.event_date, locale, "long")}
             </span>
           </div>
           {data.location && (

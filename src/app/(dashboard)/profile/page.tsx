@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowRight, CalendarClock, Inbox, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { formatDateTime } from "@/lib/datetime";
 import { PageShell } from "@/components/shared/page-shell";
 import {
   Card,
@@ -13,6 +15,11 @@ import {
 import { ProfileForm } from "./profile-form";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("profile");
+  return { title: t("title") };
+}
 
 type MembershipRow = {
   role: string;
@@ -29,10 +36,6 @@ type RsvpRow = {
 export default async function ProfilePage() {
   const t = await getTranslations("profile");
   const locale = await getLocale();
-  const dateFormatter = new Intl.DateTimeFormat(locale, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
   const supabase = await createClient();
 
   const {
@@ -144,7 +147,7 @@ export default async function ProfilePage() {
                     <Link href={`/events/${e.id}`} className="block rounded-lg border border-border bg-muted/40 px-3 py-2.5 transition-colors hover:border-primary/40">
                       <p className="truncate text-sm font-medium">{e.title}</p>
                       <p className="mt-0.5 text-xs text-muted-foreground">
-                        {dateFormatter.format(new Date(e.event_date))}
+                        {formatDateTime(e.event_date, locale, "short")}
                       </p>
                     </Link>
                   </li>

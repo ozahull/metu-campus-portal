@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { formatDateTime } from "@/lib/datetime";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -56,10 +57,6 @@ export function AdminApprovals({
   const router = useRouter();
   const t = useTranslations("admin.approvals");
   const locale = useLocale();
-  const dateFormatter = new Intl.DateTimeFormat(locale, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
   const [busyId, setBusyId] = useState<string | null>(null);
 
   async function decide(
@@ -152,7 +149,7 @@ export function AdminApprovals({
                     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1.5">
                         <Clock className="size-3.5 text-primary" />
-                        {dateFormatter.format(new Date(ev.event_date))}
+                        {formatDateTime(ev.event_date, locale, "short")}
                       </span>
                       {ev.location && (
                         <span className="inline-flex items-center gap-1.5">

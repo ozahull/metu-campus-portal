@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { cn } from "@/lib/utils";
 
 export type Club = {
@@ -38,29 +39,23 @@ export function ClubCard({
     >
       {/* Kapak */}
       <div className="relative h-24 w-full overflow-hidden bg-gradient-to-br from-primary/25 via-muted to-muted">
-        {club.cover_url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={club.cover_url}
-            alt=""
-            className="size-full object-cover"
-          />
-        )}
+        <ImageWithFallback
+          src={club.cover_url}
+          alt=""
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          fallback={null}
+        />
       </div>
 
       {/* Logo (kapağa binen) */}
       <div className="px-4">
-        <div className="-mt-7 flex size-14 items-center justify-center overflow-hidden rounded-xl border-2 border-card bg-muted text-sm font-bold text-foreground shadow-sm">
-          {club.logo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={club.logo_url}
-              alt=""
-              className="size-full object-cover"
-            />
-          ) : (
-            initials
-          )}
+        <div className="relative -mt-7 flex size-14 items-center justify-center overflow-hidden rounded-xl border-2 border-card bg-muted text-sm font-bold text-foreground shadow-sm">
+          <ImageWithFallback
+            src={club.logo_url}
+            alt=""
+            sizes="56px"
+            fallback={<span>{initials}</span>}
+          />
         </div>
       </div>
 

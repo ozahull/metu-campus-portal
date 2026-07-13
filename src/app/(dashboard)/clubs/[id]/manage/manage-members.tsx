@@ -7,6 +7,7 @@ import { ShieldCheck, ShieldMinus, UserRound, UserX } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
 export type RosterMember = {
   user_id: string;
@@ -26,6 +27,7 @@ export function ManageMembers({
 }) {
   const router = useRouter();
   const t = useTranslations("manage.members");
+  const tc = useTranslations("confirm");
   const [busyId, setBusyId] = useState<string | null>(null);
 
   async function setRole(member: RosterMember, role: "ADMIN" | "MEMBER") {
@@ -47,15 +49,6 @@ export function ManageMembers({
   }
 
   async function removeMember(member: RosterMember) {
-    if (
-      !window.confirm(
-        t("removeConfirm", {
-          name: member.full_name ?? t("removeConfirmFallback"),
-        }),
-      )
-    ) {
-      return;
-    }
     setBusyId(member.user_id);
     const supabase = createClient();
     const { error } = await supabase
@@ -115,9 +108,19 @@ export function ManageMembers({
                     <ShieldCheck className="size-4" />
                   </Button>
                 ))}
-              <Button onClick={() => removeMember(m)} disabled={busy} size="icon-sm" variant="ghost" className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label={t("removeAria")}>
-                <UserX className="size-4" />
-              </Button>
+              <ConfirmDialog
+                trigger={
+                  <Button disabled={busy} size="icon-sm" variant="ghost" className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label={t("removeAria")}>
+                    <UserX className="size-4" />
+                  </Button>
+                }
+                title={tc("removeMemberTitle")}
+                description={tc("removeMemberBody", {
+                  name: m.full_name ?? t("unnamed"),
+                })}
+                confirmLabel={tc("removeMemberConfirm")}
+                onConfirm={() => removeMember(m)}
+              />
             </div>
           </li>
         );

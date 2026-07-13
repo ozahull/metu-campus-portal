@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { CalendarDays } from "lucide-react";
@@ -6,6 +7,11 @@ import { PageShell } from "@/components/shared/page-shell";
 import { EventsExplorer, type EventRow } from "./events-explorer";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("events");
+  return { title: t("title") };
+}
 
 type EventQueryRow = {
   id: string;

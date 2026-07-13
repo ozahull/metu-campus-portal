@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ticketStatusMeta, formatPrice } from "@/lib/ticket-status";
 
 export type MyTicket = {
@@ -47,6 +48,7 @@ export function TicketFlow({
 }: TicketFlowProps) {
   const router = useRouter();
   const t = useTranslations("events.ticket");
+  const tc = useTranslations("confirm");
   const locale = useLocale();
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -72,7 +74,6 @@ export function TicketFlow({
 
   async function cancelTicket() {
     if (!ticket) return;
-    if (!window.confirm(t("toasts.cancelConfirm"))) return;
     setLoading(true);
     const supabase = createClient();
     const { error } = await supabase.from("tickets").delete().eq("id", ticket.id);
@@ -240,16 +241,23 @@ export function TicketFlow({
                 {t("uploadReceipt")}
               </Button>
               {ticket.status === "PENDING_PAYMENT" && (
-                <Button
-                  onClick={cancelTicket}
-                  disabled={loading}
-                  variant="outline"
-                  size="lg"
-                  className="gap-1.5"
-                >
-                  <X className="size-4" />
-                  {t("cancelRequest")}
-                </Button>
+                <ConfirmDialog
+                  trigger={
+                    <Button
+                      disabled={loading}
+                      variant="outline"
+                      size="lg"
+                      className="gap-1.5"
+                    >
+                      <X className="size-4" />
+                      {t("cancelRequest")}
+                    </Button>
+                  }
+                  title={tc("cancelTicketTitle")}
+                  description={tc("cancelTicketBody")}
+                  confirmLabel={tc("cancelTicketConfirm")}
+                  onConfirm={cancelTicket}
+                />
               )}
             </div>
             <p className="mt-2 text-xs text-muted-foreground">

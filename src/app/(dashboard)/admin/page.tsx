@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
@@ -29,6 +30,11 @@ const DOC_BUCKET = "event-docs";
 
 // Route Cache'i devre dışı bırak: rol kontrolü her istekte güncel veriyle yapılsın.
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("admin.page");
+  return { title: t("title") };
+}
 
 export default async function AdminPage() {
   const t = await getTranslations("admin.page");

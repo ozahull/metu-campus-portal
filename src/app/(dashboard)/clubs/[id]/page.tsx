@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -22,11 +23,30 @@ import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/shared/empty-state";
+import { ImageWithFallback } from "@/components/shared/image-with-fallback";
+import { formatDateTime } from "@/lib/datetime";
 import { cn } from "@/lib/utils";
 import { RSVPButton } from "@/components/shared/rsvp-button";
 import { JoinButton } from "./join-button";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("clubs")
+    .select("name")
+    .eq("id", id)
+    .maybeSingle<{ name: string }>();
+  if (data?.name) return { title: data.name };
+  const t = await getTranslations("clubs");
+  return { title: t("notFoundTitle") };
+}
 
 type Club = {
   id: string;
@@ -65,10 +85,6 @@ export default async function ClubDetailPage({
   const { id } = await params;
   const t = await getTranslations("clubs");
   const locale = await getLocale();
-  const dateFormatter = new Intl.DateTimeFormat(locale, {
-    dateStyle: "long",
-    timeStyle: "short",
-  });
   const supabase = await createClient();
 
   const {
@@ -191,32 +207,26 @@ export default async function ClubDetailPage({
         ) : (
           <>
             {/* Kapak banner'ı */}
-            <div className="mt-4 h-40 w-full overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/30 via-muted to-muted sm:h-52">
-              {club.cover_url && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={club.cover_url}
-                  alt={t("coverAlt", { name: club.name })}
-                  className="size-full object-cover"
-                />
-              )}
+            <div className="relative mt-4 h-40 w-full overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/30 via-muted to-muted sm:h-52">
+              <ImageWithFallback
+                src={club.cover_url}
+                alt={t("coverAlt", { name: club.name })}
+                sizes="(max-width: 1024px) 100vw, 1024px"
+                fallback={null}
+              />
             </div>
 
             {/* Üste binen logo + başlık + aksiyonlar */}
             <div className="relative -mt-12 px-1 sm:px-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div className="flex items-end gap-4">
-                  <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-4 border-background bg-muted text-xl font-bold text-foreground shadow-sm sm:size-24">
-                    {club.logo_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={club.logo_url}
-                        alt={t("logoAlt", { name: club.name })}
-                        className="size-full object-cover"
-                      />
-                    ) : (
-                      initials
-                    )}
+                  <div className="relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-4 border-background bg-muted text-xl font-bold text-foreground shadow-sm sm:size-24">
+                    <ImageWithFallback
+                      src={club.logo_url}
+                      alt={t("logoAlt", { name: club.name })}
+                      sizes="96px"
+                      fallback={<span>{initials}</span>}
+                    />
                   </div>
                   <div className="pb-1">
                     <Badge variant="primary">
@@ -363,7 +373,7 @@ export default async function ClubDetailPage({
                           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
                             <span className="inline-flex items-center gap-1.5">
                               <Clock className="size-3.5 text-primary" />
-                              {dateFormatter.format(new Date(ev.event_date))}
+                              {formatDateTime(ev.event_date, locale, "long")}
                             </span>
                             {ev.location && (
                               <span className="inline-flex items-center gap-1.5">

@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import type { LucideIcon } from "lucide-react";
@@ -12,6 +13,11 @@ import { UpcomingEvents } from "./upcoming-events";
 
 // Route Cache'i devre dışı bırak: her istekte güncel profil/kulüp verisi çekilsin.
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("nav");
+  return { title: t("home") };
+}
 
 type RsvpRow = {
   events: { event_date: string; status: string } | { event_date: string; status: string }[] | null;

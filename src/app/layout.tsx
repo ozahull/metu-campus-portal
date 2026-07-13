@@ -18,8 +18,12 @@ const geistMono = Geist_Mono({
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("meta");
+  const brand = t("title");
   return {
-    title: t("title"),
+    title: {
+      default: brand,
+      template: `%s · ${brand}`,
+    },
     description: t("description"),
   };
 }

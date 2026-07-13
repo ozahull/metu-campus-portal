@@ -215,6 +215,48 @@ export type Database = {
           },
         ]
       }
+      event_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          event_id: string
+          id: string
+          storage_path: string
+          uploader_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          storage_path: string
+          uploader_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          storage_path?: string
+          uploader_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_photos_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_photos_uploader_id_fkey"
+            columns: ["uploader_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           club_id: string
@@ -504,6 +546,7 @@ export type Database = {
         Args: { p_decision: string; p_event_id: string; p_note?: string }
         Returns: string
       }
+      event_photos_notify: { Args: { p_event_id: string }; Returns: number }
       event_submit: { Args: { p_event_id: string }; Returns: string }
       is_club_admin: { Args: { p_club_id: string }; Returns: boolean }
       is_club_advisor: { Args: { p_club_id: string }; Returns: boolean }

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { RSVPButton } from "@/components/shared/rsvp-button";
 import { AddToCalendar } from "./add-to-calendar";
+import { EventPhotoWall, type EventPhoto } from "./event-photo-wall";
 import { TicketFlow, type MyTicket } from "./ticket-flow";
 import { formatPrice } from "@/lib/ticket-status";
 import { formatDateTime } from "@/lib/datetime";
@@ -37,6 +38,7 @@ type EventClub = {
   name: string;
   iban: string | null;
   ticket_enabled: boolean;
+  advisor_id: string | null;
 };
 
 type EventDetail = {
@@ -71,7 +73,7 @@ export default async function EventDetailPage({
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, title, description, event_date, location, status, club_id, ticket_price, ticket_deadline, clubs(id, name, iban, ticket_enabled), event_attendees(user_id)",
+      "id, title, description, event_date, location, status, club_id, ticket_price, ticket_deadline, clubs(id, name, iban, ticket_enabled, advisor_id), event_attendees(user_id)",
     )
     .eq("id", id)
     .maybeSingle<EventDetail>();
@@ -97,6 +99,42 @@ export default async function EventDetailPage({
   // (ticket_price tanımlı ve > 0) gösterilir. Ücretsiz etkinlikte klasik RSVP
   // korunur — aksi halde ücretsizde gereksiz dekont akışı tetikleniyor.
   const ticketingOn = Boolean(club?.ticket_enabled) && isPaid;
+
+  // Etkinlik geçmişse fotoğraf duvarı gösterilir. Yetki (yükle/sil): kulübün
+  // başkanı/danışmanı/okul.
+  const isPast = new Date(data.event_date).getTime() < Date.now();
+  const { data: profileRow } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  const isSuperAdmin =
+    profileRow?.role?.toString().trim().toUpperCase() === "SUPER_ADMIN";
+  const { data: myMembership } = await supabase
+    .from("club_members")
+    .select("role")
+    .eq("club_id", data.club_id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const isClubAdmin = myMembership?.role?.toString().toUpperCase() === "ADMIN";
+  const isClubAdvisor = club?.advisor_id === user.id;
+  const canManagePhotos = isSuperAdmin || isClubAdmin || isClubAdvisor;
+
+  let photos: EventPhoto[] = [];
+  if (isPast) {
+    const { data: photoRows } = await supabase
+      .from("event_photos")
+      .select("id, storage_path, caption")
+      .eq("event_id", data.id)
+      .order("created_at", { ascending: false });
+    photos = (photoRows ?? []).map((p) => ({
+      id: p.id,
+      storage_path: p.storage_path,
+      caption: p.caption,
+      url: supabase.storage.from("club-images").getPublicUrl(p.storage_path).data
+        .publicUrl,
+    }));
+  }
 
   // Kullanıcının bu etkinlik için biletini çek (varsa).
   let myTicket: MyTicket | null = null;
@@ -210,6 +248,16 @@ export default async function EventDetailPage({
               {data.description}
             </p>
           </section>
+        )}
+
+        {isPast && (
+          <div className="mt-6">
+            <EventPhotoWall
+              eventId={data.id}
+              photos={photos}
+              canManage={canManagePhotos}
+            />
+          </div>
         )}
 
         <div className="mt-6">

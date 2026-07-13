@@ -43,7 +43,8 @@
       "EVENT_NEW": "Yeni etkinlik",
       "EVENT_REMINDER": "Etkinlik hatırlatıcısı",
       "CLUB_ANNOUNCEMENT": "Duyuru",
-      "MEMBERSHIP": "Kulübe hoş geldiniz"
+      "MEMBERSHIP": "Kulübe hoş geldiniz",
+      "EVENT_PHOTOS": "Etkinlik fotoğrafları"
     },
     "prefs": {
       "title": "Bildirim Tercihleri",
@@ -274,6 +275,8 @@
     "whatsappJoinTitle": "WhatsApp Grubu",
     "whatsappJoinDesc": "Kulüp üyelerine özel gruba katılın.",
     "whatsappJoin": "Gruba katıl",
+    "galleryTitle": "Galeri",
+    "galleryAlt": "Etkinlik karesi",
     "upcomingEvents": "Yaklaşan Etkinlikler",
     "noEvents": "Henüz etkinlik bulunmuyor",
     "membersTitle": "Yönetim & Üyeler",
@@ -491,7 +494,10 @@
     "deleteDocConfirm": "Belgeyi sil",
     "cancelTicketTitle": "Bileti iptal et",
     "cancelTicketBody": "Bilet talebiniz iptal edilecek. Dilerseniz daha sonra yeniden talep oluşturabilirsiniz.",
-    "cancelTicketConfirm": "Talebi iptal et"
+    "cancelTicketConfirm": "Talebi iptal et",
+    "deletePhotoTitle": "Fotoğrafı sil",
+    "deletePhotoBody": "Bu fotoğraf kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+    "deletePhotoConfirm": "Fotoğrafı sil"
   },
   "admin": {
     "page": {
@@ -598,5 +604,25 @@
     "checkedInMessage": "Giriş yapıldı",
     "successToast": "Giriş: {name}",
     "successFallback": "kullanıcı"
+  },
+  "photos": {
+    "title": "Etkinlikten Kareler",
+    "upload": "Fotoğraf Yükle",
+    "empty": "Bu etkinlikten henüz kare paylaşılmadı.",
+    "emptyManager": "Etkinlikten kareler yükleyin (en fazla 10, her biri ~5MB).",
+    "openPhoto": "Fotoğrafı büyüt",
+    "photoAlt": "Etkinlik fotoğrafı",
+    "deleteAria": "Fotoğrafı sil",
+    "prev": "Önceki",
+    "next": "Sonraki",
+    "toasts": {
+      "tooMany": "En fazla {max} fotoğraf yükleyebilirsiniz.",
+      "tooBig": "Her fotoğraf en fazla ~5MB olmalı.",
+      "uploadError": "Yüklenemedi: {message}",
+      "saveError": "Kaydedilemedi: {message}",
+      "uploaded": "{count} fotoğraf yüklendi",
+      "deleteError": "Silinemedi: {message}",
+      "deleted": "Fotoğraf silindi"
+    }
   }
 }

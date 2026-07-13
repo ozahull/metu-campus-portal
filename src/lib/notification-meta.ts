@@ -8,6 +8,7 @@ import {
   CalendarCheck,
   CalendarPlus,
   Clock,
+  Images,
   Megaphone,
   UserRoundCheck,
   type LucideIcon,
@@ -29,6 +30,7 @@ const ICONS: Record<string, LucideIcon> = {
   EVENT_REMINDER: Clock,
   CLUB_ANNOUNCEMENT: Megaphone,
   MEMBERSHIP: UserRoundCheck,
+  EVENT_PHOTOS: Images,
 };
 
 export function notificationIcon(type: string): LucideIcon {

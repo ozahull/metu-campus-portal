@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -8,6 +9,7 @@ import {
   CalendarDays,
   Clock,
   ExternalLink,
+  Images,
   Info,
   Mail,
   MapPin,
@@ -164,6 +166,26 @@ export default async function ClubDetailPage({
   }
 
   const events = (eventsRaw ?? []) as ClubEvent[];
+
+  // Galeri şeridi: kulübün etkinliklerinden son kareler (RLS: yalnız APPROVED
+  // etkinliklerin fotoğrafları herkese görünür).
+  const { data: galleryRaw } = await supabase
+    .from("event_photos")
+    .select("id, storage_path, event_id, events!inner(club_id)")
+    .eq("events.club_id", id)
+    .order("created_at", { ascending: false })
+    .limit(8);
+  const gallery = ((galleryRaw ?? []) as unknown as {
+    id: string;
+    storage_path: string;
+    event_id: string;
+  }[]).map((g) => ({
+    id: g.id,
+    event_id: g.event_id,
+    url: supabase.storage.from("club-images").getPublicUrl(g.storage_path).data
+      .publicUrl,
+  }));
+
   const initials = club?.name.slice(0, 2).toUpperCase() ?? "";
   // NOT: whatsapp_url genel iletişim listesinde GÖSTERİLMEZ — WhatsApp grup
   // daveti yalnızca onaylı üyeye özel bir buton olarak sunulur (spam koruması).
@@ -327,6 +349,33 @@ export default async function ClubDetailPage({
                       : t("noDescription")}
                   </p>
                 </section>
+
+                {gallery.length > 0 && (
+                  <section className="rounded-xl border border-border bg-card p-5">
+                    <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+                      <Images className="size-4 text-primary" />
+                      {t("galleryTitle")}
+                    </h2>
+                    <ul className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:thin]">
+                      {gallery.map((g) => (
+                        <li key={g.id} className="shrink-0">
+                          <Link
+                            href={`/events/${g.event_id}`}
+                            className="relative block size-24 overflow-hidden rounded-lg border border-border bg-muted transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          >
+                            <Image
+                              src={g.url}
+                              alt={t("galleryAlt")}
+                              fill
+                              sizes="96px"
+                              className="object-cover"
+                            />
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
 
                 {club.vision?.trim() && (
                   <section className="rounded-xl border border-border bg-card p-5">

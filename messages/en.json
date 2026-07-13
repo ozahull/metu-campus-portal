@@ -43,7 +43,8 @@
       "EVENT_NEW": "New event",
       "EVENT_REMINDER": "Event reminder",
       "CLUB_ANNOUNCEMENT": "Announcement",
-      "MEMBERSHIP": "Welcome to the club"
+      "MEMBERSHIP": "Welcome to the club",
+      "EVENT_PHOTOS": "Event photos"
     },
     "prefs": {
       "title": "Notification Preferences",
@@ -274,6 +275,8 @@
     "whatsappJoinTitle": "WhatsApp Group",
     "whatsappJoinDesc": "Join the group exclusive to club members.",
     "whatsappJoin": "Join group",
+    "galleryTitle": "Gallery",
+    "galleryAlt": "Event snapshot",
     "upcomingEvents": "Upcoming Events",
     "noEvents": "No events yet",
     "membersTitle": "Management & Members",
@@ -491,7 +494,10 @@
     "deleteDocConfirm": "Delete document",
     "cancelTicketTitle": "Cancel ticket",
     "cancelTicketBody": "Your ticket request will be cancelled. You can request again later if you wish.",
-    "cancelTicketConfirm": "Cancel request"
+    "cancelTicketConfirm": "Cancel request",
+    "deletePhotoTitle": "Delete photo",
+    "deletePhotoBody": "This photo will be permanently deleted. This cannot be undone.",
+    "deletePhotoConfirm": "Delete photo"
   },
   "admin": {
     "page": {
@@ -598,5 +604,25 @@
     "checkedInMessage": "Checked in",
     "successToast": "Checked in: {name}",
     "successFallback": "user"
+  },
+  "photos": {
+    "title": "Event Snapshots",
+    "upload": "Upload Photos",
+    "empty": "No snapshots from this event yet.",
+    "emptyManager": "Upload snapshots from the event (max 10, ~5MB each).",
+    "openPhoto": "Enlarge photo",
+    "photoAlt": "Event photo",
+    "deleteAria": "Delete photo",
+    "prev": "Previous",
+    "next": "Next",
+    "toasts": {
+      "tooMany": "You can upload at most {max} photos.",
+      "tooBig": "Each photo must be at most ~5MB.",
+      "uploadError": "Could not upload: {message}",
+      "saveError": "Could not save: {message}",
+      "uploaded": "{count} photos uploaded",
+      "deleteError": "Could not delete: {message}",
+      "deleted": "Photo deleted"
+    }
   }
 }

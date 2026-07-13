@@ -53,15 +53,19 @@ function DropdownMenuGroup({ ...props }: MenuPrimitive.Group.Props) {
   return <MenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />
 }
 
+// NOT: Base UI'da MenuPrimitive.GroupLabel yalnızca <Menu.Group> içinde
+// yaşayabilir (aksi halde "MenuGroupContext is missing" runtime crash). Label
+// burada tüm menünün başlığı olarak (grup semantiği olmadan) kullanıldığından
+// düz <div>'e alındı — Radix tabanlı shadcn'de Label zaten stilli bir div'dir.
 function DropdownMenuLabel({
   className,
   inset,
   ...props
-}: MenuPrimitive.GroupLabel.Props & {
+}: React.ComponentProps<"div"> & {
   inset?: boolean
 }) {
   return (
-    <MenuPrimitive.GroupLabel
+    <div
       data-slot="dropdown-menu-label"
       data-inset={inset}
       className={cn(

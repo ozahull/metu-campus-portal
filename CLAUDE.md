@@ -40,6 +40,9 @@ token'lar üzerinden (bkz. §8).
   - Bunun pratik sonucu: `<Button asChild>` ÇALIŞMAZ. Bir Link'i buton
     gibi göstermek için `buttonVariants()` + `cn()` kullan:
     `<Link className={cn(buttonVariants({variant,size}), "...")}>`
+  - Base UI'da `Menu.GroupLabel`/`DropdownMenuLabel` mutlaka `<Menu.Group>`
+    (DropdownMenuGroup) içinde olmalı; grupsuz kullanım "MenuGroupContext is
+    missing" runtime crash'i verir. (Bu projede Label düz `<div>`'e alındı.)
   - Base color: slate (globals.css OKLCH değişkenleri slate'e ayarlı)
 - **Auth & DB:** Supabase (@supabase/supabase-js + @supabase/ssr)
   - Supabase proje ref: **zmnmdcuvdrvgdkdcaxjj** (URL: https://zmnmdcuvdrvgdkdcaxjj.supabase.co)

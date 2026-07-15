@@ -71,7 +71,7 @@ export default async function ClubManagePage({
   const { data: club } = await supabase
     .from("clubs")
     .select(
-      "id, name, category, description, vision, logo_url, cover_url, contact_email, contact_phone, whatsapp_url, instagram_url, iban, ticket_enabled, advisor_id",
+      "id, name, category, description, vision, logo_url, cover_url, contact_email, contact_phone, whatsapp_url, instagram_url, ticket_enabled, advisor_id",
     )
     .eq("id", id)
     .maybeSingle<ClubInfo & { advisor_id: string | null }>();
@@ -108,7 +108,7 @@ export default async function ClubManagePage({
   const { data: eventsRaw } = await supabase
     .from("events")
     .select(
-      "id, title, description, event_date, location, status, review_note, ticket_price, ticket_capacity, ticket_deadline",
+      "id, title, description, event_date, location, status, review_note, ticket_capacity, ticket_deadline",
     )
     .eq("club_id", id)
     .order("event_date", { ascending: true });

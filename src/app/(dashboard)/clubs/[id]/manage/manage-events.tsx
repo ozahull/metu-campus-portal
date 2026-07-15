@@ -44,7 +44,6 @@ export type ManageEvent = {
   location: string | null;
   status: string;
   review_note: string | null;
-  ticket_price: number | null;
   ticket_capacity: number | null;
   ticket_deadline: string | null;
 };

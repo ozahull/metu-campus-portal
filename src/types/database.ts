@@ -119,7 +119,6 @@ export type Database = {
           contact_phone: string | null
           cover_url: string | null
           description: string | null
-          iban: string | null
           id: string
           instagram_url: string | null
           logo_url: string | null
@@ -136,7 +135,6 @@ export type Database = {
           contact_phone?: string | null
           cover_url?: string | null
           description?: string | null
-          iban?: string | null
           id?: string
           instagram_url?: string | null
           logo_url?: string | null
@@ -153,7 +151,6 @@ export type Database = {
           contact_phone?: string | null
           cover_url?: string | null
           description?: string | null
-          iban?: string | null
           id?: string
           instagram_url?: string | null
           logo_url?: string | null
@@ -306,7 +303,6 @@ export type Database = {
           status: string
           ticket_capacity: number | null
           ticket_deadline: string | null
-          ticket_price: number | null
           title: string
         }
         Insert: {
@@ -321,7 +317,6 @@ export type Database = {
           status?: string
           ticket_capacity?: number | null
           ticket_deadline?: string | null
-          ticket_price?: number | null
           title: string
         }
         Update: {
@@ -336,7 +331,6 @@ export type Database = {
           status?: string
           ticket_capacity?: number | null
           ticket_deadline?: string | null
-          ticket_price?: number | null
           title?: string
         }
         Relationships: [
@@ -473,9 +467,6 @@ export type Database = {
           created_at: string
           event_id: string
           id: string
-          receipt_url: string | null
-          reviewed_at: string | null
-          reviewed_by: string | null
           status: string
           token: string
           updated_at: string
@@ -486,9 +477,6 @@ export type Database = {
           created_at?: string
           event_id: string
           id?: string
-          receipt_url?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
           status?: string
           token?: string
           updated_at?: string
@@ -499,9 +487,6 @@ export type Database = {
           created_at?: string
           event_id?: string
           id?: string
-          receipt_url?: string | null
-          reviewed_at?: string | null
-          reviewed_by?: string | null
           status?: string
           token?: string
           updated_at?: string
@@ -513,13 +498,6 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tickets_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -639,10 +617,6 @@ export type Database = {
         Args: { p_scope: string }
         Returns: undefined
       }
-      ticket_approve: {
-        Args: { p_decision: string; p_note?: string; p_ticket_id: string }
-        Returns: undefined
-      }
       ticket_checkin: {
         Args: { p_token: string }
         Returns: {
@@ -653,10 +627,6 @@ export type Database = {
       }
       ticket_issue: {
         Args: { p_event: string }
-        Returns: undefined
-      }
-      ticket_submit_receipt: {
-        Args: { p_receipt_url: string; p_ticket_id: string }
         Returns: undefined
       }
     }

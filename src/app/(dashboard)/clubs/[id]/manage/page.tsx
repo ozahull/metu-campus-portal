@@ -31,20 +31,14 @@ type RosterRow = {
 };
 
 type TicketRow = {
-  id: string;
   status: string;
-  receipt_url: string | null;
-  user_id: string;
   event_id: string;
-  created_at: string;
-  profile: { full_name: string | null } | { full_name: string | null }[] | null;
   events:
     | { title: string; ticket_capacity: number | null }
     | { title: string; ticket_capacity: number | null }[]
     | null;
 };
 
-const RECEIPT_BUCKET = "receipts";
 const DOC_BUCKET = "event-docs";
 
 type EventDocumentRow = {
@@ -168,18 +162,17 @@ export default async function ClubManagePage({
     },
   );
 
-  // Biletler: bu kulübün etkinliklerine ait biletler (events!inner ile kulübe filtre).
+  // Biletler: bu kulübün etkinliklerine ait katılım biletleri (salt-okunur
+  // özet — ödeme/dekont yok). events!inner ile kulübe filtre.
   const { data: ticketRaw } = await supabase
     .from("tickets")
-    .select(
-      "id, status, receipt_url, user_id, event_id, created_at, profile:user_id(full_name), events!inner(title, club_id, ticket_capacity)",
-    )
+    .select("status, event_id, events!inner(title, club_id, ticket_capacity)")
     .eq("events.club_id", id)
     .order("created_at", { ascending: true });
 
   const ticketRows = (ticketRaw ?? []) as unknown as TicketRow[];
 
-  // Etkinlik bazlı grupla: bekleyen (SUBMITTED) + onaylı/giriş sayacı.
+  // Etkinlik bazlı grupla: verilen bilet (APPROVED+CHECKED_IN) + giriş sayacı.
   const groupMap = new Map<string, EventTicketGroup>();
   for (const t of ticketRows) {
     const ev = unwrap(t.events);
@@ -190,34 +183,20 @@ export default async function ClubManagePage({
         eventId: t.event_id,
         title: ev.title,
         capacity: ev.ticket_capacity,
-        approvedCount: 0,
+        issuedCount: 0,
         checkedInCount: 0,
-        pending: [],
       };
       groupMap.set(t.event_id, g);
     }
-    if (t.status === "APPROVED") g.approvedCount += 1;
-    else if (t.status === "CHECKED_IN") {
-      g.approvedCount += 1;
-      g.checkedInCount += 1;
-    } else if (t.status === "SUBMITTED") {
-      // Dekontu kısa ömürlü signed URL ile göster (public URL ASLA).
-      let receiptSignedUrl: string | null = null;
-      if (t.receipt_url) {
-        const { data: signed } = await supabase.storage
-          .from(RECEIPT_BUCKET)
-          .createSignedUrl(t.receipt_url, 120);
-        receiptSignedUrl = signed?.signedUrl ?? null;
-      }
-      g.pending.push({
-        id: t.id,
-        full_name: unwrap(t.profile)?.full_name ?? null,
-        receiptSignedUrl,
-      });
+    if (t.status === "APPROVED" || t.status === "CHECKED_IN") {
+      g.issuedCount += 1;
+      if (t.status === "CHECKED_IN") g.checkedInCount += 1;
     }
   }
   const ticketGroups = Array.from(groupMap.values());
-  const hasTicketing = ticketGroups.length > 0;
+  // OPT-IN: check-in sekmesi/linki kulüp katılım biletini açtıysa görünür
+  // (eski "dekont var mı" koşulundan bağımsız — giriş noktası kaybolmasın).
+  const hasTicketing = club.ticket_enabled;
 
   return (
     // Dil B "Sessiz Verimlilik": yönetim yüzeyi surface-admin ile beyaz/nötr

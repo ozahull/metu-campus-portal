@@ -472,6 +472,8 @@
       }
     },
     "tickets": {
+      "empty": "No attendance passes issued for this club yet.",
+      "issued": "{count} passes",
       "approved": "{count} approved",
       "capacity": " / {count} capacity",
       "checkedIn": "{count} checked in",

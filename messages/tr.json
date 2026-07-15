@@ -472,6 +472,8 @@
       }
     },
     "tickets": {
+      "empty": "Bu kulüpte henüz katılım bileti verilmedi.",
+      "issued": "{count} bilet",
       "approved": "{count} onaylı",
       "capacity": " / {count} kapasite",
       "checkedIn": "{count} giriş",

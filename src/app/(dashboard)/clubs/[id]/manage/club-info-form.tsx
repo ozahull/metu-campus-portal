@@ -34,7 +34,6 @@ export type ClubInfo = {
   contact_phone: string | null;
   whatsapp_url: string | null;
   instagram_url: string | null;
-  iban: string | null;
   ticket_enabled: boolean;
 };
 
@@ -53,7 +52,6 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
     contact_phone: club.contact_phone ?? "",
     whatsapp_url: club.whatsapp_url ?? "",
     instagram_url: club.instagram_url ?? "",
-    iban: club.iban ?? "",
   });
   const [ticketEnabled, setTicketEnabled] = useState(club.ticket_enabled);
 
@@ -69,11 +67,6 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
     e.preventDefault();
     if (form.name.trim().length === 0) {
       toast.error(t("toasts.nameRequired"));
-      return;
-    }
-    // Bilet sistemi açıkken IBAN zorunlu (ödeme yapılacak hesap olmadan satış anlamsız).
-    if (ticketEnabled && orNull(form.iban) === null) {
-      toast.error(t("toasts.ibanRequired"));
       return;
     }
 
@@ -92,7 +85,6 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
         contact_phone: orNull(form.contact_phone),
         whatsapp_url: orNull(form.whatsapp_url),
         instagram_url: orNull(form.instagram_url),
-        iban: orNull(form.iban),
         ticket_enabled: ticketEnabled,
       })
       .eq("id", club.id);
@@ -199,21 +191,6 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
               )}
             />
           </button>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="iban">
-            {t("iban")}{" "}
-            {ticketEnabled && <span className="text-primary">*</span>}
-          </Label>
-          <Input
-            id="iban"
-            placeholder="TR00 0000 0000 0000 0000 0000 00"
-            value={form.iban}
-            onChange={(e) => set("iban", e.target.value)}
-            disabled={loading}
-            className="font-mono"
-          />
         </div>
       </div>
 

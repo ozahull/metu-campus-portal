@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
 import { statusMeta } from "@/lib/event-status";
 import { formatDateTime } from "@/lib/datetime";
 import { Button } from "@/components/ui/button";
@@ -94,8 +93,6 @@ export function ManageEvents({
   const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [location, setLocation] = useState("");
-  const [isPaid, setIsPaid] = useState(false);
-  const [ticketPrice, setTicketPrice] = useState("");
   const [ticketCapacity, setTicketCapacity] = useState("");
   const [ticketDeadline, setTicketDeadline] = useState("");
 
@@ -105,8 +102,6 @@ export function ManageEvents({
     setDescription("");
     setEventDate("");
     setLocation("");
-    setIsPaid(false);
-    setTicketPrice("");
     setTicketCapacity("");
     setTicketDeadline("");
     setOpen(true);
@@ -118,8 +113,6 @@ export function ManageEvents({
     setDescription(ev.description ?? "");
     setEventDate(toLocalInput(ev.event_date));
     setLocation(ev.location ?? "");
-    setIsPaid(ev.ticket_price !== null && Number(ev.ticket_price) > 0);
-    setTicketPrice(ev.ticket_price !== null ? String(ev.ticket_price) : "");
     setTicketCapacity(
       ev.ticket_capacity !== null ? String(ev.ticket_capacity) : "",
     );
@@ -138,43 +131,27 @@ export function ManageEvents({
       return;
     }
 
-    // Bilet alanları (yalnızca kulüp bilet sistemi açıkken yazılır).
+    // Bilet alanları (yalnızca kulüp katılım bileti sistemi açıkken yazılır).
+    // Ödeme yok — fiyat kaldırıldı; yalnız kontenjan + son tarih.
     let ticketFields: {
-      ticket_price: number | null;
       ticket_capacity: number | null;
       ticket_deadline: string | null;
     } | null = null;
     if (ticketEnabled) {
-      if (!isPaid) {
-        // Ücretsiz: tüm bilet alanları temizlenir.
-        ticketFields = {
-          ticket_price: null,
-          ticket_capacity: null,
-          ticket_deadline: null,
-        };
-      } else {
-        // Ücretli: fiyat zorunlu ve > 0.
-        const price = Number(ticketPrice);
-        if (ticketPrice.trim() === "" || !Number.isFinite(price) || price <= 0) {
-          toast.error(t("toasts.priceInvalid"));
+      let capacity: number | null = null;
+      if (ticketCapacity.trim() !== "") {
+        capacity = Number.parseInt(ticketCapacity, 10);
+        if (!Number.isInteger(capacity) || capacity <= 0) {
+          toast.error(t("toasts.capacityInvalid"));
           return;
         }
-        let capacity: number | null = null;
-        if (ticketCapacity.trim() !== "") {
-          capacity = Number.parseInt(ticketCapacity, 10);
-          if (!Number.isInteger(capacity) || capacity <= 0) {
-            toast.error(t("toasts.capacityInvalid"));
-            return;
-          }
-        }
-        ticketFields = {
-          ticket_price: price,
-          ticket_capacity: capacity,
-          ticket_deadline: ticketDeadline
-            ? new Date(ticketDeadline).toISOString()
-            : null,
-        };
       }
+      ticketFields = {
+        ticket_capacity: capacity,
+        ticket_deadline: ticketDeadline
+          ? new Date(ticketDeadline).toISOString()
+          : null,
+      };
     }
 
     setLoading(true);
@@ -492,57 +469,16 @@ export function ManageEvents({
                   {t("ticketSettings")}
                 </p>
 
-                {/* Ücretsiz / Ücretli seçimi (varsayılan: Ücretsiz) */}
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsPaid(false)}
-                    disabled={loading}
-                    aria-pressed={!isPaid}
-                    className={cn(
-                      "rounded-lg border px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
-                      !isPaid
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border bg-card text-muted-foreground hover:bg-accent",
-                    )}
-                  >
-                    {t("free")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsPaid(true)}
-                    disabled={loading}
-                    aria-pressed={isPaid}
-                    className={cn(
-                      "rounded-lg border px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
-                      isPaid
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border bg-card text-muted-foreground hover:bg-accent",
-                    )}
-                  >
-                    {t("paid")}
-                  </button>
+                {/* Ödeme yok — yalnız kontenjan (opsiyonel) + son tarih. */}
+                <div className="space-y-2">
+                  <Label htmlFor="ev-capacity">{t("capacity")}</Label>
+                  <Input id="ev-capacity" type="number" min="1" step="1" inputMode="numeric" placeholder={t("capacityPlaceholder")} value={ticketCapacity} onChange={(e) => setTicketCapacity(e.target.value)} disabled={loading} />
                 </div>
-
-                {isPaid && (
-                  <>
-                    <div className="space-y-2">
-                      <Label htmlFor="ev-price">
-                        {t("price")} <span className="text-primary">*</span>
-                      </Label>
-                      <Input id="ev-price" type="number" min="0" step="0.01" inputMode="decimal" placeholder={t("pricePlaceholder")} value={ticketPrice} onChange={(e) => setTicketPrice(e.target.value)} disabled={loading} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="ev-capacity">{t("capacity")}</Label>
-                      <Input id="ev-capacity" type="number" min="1" step="1" inputMode="numeric" placeholder={t("capacityPlaceholder")} value={ticketCapacity} onChange={(e) => setTicketCapacity(e.target.value)} disabled={loading} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="ev-deadline">{t("deadline")}</Label>
-                      <Input id="ev-deadline" type="datetime-local" className="[color-scheme:light] dark:[color-scheme:dark]" value={ticketDeadline} onChange={(e) => setTicketDeadline(e.target.value)} disabled={loading} />
-                      <p className="text-xs text-muted-foreground">{t("deadlineHint")}</p>
-                    </div>
-                  </>
-                )}
+                <div className="space-y-2">
+                  <Label htmlFor="ev-deadline">{t("deadline")}</Label>
+                  <Input id="ev-deadline" type="datetime-local" className="[color-scheme:light] dark:[color-scheme:dark]" value={ticketDeadline} onChange={(e) => setTicketDeadline(e.target.value)} disabled={loading} />
+                  <p className="text-xs text-muted-foreground">{t("deadlineHint")}</p>
+                </div>
               </div>
             )}
 

@@ -101,24 +101,21 @@ export function AdminAnalytics({
   return (
     <section className="space-y-6">
       <header className="flex items-center gap-2">
-        <BarChart3 className="size-5 text-primary" />
-        <h2 className="text-xl font-bold tracking-tight">{t("heading")}</h2>
+        <BarChart3 className="size-4 text-muted-foreground" />
+        <h2 className="text-base font-semibold tracking-tight">{t("heading")}</h2>
       </header>
 
-      {/* Metrik kartları */}
+      {/* Metrik kartları (Dil B: nötr sayı öne, UPPERCASE etiket, tabular-nums) */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {metricDefs.map(({ key, labelKey, icon: Icon }) => (
-          <Card
-            key={key}
-            className="transition-colors hover:border-primary/40"
-          >
+          <Card key={key}>
             <CardContent className="flex flex-col gap-2 p-4">
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                <Icon className="size-3.5 text-primary" />
+              <span className="inline-flex items-center gap-1.5 text-[0.7rem] font-medium tracking-wide text-muted-foreground uppercase">
+                <Icon className="size-3.5" />
                 {t(labelKey)}
               </span>
-              <span className="text-3xl font-bold tracking-tight text-primary">
-                {overview ? overview[key].toLocaleString("tr-TR") : "—"}
+              <span className="text-3xl font-semibold tracking-tight text-foreground tabular-nums">
+                {overview ? overview[key].toLocaleString(locale) : "—"}
               </span>
             </CardContent>
           </Card>
@@ -128,8 +125,8 @@ export function AdminAnalytics({
       {/* Üye büyüme grafiği */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-            <TrendingUp className="size-5 text-primary" />
+          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+            <TrendingUp className="size-4 text-muted-foreground" />
             {t("growthTitle")}
           </CardTitle>
           <CardDescription>
@@ -200,8 +197,8 @@ export function AdminAnalytics({
       {/* Kulüp performans tablosu */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-            <Users2 className="size-5 text-primary" />
+          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+            <Users2 className="size-4 text-muted-foreground" />
             {t("clubsTitle")}
           </CardTitle>
           <CardDescription>
@@ -215,7 +212,7 @@ export function AdminAnalytics({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border text-left text-xs text-muted-foreground">
+                  <tr className="border-b border-border text-left text-[0.7rem] tracking-wide text-muted-foreground uppercase">
                     <th className="py-2 pr-3 font-medium">{t("colClub")}</th>
                     <th className="px-3 py-2 text-right font-medium">{t("colMember")}</th>
                     <th className="px-3 py-2 text-right font-medium">{t("colEvent")}</th>
@@ -227,20 +224,20 @@ export function AdminAnalytics({
                   {clubs.map((c) => (
                     <tr
                       key={c.club_id}
-                      className="border-b border-border transition-colors last:border-0 hover:bg-muted/40"
+                      className="border-b border-border transition-colors last:border-0 hover:bg-secondary/40"
                     >
                       <td className="py-2.5 pr-3 font-medium">{c.club_name}</td>
-                      <td className="px-3 py-2.5 text-right text-muted-foreground">
-                        {Number(c.member_count).toLocaleString("tr-TR")}
+                      <td className="px-3 py-2.5 text-right text-muted-foreground tabular-nums">
+                        {Number(c.member_count).toLocaleString(locale)}
                       </td>
-                      <td className="px-3 py-2.5 text-right text-muted-foreground">
-                        {Number(c.event_count).toLocaleString("tr-TR")}
+                      <td className="px-3 py-2.5 text-right text-muted-foreground tabular-nums">
+                        {Number(c.event_count).toLocaleString(locale)}
                       </td>
-                      <td className="px-3 py-2.5 text-right text-muted-foreground">
-                        {Number(c.approved_event_count).toLocaleString("tr-TR")}
+                      <td className="px-3 py-2.5 text-right text-muted-foreground tabular-nums">
+                        {Number(c.approved_event_count).toLocaleString(locale)}
                       </td>
-                      <td className="py-2.5 pl-3 text-right text-muted-foreground">
-                        {Number(c.total_checkins).toLocaleString("tr-TR")}
+                      <td className="py-2.5 pl-3 text-right text-muted-foreground tabular-nums">
+                        {Number(c.total_checkins).toLocaleString(locale)}
                       </td>
                     </tr>
                   ))}

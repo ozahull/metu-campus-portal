@@ -1,34 +1,20 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import {
-  BarChart3,
-  Building2,
-  ClipboardCheck,
-  FileText,
-  ShieldCheck,
-  UserCog,
-} from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AdminSurface } from "@/components/shared/admin-surface";
 import { PageShell } from "@/components/shared/page-shell";
-import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
-import { NewClubForm } from "./new-club-form";
-import { FairModeToggle } from "./fair-mode-toggle";
-import { AdminAssignments, type Option } from "./admin-assignments";
-import {
-  AdminApprovals,
-  type ClubSetting,
-  type PendingEvent,
-} from "./admin-approvals";
+import { AdminShell } from "./admin-shell";
+import { type Option } from "./admin-assignments";
+import { type PendingEvent } from "./admin-approvals";
+import { type ClubSetting } from "./admin-settings";
 import type { EventDocument } from "../clubs/[id]/manage/event-documents";
 import {
-  AdminAnalytics,
   type ClubStat,
   type MemberGrowthPoint,
   type Overview,
 } from "./admin-analytics";
-import { TermReport } from "./term-report";
 
 const DOC_BUCKET = "event-docs";
 
@@ -189,7 +175,7 @@ export default async function AdminPage() {
     <AdminSurface>
       <PageShell glow={false}>
         <header className="mb-8 flex items-center gap-3">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-secondary text-muted-foreground">
             <ShieldCheck className="size-5" />
           </span>
           <div>
@@ -198,64 +184,17 @@ export default async function AdminPage() {
           </div>
         </header>
 
-        <Tabs defaultValue="approvals">
-          <TabsList>
-            <TabsTab value="approvals">
-              <ClipboardCheck className="size-4" />
-              {t("tabApprovals")}
-              {pending.length > 0 && (
-                <span className="rounded-full bg-primary/15 px-1.5 text-xs text-primary">
-                  {pending.length}
-                </span>
-              )}
-            </TabsTab>
-            <TabsTab value="clubs">
-              <Building2 className="size-4" />
-              {t("tabClubs")}
-            </TabsTab>
-            <TabsTab value="assignments">
-              <UserCog className="size-4" />
-              {t("tabAssignments")}
-            </TabsTab>
-            <TabsTab value="analytics">
-              <BarChart3 className="size-4" />
-              {t("tabAnalytics")}
-            </TabsTab>
-            <TabsTab value="report">
-              <FileText className="size-4" />
-              {t("tabReport")}
-            </TabsTab>
-          </TabsList>
-
-          <TabsPanel value="approvals">
-            <AdminApprovals
-              pending={pending}
-              clubs={clubSettings}
-              userId={user.id}
-            />
-          </TabsPanel>
-
-          <TabsPanel value="clubs" className="space-y-6">
-            <FairModeToggle initialEnabled={fairEnabled} />
-            <NewClubForm />
-          </TabsPanel>
-
-          <TabsPanel value="assignments">
-            <AdminAssignments clubs={clubOptions} users={userOptions} />
-          </TabsPanel>
-
-          <TabsPanel value="analytics">
-            <AdminAnalytics
-              overview={overview}
-              clubs={clubStats}
-              growth={memberGrowth}
-            />
-          </TabsPanel>
-
-          <TabsPanel value="report">
-            <TermReport />
-          </TabsPanel>
-        </Tabs>
+        <AdminShell
+          overview={overview}
+          pending={pending}
+          clubSettings={clubSettings}
+          clubStats={clubStats}
+          memberGrowth={memberGrowth}
+          clubOptions={clubOptions}
+          userOptions={userOptions}
+          fairEnabled={fairEnabled}
+          userId={user.id}
+        />
       </PageShell>
     </AdminSurface>
   );

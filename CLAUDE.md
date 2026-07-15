@@ -497,7 +497,26 @@ RESKIN — İKİ TASARIM DİLİ (R0 altyapısı tamam):
   `globals.css`'e `-webkit-autofill` remap'i (Chrome soğuk mavi autofill zeminini
   token'a bağlar) → login inputları artık sıcak kum. İş mantığı/RLS/route sabit;
   tek veri değişikliği select'e `cover_url` eklemek.
-- Sonraki tur: R4 (admin) — Dil B "Sessiz Verimlilik" yüzeyinin ekran redesign'ı.
+- R4 TAMAM (yönetim paneli Dil B "Sessiz Verimlilik"): /admin yatay Tabs →
+  KALICI SOL SİDEBAR (mobilde yatay sekme barına düşer). Yeni admin-özel
+  navigasyon `admin/admin-tabs.tsx` (Base UI Tabs primitive; paylaşılan Dil A
+  `ui/tabs.tsx`'e DOKUNULMAZ). `admin/admin-shell.tsx` orkestratör: Tabs
+  CONTROLLED (state) — "Genel Bakış → Tümü" linki Onay Kuyruğuna programatik
+  geçsin diye. YENİ ekranlar: `admin-overview.tsx` (Genel Bakış — stat kartları
+  UPPERCASE etiket + `tabular-nums`, Gabarito YOK; bekleyen onay önizlemesi;
+  Fuar Modu anahtarı KULÜPLER formundan buraya taşındı) ve `admin-settings.tsx`
+  (Ayarlar — danışman kapısı `requires_advisor_approval` toggle'ları, Onay
+  Kuyruğundan çıkarıldı). `admin-approvals.tsx` satır-içi kararlı kuyruğa döndü:
+  Onayla=primary, Reddet=destructive `ConfirmDialog` ile (`window.prompt` YOK),
+  Revizyon=nötr satır-içi not editörü; odak satırında ince kırmızı sol çizgi
+  (`focus-within:border-l-primary`). Eski hardcoded `orange-*` Revizyon butonu
+  kaldırıldı. Paneller (analitik/atama/yeni-kulüp) Dil B'ye giydirildi (nötr
+  sayı öne, UPPERCASE + `tabular-nums` tablo başlıkları, dekor kırmızı → nötr).
+  Fuar toggle knob `bg-white`→`bg-primary-foreground` (token). Dönem Raporu +
+  `@media print` remap KORUNDU (dokunulmadı). Navbar HÂLÂ Dil A; surface-admin
+  yalnız /admin kökünde. İş mantığı/RLS/RPC/route DEĞİŞMEDİ.
+  → Sunum minimum kümesi (R0-R1-R2-R4) TAMAM. Kalan: R3 (öğrenci: /clubs listesi,
+  profil, bildirimler, lightbox) + R5 (başkan /manage + QR check-in) sunum sonrası.
 
 ARAYÜZ YENİLEME FAZLARI (tamam): A (iki temalı token altyapısı + switcher) →
 B (iskelet/navigasyon/tema-duyarlı yeniden tasarım) → C0/C1/C2 (primary

@@ -39,7 +39,7 @@ export function FairModeToggle({ initialEnabled }: { initialEnabled: boolean }) 
     <div className="flex items-start justify-between gap-4 rounded-xl border border-border bg-card p-5">
       <div className="min-w-0">
         <p className="inline-flex items-center gap-2 text-sm font-semibold">
-          <Sparkles className="size-4 text-primary" />
+          <Sparkles className="size-4 text-muted-foreground" />
           {t("title")}
         </p>
         <p className="mt-1 text-sm text-muted-foreground">{t("desc")}</p>
@@ -58,7 +58,7 @@ export function FairModeToggle({ initialEnabled }: { initialEnabled: boolean }) 
       >
         <span
           className={cn(
-            "inline-block size-4 transform rounded-full bg-white shadow-sm transition-transform",
+            "inline-block size-4 transform rounded-full bg-primary-foreground shadow-sm transition-transform",
             enabled ? "translate-x-6" : "translate-x-1",
           )}
         />

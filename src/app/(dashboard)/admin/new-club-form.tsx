@@ -56,11 +56,11 @@ export function NewClubForm() {
     <Card className="w-full max-w-lg">
       <CardHeader className="space-y-3">
         <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+          <div className="flex size-10 items-center justify-center rounded-lg border border-border bg-secondary text-muted-foreground">
             <ShieldCheck className="size-5" />
           </div>
           <div>
-            <CardTitle className="text-xl font-semibold tracking-tight">
+            <CardTitle className="text-base font-semibold tracking-tight">
               {t("title")}
             </CardTitle>
             <CardDescription>

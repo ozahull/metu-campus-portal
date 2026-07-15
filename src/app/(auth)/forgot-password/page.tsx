@@ -59,9 +59,9 @@ export default function ForgotPasswordPage() {
 
   return (
     <AuthShell>
-      <Card className="w-full max-w-sm shadow-xl">
+      <Card className="w-full max-w-sm shadow-[0_24px_60px_-28px_color-mix(in_oklab,var(--primary)_40%,transparent)]">
         <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-xl font-semibold tracking-tight text-balance">
+          <CardTitle className="font-display text-2xl font-bold tracking-tight text-balance">
             {t("forgot.title")}
           </CardTitle>
           <CardDescription className="text-pretty">
@@ -99,6 +99,7 @@ export default function ForgotPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
+                  className="h-11"
                   required
                 />
               </div>
@@ -107,7 +108,7 @@ export default function ForgotPasswordPage() {
                 type="submit"
                 size="lg"
                 disabled={loading || email.trim().length === 0}
-                className="w-full gap-2 font-medium"
+                className="h-11 w-full gap-2 rounded-full text-[0.95rem] font-semibold shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-12px_color-mix(in_oklab,var(--primary)_55%,transparent)]"
               >
                 {loading && <Loader2 className="size-4 animate-spin" />}
                 {loading ? t("forgot.submitting") : t("forgot.submit")}
@@ -119,7 +120,7 @@ export default function ForgotPasswordPage() {
         <CardFooter className="justify-center">
           <Link
             href="/login"
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            className="inline-flex items-center gap-1.5 text-sm text-primary underline-offset-4 hover:text-accent-ember hover:underline"
           >
             <ArrowLeft className="size-3.5" />
             {t("forgot.backToLogin")}

@@ -54,12 +54,12 @@ function LoginCard() {
   }
 
   return (
-    <Card className="w-full max-w-sm shadow-xl">
+    <Card className="w-full max-w-sm shadow-[0_24px_60px_-28px_color-mix(in_oklab,var(--primary)_40%,transparent)]">
       <CardHeader className="space-y-3 text-center">
         <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
-          <span className="text-lg font-semibold tracking-tight">KKK</span>
+          <span className="font-display text-lg font-bold tracking-tight">KKK</span>
         </div>
-        <CardTitle className="text-xl font-semibold tracking-tight text-balance">
+        <CardTitle className="font-display text-2xl font-bold tracking-tight text-balance">
           {t("login.title")}
         </CardTitle>
         <CardDescription className="text-pretty">
@@ -90,6 +90,7 @@ function LoginCard() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
+              className="h-11"
               required
             />
           </div>
@@ -99,7 +100,7 @@ function LoginCard() {
               <Label htmlFor="password">{t("login.passwordLabel")}</Label>
               <Link
                 href="/forgot-password"
-                className="text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                className="text-xs font-medium text-primary underline-offset-4 hover:text-accent-ember hover:underline"
               >
                 {t("login.forgotPassword")}
               </Link>
@@ -113,7 +114,7 @@ function LoginCard() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
-                className="pr-10"
+                className="h-11 pr-10"
                 required
               />
               <button
@@ -135,7 +136,7 @@ function LoginCard() {
             type="submit"
             size="lg"
             disabled={loading || email.trim().length === 0 || password.length === 0}
-            className="w-full gap-2 font-medium"
+            className="h-11 w-full gap-2 rounded-full text-[0.95rem] font-semibold shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-12px_color-mix(in_oklab,var(--primary)_55%,transparent)]"
           >
             {loading && <Loader2 className="size-4 animate-spin" />}
             {loading ? t("login.submitting") : t("login.submit")}
@@ -148,7 +149,7 @@ function LoginCard() {
           {t("login.noAccount")}{" "}
           <Link
             href="/register"
-            className="font-medium text-foreground underline-offset-4 hover:underline"
+            className="font-medium text-primary underline-offset-4 hover:text-accent-ember hover:underline"
           >
             {t("login.registerLink")}
           </Link>

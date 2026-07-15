@@ -313,3 +313,24 @@
     break-inside: avoid;
   }
 }
+
+/*
+  KEN BURNS (R1 — auth hero imzası). Kampüs fotoğrafına çok hafif yavaş
+  zoom/pan. YALNIZCA prefers-reduced-motion: no-preference altında çalışır;
+  azaltılmış harekette animasyon tanımlanmaz (statik foto). Ölçek keyframe'de
+  ≥1.06 tutulur ki pan sırasında object-cover kenarları açığa çıkmasın.
+*/
+@media (prefers-reduced-motion: no-preference) {
+  .animate-kenburns {
+    animation: kenburns 32s ease-in-out infinite alternate;
+    will-change: transform;
+  }
+  @keyframes kenburns {
+    from {
+      transform: scale(1.06) translate3d(0, 0, 0);
+    }
+    to {
+      transform: scale(1.16) translate3d(-2%, -2.5%, 0);
+    }
+  }
+}

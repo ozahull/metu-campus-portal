@@ -117,14 +117,14 @@ export default function RegisterPage() {
 
   return (
     <AuthShell>
-      <Card className="w-full max-w-md shadow-xl">
+      <Card className="w-full max-w-md shadow-[0_24px_60px_-28px_color-mix(in_oklab,var(--primary)_40%,transparent)]">
         <CardHeader className="space-y-3 text-center">
           <div
             className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm"
           >
-            <span className="text-lg font-semibold tracking-tight">KKK</span>
+            <span className="font-display text-lg font-bold tracking-tight">KKK</span>
           </div>
-          <CardTitle className="text-xl font-semibold tracking-tight text-balance">
+          <CardTitle className="font-display text-2xl font-bold tracking-tight text-balance">
             {t("register.title")}
           </CardTitle>
           <CardDescription className="text-pretty">
@@ -161,6 +161,7 @@ export default function RegisterPage() {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     disabled={loading}
+                    className="h-11"
                     required
                   />
                 </div>
@@ -173,6 +174,7 @@ export default function RegisterPage() {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     disabled={loading}
+                    className="h-11"
                     required
                   />
                 </div>
@@ -190,6 +192,7 @@ export default function RegisterPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
                   aria-invalid={!emailValid}
+                  className="h-11"
                   required
                 />
                 {!emailValid && (
@@ -210,7 +213,7 @@ export default function RegisterPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
-                    className="pr-10"
+                    className="h-11 pr-10"
                     required
                   />
                   <button
@@ -232,7 +235,7 @@ export default function RegisterPage() {
                 type="submit"
                 size="lg"
                 disabled={loading || !formValid}
-                className="w-full gap-2 font-medium"
+                className="h-11 w-full gap-2 rounded-full text-[0.95rem] font-semibold shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-12px_color-mix(in_oklab,var(--primary)_55%,transparent)]"
               >
                 {loading && <Loader2 className="size-4 animate-spin" />}
                 {loading ? t("register.submitting") : t("register.submit")}
@@ -246,7 +249,7 @@ export default function RegisterPage() {
             {t("register.haveAccount")}{" "}
             <Link
               href="/login"
-              className="font-medium text-foreground underline-offset-4 hover:underline"
+              className="font-medium text-primary underline-offset-4 hover:text-accent-ember hover:underline"
             >
               {t("register.loginLink")}
             </Link>

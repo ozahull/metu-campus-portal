@@ -81,9 +81,9 @@ export default function ResetPasswordPage() {
 
   return (
     <AuthShell>
-      <Card className="w-full max-w-sm shadow-xl">
+      <Card className="w-full max-w-sm shadow-[0_24px_60px_-28px_color-mix(in_oklab,var(--primary)_40%,transparent)]">
         <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-xl font-semibold tracking-tight text-balance">
+          <CardTitle className="font-display text-2xl font-bold tracking-tight text-balance">
             {t("reset.title")}
           </CardTitle>
           <CardDescription className="text-pretty">
@@ -133,7 +133,7 @@ export default function ResetPasswordPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
-                    className="pr-10"
+                    className="h-11 pr-10"
                     required
                   />
                   <button
@@ -161,6 +161,7 @@ export default function ResetPasswordPage() {
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   disabled={loading}
+                  className="h-11"
                   required
                 />
               </div>
@@ -169,7 +170,7 @@ export default function ResetPasswordPage() {
                 type="submit"
                 size="lg"
                 disabled={loading || password.length === 0 || confirm.length === 0}
-                className="w-full gap-2 font-medium"
+                className="h-11 w-full gap-2 rounded-full text-[0.95rem] font-semibold shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-12px_color-mix(in_oklab,var(--primary)_55%,transparent)]"
               >
                 {loading && <Loader2 className="size-4 animate-spin" />}
                 {loading ? t("reset.submitting") : t("reset.submit")}

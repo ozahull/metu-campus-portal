@@ -468,7 +468,17 @@ RESKIN — İKİ TASARIM DİLİ (R0 altyapısı tamam):
   latin-ext), display **Gabarito** (`--font-display`, `font-display` utility —
   başlıklara uygulaması R1-R2). Mono `--font-geist-mono` korunur; `tabular-nums`
   çekirdek utility.
-- Sonraki turlar: R1 (auth), R2 (öğrenci), R4 (admin) — bileşen/ekran redesign'ları.
+- R1 TAMAM (auth sahnesi): `shared/auth-shell.tsx` Dil A imzasına döndü — sol
+  panelde kampüs fotoğrafı (`ImageWithFallback` + `priority`, tek sabit `HERO_SRC`
+  = `/campus/login-hero.jpg`; placeholder foto var, foto silinse bile gradyan tek
+  başına düzgün) + token'lı `color-mix` gün batımı perdesi (primary→ember, altın
+  radial parıltı) + hafif Ken Burns (`.animate-kenburns`, yalnız
+  `prefers-reduced-motion: no-preference`). Formlar (login/register/forgot/reset):
+  Gabarito `font-display` başlıklar, 44px inputlar (`h-11`), pill submit
+  (`rounded-full` + hover lift/`color-mix` ışıma), primary/ember aksan linkler.
+  Eski iki ham dekor (rgba beyaz radial + `bg-white/10`) `color-mix`/`accent-gold`
+  token'a çevrildi. Mobilde üstte ince sıcak gradyan şerit.
+- Sonraki turlar: R2 (öğrenci), R4 (admin) — bileşen/ekran redesign'ları.
 
 ARAYÜZ YENİLEME FAZLARI (tamam): A (iki temalı token altyapısı + switcher) →
 B (iskelet/navigasyon/tema-duyarlı yeniden tasarım) → C0/C1/C2 (primary

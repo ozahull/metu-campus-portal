@@ -10,6 +10,7 @@ import {
   UserCog,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { AdminSurface } from "@/components/shared/admin-surface";
 import { PageShell } from "@/components/shared/page-shell";
 import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
 import { NewClubForm } from "./new-club-form";
@@ -185,75 +186,77 @@ export default async function AdminPage() {
   const fairEnabled = fairRow?.value === "true";
 
   return (
-    <PageShell>
-      <header className="mb-8 flex items-center gap-3">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-          <ShieldCheck className="size-5" />
-        </span>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
-        </div>
-      </header>
+    <AdminSurface>
+      <PageShell glow={false}>
+        <header className="mb-8 flex items-center gap-3">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+            <ShieldCheck className="size-5" />
+          </span>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
+          </div>
+        </header>
 
-      <Tabs defaultValue="approvals">
-        <TabsList>
-          <TabsTab value="approvals">
-            <ClipboardCheck className="size-4" />
-            {t("tabApprovals")}
-            {pending.length > 0 && (
-              <span className="rounded-full bg-primary/15 px-1.5 text-xs text-primary">
-                {pending.length}
-              </span>
-            )}
-          </TabsTab>
-          <TabsTab value="clubs">
-            <Building2 className="size-4" />
-            {t("tabClubs")}
-          </TabsTab>
-          <TabsTab value="assignments">
-            <UserCog className="size-4" />
-            {t("tabAssignments")}
-          </TabsTab>
-          <TabsTab value="analytics">
-            <BarChart3 className="size-4" />
-            {t("tabAnalytics")}
-          </TabsTab>
-          <TabsTab value="report">
-            <FileText className="size-4" />
-            {t("tabReport")}
-          </TabsTab>
-        </TabsList>
+        <Tabs defaultValue="approvals">
+          <TabsList>
+            <TabsTab value="approvals">
+              <ClipboardCheck className="size-4" />
+              {t("tabApprovals")}
+              {pending.length > 0 && (
+                <span className="rounded-full bg-primary/15 px-1.5 text-xs text-primary">
+                  {pending.length}
+                </span>
+              )}
+            </TabsTab>
+            <TabsTab value="clubs">
+              <Building2 className="size-4" />
+              {t("tabClubs")}
+            </TabsTab>
+            <TabsTab value="assignments">
+              <UserCog className="size-4" />
+              {t("tabAssignments")}
+            </TabsTab>
+            <TabsTab value="analytics">
+              <BarChart3 className="size-4" />
+              {t("tabAnalytics")}
+            </TabsTab>
+            <TabsTab value="report">
+              <FileText className="size-4" />
+              {t("tabReport")}
+            </TabsTab>
+          </TabsList>
 
-        <TabsPanel value="approvals">
-          <AdminApprovals
-            pending={pending}
-            clubs={clubSettings}
-            userId={user.id}
-          />
-        </TabsPanel>
+          <TabsPanel value="approvals">
+            <AdminApprovals
+              pending={pending}
+              clubs={clubSettings}
+              userId={user.id}
+            />
+          </TabsPanel>
 
-        <TabsPanel value="clubs" className="space-y-6">
-          <FairModeToggle initialEnabled={fairEnabled} />
-          <NewClubForm />
-        </TabsPanel>
+          <TabsPanel value="clubs" className="space-y-6">
+            <FairModeToggle initialEnabled={fairEnabled} />
+            <NewClubForm />
+          </TabsPanel>
 
-        <TabsPanel value="assignments">
-          <AdminAssignments clubs={clubOptions} users={userOptions} />
-        </TabsPanel>
+          <TabsPanel value="assignments">
+            <AdminAssignments clubs={clubOptions} users={userOptions} />
+          </TabsPanel>
 
-        <TabsPanel value="analytics">
-          <AdminAnalytics
-            overview={overview}
-            clubs={clubStats}
-            growth={memberGrowth}
-          />
-        </TabsPanel>
+          <TabsPanel value="analytics">
+            <AdminAnalytics
+              overview={overview}
+              clubs={clubStats}
+              growth={memberGrowth}
+            />
+          </TabsPanel>
 
-        <TabsPanel value="report">
-          <TermReport />
-        </TabsPanel>
-      </Tabs>
-    </PageShell>
+          <TabsPanel value="report">
+            <TermReport />
+          </TabsPanel>
+        </Tabs>
+      </PageShell>
+    </AdminSurface>
   );
 }

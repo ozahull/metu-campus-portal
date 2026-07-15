@@ -220,7 +220,9 @@ export default async function ClubManagePage({
   const hasTicketing = ticketGroups.length > 0;
 
   return (
-    <main className="relative">
+    // Dil B "Sessiz Verimlilik": yönetim yüzeyi surface-admin ile beyaz/nötr
+    // remap'e döner (navbar Dil A'da kalır). bkz. shared/admin-surface.tsx.
+    <main className="surface-admin relative min-h-svh bg-background text-foreground">
       <div className="mx-auto w-full max-w-4xl px-4 pb-14 sm:px-6 lg:px-8">
         <div className="pt-6">
           <Link

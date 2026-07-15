@@ -7,7 +7,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* Tipografi (R0): gövde Figtree (--font-sans), display Gabarito (--font-display).
+     next/font root layout'ta bu değişkenleri html'e bağlar; utility'ler burada. */
   --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -26,12 +29,16 @@
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-accent-gold: var(--accent-gold);
+  --color-accent-ember: var(--accent-ember);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -55,51 +62,61 @@
 }
 
 /*
-  SEMANTİK TEMA TOKEN'LARI — iki tema (açık: :root, koyu: .dark).
-  Marka çapası METU kırmızısı (#841515 ≈ oklch(0.40 0.14 27)); açık temada
-  doygun/derin kırmızı primary, koyu temada kontrastlı parlak varyant.
-  Nötrler hafif serin gri (hue 285, düşük chroma). Hiçbir bileşen ham renk
-  kullanmaz — yalnızca bu token'lar (bkz. CLAUDE.md §8: "hardcoded renk yasak").
+  SEMANTİK TEMA TOKEN'LARI — İKİ TASARIM DİLİ (bkz. CLAUDE.md §8).
+  Dil A "Kampüs Enerjisi" (öğrenci/global): sıcak kum zemin, METU kırmızısı +
+  ember + gold aksanlar. Açık tema :root, koyu tema (sıcak akşam) .dark.
+  Dil B "Sessiz Verimlilik" (yönetim): .surface-admin kapsam sınıfıyla beyaz/
+  nötr taş grisi remap (aşağıda, print remap'in üstünde).
+  Marka çapası METU kırmızısı (#841515 ≈ oklch(0.40 0.14 27)); primary küçük
+  yüzeylerde okunur olsun diye 0.48'e alınmıştır (beyaz metinle kontrast ~7:1).
+  Hiçbir bileşen ham renk kullanmaz — yalnızca bu token'lar.
 */
 :root {
-  --radius: 0.75rem;
+  /* Dil A kart dili 16px yuvarlaklık; türev radius'lar orantılı kalır. */
+  --radius: 1rem;
 
-  --background: oklch(0.99 0.002 285);
-  --foreground: oklch(0.21 0.006 285);
+  --background: oklch(0.951 0.013 82);
+  --foreground: oklch(0.247 0.024 55);
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.006 285);
-  --card-hover: oklch(0.975 0.003 285);
+  --card: oklch(0.988 0.007 88);
+  --card-foreground: oklch(0.247 0.024 55);
+  --card-hover: oklch(0.968 0.012 84);
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.006 285);
+  --popover: oklch(0.988 0.007 88);
+  --popover-foreground: oklch(0.247 0.024 55);
 
-  /* Marka kırmızısı (METU). Hue/chroma #841515 kimliğinde; lightness küçük
-     yüzeylerde (rozet/ikon) siyaha yakın okunmasın diye 0.48'e alındı —
-     beyaz metinle kontrast ~7:1 (WCAG AAA). */
+  /* METU kırmızısı — değişmiyor (marka çapası). */
   --primary: oklch(0.48 0.15 27);
-  --primary-foreground: oklch(0.985 0.005 27);
+  --primary-foreground: oklch(0.985 0.006 27);
 
-  --secondary: oklch(0.965 0.004 285);
-  --secondary-foreground: oklch(0.28 0.006 285);
+  --secondary: oklch(0.928 0.016 82);
+  --secondary-foreground: oklch(0.3 0.022 55);
 
-  --muted: oklch(0.965 0.004 285);
-  --muted-foreground: oklch(0.52 0.012 285);
+  --muted: oklch(0.928 0.016 82);
+  --muted-foreground: oklch(0.505 0.022 60);
 
-  --accent: oklch(0.955 0.006 285);
-  --accent-foreground: oklch(0.28 0.006 285);
+  --accent: oklch(0.918 0.02 78);
+  --accent-foreground: oklch(0.3 0.022 55);
 
-  --success: oklch(0.62 0.15 150);
-  --success-foreground: oklch(0.99 0.01 150);
+  /* Dil A sıcak aksanları (gradyan/ışıma uygulamaları R1-R2'de). */
+  --accent-ember: oklch(0.559 0.168 37);
+  --accent-gold: oklch(0.708 0.137 67);
 
-  --warning: oklch(0.72 0.15 75);
-  --warning-foreground: oklch(0.28 0.05 75);
+  /* Durum renkleri — iki dilde ortak (normalize edilmiş palet). */
+  --success: oklch(0.527 0.137 150);
+  --success-foreground: oklch(0.985 0.02 150);
 
-  --destructive: oklch(0.577 0.245 27);
+  --warning: oklch(0.555 0.146 49);
+  --warning-foreground: oklch(0.99 0.02 85);
+
+  --destructive: oklch(0.505 0.19 27);
   --destructive-foreground: oklch(0.985 0.01 27);
 
-  --border: oklch(0.92 0.004 285);
-  --input: oklch(0.92 0.004 285);
+  --info: oklch(0.5 0.119 243);
+  --info-foreground: oklch(0.985 0.015 240);
+
+  --border: oklch(0.898 0.021 79);
+  --input: oklch(0.898 0.021 79);
   --ring: oklch(0.48 0.15 27);
 
   --chart-1: oklch(0.48 0.15 27);
@@ -108,52 +125,59 @@
   --chart-4: oklch(0.55 0.16 264);
   --chart-5: oklch(0.62 0.15 150);
 
-  --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.21 0.006 285);
+  --sidebar: oklch(0.988 0.007 88);
+  --sidebar-foreground: oklch(0.247 0.024 55);
   --sidebar-primary: oklch(0.48 0.15 27);
-  --sidebar-primary-foreground: oklch(0.985 0.005 27);
-  --sidebar-accent: oklch(0.955 0.006 285);
-  --sidebar-accent-foreground: oklch(0.28 0.006 285);
-  --sidebar-border: oklch(0.92 0.004 285);
+  --sidebar-primary-foreground: oklch(0.985 0.006 27);
+  --sidebar-accent: oklch(0.918 0.02 78);
+  --sidebar-accent-foreground: oklch(0.3 0.022 55);
+  --sidebar-border: oklch(0.898 0.021 79);
   --sidebar-ring: oklch(0.48 0.15 27);
 }
 
 .dark {
-  --background: oklch(0.165 0.006 285);
-  --foreground: oklch(0.97 0.003 285);
+  /* Sıcak akşam ailesi (mor-gri DEĞİL). */
+  --background: oklch(0.202 0.016 39);
+  --foreground: oklch(0.936 0.016 65);
 
-  --card: oklch(0.205 0.007 285);
-  --card-foreground: oklch(0.97 0.003 285);
-  --card-hover: oklch(0.245 0.008 285);
+  --card: oklch(0.252 0.017 51);
+  --card-foreground: oklch(0.936 0.016 65);
+  --card-hover: oklch(0.292 0.018 52);
 
-  --popover: oklch(0.205 0.007 285);
-  --popover-foreground: oklch(0.97 0.003 285);
+  --popover: oklch(0.252 0.017 51);
+  --popover-foreground: oklch(0.936 0.016 65);
 
-  /* Koyu temada parlak/kontrastlı kırmızı varyant. */
-  --primary: oklch(0.56 0.19 26);
-  --primary-foreground: oklch(0.99 0.008 27);
+  /* Koyu tema kırmızısı (#A32A2A). */
+  --primary: oklch(0.477 0.158 26);
+  --primary-foreground: oklch(0.985 0.008 27);
 
-  --secondary: oklch(0.27 0.008 285);
-  --secondary-foreground: oklch(0.97 0.003 285);
+  --secondary: oklch(0.3 0.018 50);
+  --secondary-foreground: oklch(0.936 0.016 65);
 
-  --muted: oklch(0.27 0.008 285);
-  --muted-foreground: oklch(0.72 0.012 285);
+  --muted: oklch(0.3 0.018 50);
+  --muted-foreground: oklch(0.72 0.016 62);
 
-  --accent: oklch(0.28 0.009 285);
-  --accent-foreground: oklch(0.97 0.003 285);
+  --accent: oklch(0.315 0.02 50);
+  --accent-foreground: oklch(0.936 0.016 65);
 
-  --success: oklch(0.7 0.15 155);
-  --success-foreground: oklch(0.16 0.02 155);
+  --accent-ember: oklch(0.648 0.152 42);
+  --accent-gold: oklch(0.733 0.116 57);
 
-  --warning: oklch(0.8 0.14 80);
-  --warning-foreground: oklch(0.2 0.04 80);
+  --success: oklch(0.72 0.15 152);
+  --success-foreground: oklch(0.2 0.03 150);
 
-  --destructive: oklch(0.62 0.21 25);
-  --destructive-foreground: oklch(0.99 0.01 27);
+  --warning: oklch(0.78 0.14 65);
+  --warning-foreground: oklch(0.25 0.04 68);
 
-  --border: oklch(1 0 0 / 10%);
+  --destructive: oklch(0.62 0.2 27);
+  --destructive-foreground: oklch(0.985 0.01 27);
+
+  --info: oklch(0.68 0.13 240);
+  --info-foreground: oklch(0.18 0.04 240);
+
+  --border: oklch(1 0 0 / 9%);
   --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.56 0.19 26);
+  --ring: oklch(0.477 0.158 26);
 
   --chart-1: oklch(0.56 0.19 26);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -161,14 +185,14 @@
   --chart-4: oklch(0.62 0.2 264);
   --chart-5: oklch(0.7 0.15 155);
 
-  --sidebar: oklch(0.205 0.007 285);
-  --sidebar-foreground: oklch(0.97 0.003 285);
-  --sidebar-primary: oklch(0.56 0.19 26);
-  --sidebar-primary-foreground: oklch(0.99 0.008 27);
-  --sidebar-accent: oklch(0.28 0.009 285);
-  --sidebar-accent-foreground: oklch(0.97 0.003 285);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.56 0.19 26);
+  --sidebar: oklch(0.252 0.017 51);
+  --sidebar-foreground: oklch(0.936 0.016 65);
+  --sidebar-primary: oklch(0.477 0.158 26);
+  --sidebar-primary-foreground: oklch(0.985 0.008 27);
+  --sidebar-accent: oklch(0.315 0.02 50);
+  --sidebar-accent-foreground: oklch(0.936 0.016 65);
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: oklch(0.477 0.158 26);
 }
 
 @layer base {
@@ -184,10 +208,70 @@
 }
 
 /*
+  DİL B "Sessiz Verimlilik" — yönetim yüzeyi remap katmanı (Görev 3).
+  .surface-admin kapsam sınıfı zemin/kart/border/radius + nötr taş grisi
+  ailesini remap eder; primary (kırmızı, yalnız aksiyon), durum renkleri ve
+  aksan token'ları GLOBAL katmandan miras alınır (iki dilde ortak). Print
+  remap'in hemen üstünde, aynı desenle (o remap emsal).
+*/
+.surface-admin {
+  /* Dil B daha sıkı 8px köşe dili. */
+  --radius: 0.5rem;
+
+  --background: oklch(0.985 0.001 106);
+  --foreground: oklch(0.216 0.006 56);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.216 0.006 56);
+  --card-hover: oklch(0.97 0.001 106);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.216 0.006 56);
+
+  --secondary: oklch(0.97 0.001 106);
+  --secondary-foreground: oklch(0.268 0.006 34);
+
+  --muted: oklch(0.97 0.001 106);
+  --muted-foreground: oklch(0.553 0.012 58);
+
+  --accent: oklch(0.97 0.001 106);
+  --accent-foreground: oklch(0.268 0.006 34);
+
+  --border: oklch(0.923 0.003 49);
+  --input: oklch(0.923 0.003 49);
+}
+
+.dark .surface-admin {
+  --background: oklch(0.194 0.006 56);
+  --foreground: oklch(0.923 0.004 70);
+
+  --card: oklch(0.234 0.008 59);
+  --card-foreground: oklch(0.923 0.004 70);
+  --card-hover: oklch(0.271 0.012 78);
+
+  --popover: oklch(0.234 0.008 59);
+  --popover-foreground: oklch(0.923 0.004 70);
+
+  --secondary: oklch(0.275 0.01 60);
+  --secondary-foreground: oklch(0.923 0.004 70);
+
+  --muted: oklch(0.275 0.01 60);
+  --muted-foreground: oklch(0.7 0.008 65);
+
+  --accent: oklch(0.29 0.01 62);
+  --accent-foreground: oklch(0.923 0.004 70);
+
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 14%);
+}
+
+/*
   YAZDIRMA (Faz 9B — Dönem Raporu). Yalnız .print-report bölgesi yazdırılır;
   geri kalan arayüz gizlenir. Kağıt için token'lar .print-report üzerinde
-  sabit AÇIK palete remap edilir (tema koyu olsa bile rapor beyaz zeminde
-  siyah metin çıkar) — bu remap yalnız @media print içinde, TSX token-only kalır.
+  sabit AÇIK palete remap edilir (tema koyu ya da surface-admin olsa bile rapor
+  beyaz zeminde siyah metin çıkar) — bu remap yalnız @media print içinde,
+  TSX token-only kalır. Rapor yalnız background/card/muted/border/primary
+  token'larını kullanır; yeni token'lar (info/accent-*) burada kullanılmaz.
 */
 @media print {
   @page {

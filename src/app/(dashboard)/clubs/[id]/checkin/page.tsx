@@ -83,7 +83,9 @@ export default async function CheckinPage({
     .sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? "", "tr"));
 
   return (
-    <main className="relative">
+    // Dil B "Sessiz Verimlilik": kapı girişi ekranı surface-admin ile beyaz/nötr
+    // remap'e döner (navbar Dil A'da kalır). bkz. shared/admin-surface.tsx.
+    <main className="surface-admin relative min-h-svh bg-background text-foreground">
       <div className="mx-auto w-full max-w-2xl px-4 pb-14 sm:px-6 lg:px-8">
         <div className="pt-6">
           <Link

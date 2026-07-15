@@ -445,6 +445,31 @@ DESENLER:
 - Onay diyaloğu: geri alınamaz aksiyonlar `shared/confirm-dialog.tsx`
   (Base UI AlertDialog) ile sarılır — `window.confirm` KULLANMA.
 
+RESKIN — İKİ TASARIM DİLİ (R0 altyapısı tamam):
+- Site iki dile ayrılır (token adları AYNI; yalnız değerler/kapsam değişir):
+  • Dil A "Kampüs Enerjisi" (öğrenci/global, varsayılan): sıcak kum zemin
+    (:root ~oklch hue 55-88), METU kırmızısı + ember + gold aksanları, koyu tema
+    (.dark) sıcak akşam ailesi (mor-gri DEĞİL). Kart dili 16px (`--radius:1rem`).
+  • Dil B "Sessiz Verimlilik" (yönetim): beyaz/nötr taş grisi, hairline border,
+    kırmızı yalnız aksiyonda. `.surface-admin` KAPSAM SINIFI ile globals.css'te
+    zemin/kart/border + nötr aile + `--radius:0.5rem` REMAP edilir; primary,
+    durum ve aksan token'ları GLOBAL katmandan miras (iki dilde ortak).
+    Koyu karşılığı `.dark .surface-admin`. Desen print remap emsaliyle aynı.
+- Kapsam uygulaması: `shared/admin-surface.tsx` (`.surface-admin min-h-svh
+  bg-background text-foreground` div) SAYFA KÖKÜNE eklenir — (dashboard) grup
+  layout'una DEĞİL (navbar Dil A'da kalır). /admin (AdminSurface + PageShell
+  `glow={false}`), /clubs/[id]/manage ve /checkin (kök `<main>`'e sınıf).
+- YENİ TOKEN'LAR: `--accent-ember` / `--accent-gold` (Dil A sıcak aksanları;
+  `bg-accent-ember`/`text-accent-gold` utility'leri) + `--info`/`--info-foreground`
+  (durum). Durum renkleri normalize edildi (success `#15803D`, warning `#B45309`,
+  destructive `#B91C1C`, info `#0369A1`); iki dilde ortak, koyu temada okunur
+  varyant. Gradyan/gölge uygulamaları (color-mix ile) R1-R2'ye ertelendi.
+- TİPOGRAFİ (next/font, self-host): gövde **Figtree** (`--font-sans`, italic +
+  latin-ext), display **Gabarito** (`--font-display`, `font-display` utility —
+  başlıklara uygulaması R1-R2). Mono `--font-geist-mono` korunur; `tabular-nums`
+  çekirdek utility.
+- Sonraki turlar: R1 (auth), R2 (öğrenci), R4 (admin) — bileşen/ekran redesign'ları.
+
 ARAYÜZ YENİLEME FAZLARI (tamam): A (iki temalı token altyapısı + switcher) →
 B (iskelet/navigasyon/tema-duyarlı yeniden tasarım) → C0/C1/C2 (primary
 parlaklık + mikro-etkileşim + skeleton + tipografi + metadata + favicon + onay

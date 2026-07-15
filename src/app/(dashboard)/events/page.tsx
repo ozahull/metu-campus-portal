@@ -19,7 +19,10 @@ type EventQueryRow = {
   event_date: string;
   location: string | null;
   club_id: string;
-  clubs: { name: string; category: string | null } | { name: string; category: string | null }[] | null;
+  clubs:
+    | { name: string; category: string | null; cover_url: string | null }
+    | { name: string; category: string | null; cover_url: string | null }[]
+    | null;
   event_attendees: { user_id: string }[] | null;
 };
 
@@ -35,7 +38,7 @@ export default async function EventsPage() {
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, title, event_date, location, club_id, clubs(name, category), event_attendees(user_id)",
+      "id, title, event_date, location, club_id, clubs(name, category, cover_url), event_attendees(user_id)",
     )
     .eq("status", "APPROVED")
     .gte("event_date", new Date().toISOString())
@@ -57,6 +60,7 @@ export default async function EventsPage() {
         club_id: e.club_id,
         club_name: club?.name ?? null,
         category: club?.category ?? null,
+        cover_url: club?.cover_url ?? null,
         attendees: att.length,
         attending: att.some((a) => a.user_id === user.id),
       };

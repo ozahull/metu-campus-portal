@@ -109,7 +109,7 @@ export default async function DashboardPage({
     <PageShell>
       {/* İşlevsel karşılama: isim + hızlı istatistikler */}
       <header className="mb-10">
-        <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+        <h1 className="font-display text-2xl font-black tracking-tight text-balance sm:text-3xl">
           {t("welcome", { name: displayName ?? "" })}
         </h1>
         <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">
@@ -162,15 +162,15 @@ function StatCard({
   label: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+    <div className="flex items-center gap-3.5 rounded-2xl border border-border bg-card p-4 transition-colors hover:border-primary/30">
+      <span className="flex size-12 shrink-0 items-center justify-center rounded-full text-primary ring-1 ring-primary/15 bg-[radial-gradient(circle_at_30%_25%,color-mix(in_oklab,var(--accent-gold)_38%,transparent),color-mix(in_oklab,var(--primary)_16%,transparent))]">
         <Icon className="size-5" />
       </span>
       <div className="min-w-0">
-        <div className="text-2xl font-bold leading-none tracking-tight">
+        <div className="font-display text-3xl font-black leading-none tracking-tight tabular-nums">
           {value}
         </div>
-        <div className="mt-1 truncate text-xs text-muted-foreground">
+        <div className="mt-1.5 truncate text-xs text-muted-foreground">
           {label}
         </div>
       </div>

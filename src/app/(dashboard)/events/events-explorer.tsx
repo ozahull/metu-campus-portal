@@ -6,6 +6,7 @@ import { Search, SearchX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/shared/empty-state";
 import { EventCard, type EventCardData } from "@/components/shared/event-card";
+import { cn } from "@/lib/utils";
 
 export type EventRow = {
   id: string;
@@ -15,12 +16,23 @@ export type EventRow = {
   club_id: string;
   club_name: string | null;
   category: string | null;
+  cover_url: string | null;
   attendees: number;
   attending: boolean;
 };
 
 const selectClass =
-  "h-11 rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none transition-colors focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring [&>option]:bg-card";
+  "h-11 rounded-full border border-border bg-card px-4 text-sm text-foreground outline-none transition-colors focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring [&>option]:bg-card";
+
+/** Kategori filtresi pill chip'i — seçili dolu primary, diğerleri outline. */
+function chipCls(active: boolean): string {
+  return cn(
+    "h-9 rounded-full border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+    active
+      ? "border-primary bg-primary text-primary-foreground"
+      : "border-border bg-card text-foreground hover:border-primary/50",
+  );
+}
 
 export function EventsExplorer({
   events,
@@ -60,15 +72,15 @@ export function EventsExplorer({
 
   return (
     <div>
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             placeholder={t("searchPlaceholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="h-11 pl-10 text-base"
+            className="h-11 rounded-full pl-11 text-base"
           />
         </div>
         <select
@@ -84,22 +96,32 @@ export function EventsExplorer({
             </option>
           ))}
         </select>
-        {categories.length > 0 && (
-          <select
-            className={selectClass}
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            aria-label={t("categoryFilter")}
-          >
-            <option value="">{t("allCategories")}</option>
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        )}
       </div>
+
+      {/* Kategori pill chip dizisi (seçili = dolu kırmızı, diğerleri outline) */}
+      {categories.length > 0 && (
+        <div className="mb-8 flex flex-wrap gap-2">
+          <button
+            type="button"
+            aria-pressed={category === ""}
+            onClick={() => setCategory("")}
+            className={chipCls(category === "")}
+          >
+            {t("allCategories")}
+          </button>
+          {categories.map((c) => (
+            <button
+              key={c}
+              type="button"
+              aria-pressed={category === c}
+              onClick={() => setCategory((prev) => (prev === c ? "" : c))}
+              className={chipCls(category === c)}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <EmptyState
@@ -117,6 +139,7 @@ export function EventsExplorer({
               location: e.location,
               clubName: e.club_name,
               category: e.category,
+              coverUrl: e.cover_url,
               attendeeCount: e.attendees,
             };
             return (

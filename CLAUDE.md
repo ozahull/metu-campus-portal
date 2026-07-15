@@ -478,7 +478,26 @@ RESKIN — İKİ TASARIM DİLİ (R0 altyapısı tamam):
   (`rounded-full` + hover lift/`color-mix` ışıma), primary/ember aksan linkler.
   Eski iki ham dekor (rgba beyaz radial + `bg-white/10`) `color-mix`/`accent-gold`
   token'a çevrildi. Mobilde üstte ince sıcak gradyan şerit.
-- Sonraki turlar: R2 (öğrenci), R4 (admin) — bileşen/ekran redesign'ları.
+- R2 TAMAM (öğrenci çekirdeği): `shared/event-card.tsx` FOTOĞRAF ÖNCELİKLİ karta
+  döndü — üstte 16:9 kapak (`ImageWithFallback` + `fallback=null`; kapak yoksa
+  gün batımı `color-mix` gradyanı + başlığın filigran ilk harfi, kırık ikon YOK),
+  kapak köşesinde `DateBadge` çipi, altında kulüp/kategori + Gabarito başlık
+  (`line-clamp-2`) + tarih/konum + katılımcı/RSVP; hover `-translate-y-1` + sıcak
+  `color-mix` gölge. `EventCardData`'ya `coverUrl` eklendi. VERİ: `events`'te
+  cover alanı YOK → sorgular `clubs(cover_url)` çekip kulübün kapağını etkinlik
+  kapağı yapar (upcoming-events, /events, kulüp detayı). Kart artık ÜÇ yerde de
+  aynı (kulüp detayı eski satır-liste yerine `EventCard` grid'ine geçti).
+  Dashboard: StatCard'lar sıcak `color-mix` ikon dairesi + Gabarito büyük sayı;
+  fuar keşif banner'ı gradyan + filigran "F" + Gabarito 900. /events: pill arama +
+  kategori pill chip dizisi (seçili=dolu primary) + Dil A kulüp select.
+  /events/[id]: kapak HERO (gradyan overlay + Gabarito başlık) + iki sütun (sol
+  açıklama/foto/takvim, sağ YAPIŞKAN katılım kartı: tarih/konum/kontenjan barı
+  `color-mix` dolgu/CTA; mobilde CTA hero'nun hemen altında `order`). INPUT FIX
+  (Görev 5): `ui/input.tsx` `bg-transparent`→`bg-background` (sıcak token) +
+  `globals.css`'e `-webkit-autofill` remap'i (Chrome soğuk mavi autofill zeminini
+  token'a bağlar) → login inputları artık sıcak kum. İş mantığı/RLS/route sabit;
+  tek veri değişikliği select'e `cover_url` eklemek.
+- Sonraki tur: R4 (admin) — Dil B "Sessiz Verimlilik" yüzeyinin ekran redesign'ı.
 
 ARAYÜZ YENİLEME FAZLARI (tamam): A (iki temalı token altyapısı + switcher) →
 B (iskelet/navigasyon/tema-duyarlı yeniden tasarım) → C0/C1/C2 (primary

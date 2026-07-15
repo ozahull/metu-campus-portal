@@ -75,12 +75,23 @@ export function FairModeDiscovery({
   }, [clubs, selected, memberSet]);
 
   return (
-    <section className="mb-12 rounded-2xl border border-primary/25 bg-[radial-gradient(60%_80%_at_50%_0%,color-mix(in_oklab,var(--primary)_10%,transparent),transparent)] p-5 sm:p-6">
-      <div className="flex items-center gap-2">
-        <PartyPopper className="size-5 text-primary" />
-        <h2 className="text-xl font-bold tracking-tight">{t("title")}</h2>
+    <section className="relative mb-12 overflow-hidden rounded-3xl border border-primary/25 p-6 sm:p-8 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--primary)_15%,transparent),color-mix(in_oklab,var(--accent-gold)_14%,transparent))]">
+      {/* Filigran "F" (Fuar/Fair) */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-10 -right-3 select-none font-display text-[11rem] leading-none font-black text-primary/10"
+      >
+        F
+      </span>
+      <div className="relative flex items-center gap-2">
+        <PartyPopper className="size-6 text-primary" />
+        <h2 className="font-display text-2xl font-black tracking-tight sm:text-3xl">
+          {t("title")}
+        </h2>
       </div>
-      <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
+      <p className="relative mt-1.5 max-w-md text-sm text-muted-foreground">
+        {t("subtitle")}
+      </p>
 
       {categories.length === 0 ? (
         <p className="mt-4 text-sm text-muted-foreground">

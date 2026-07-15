@@ -8,18 +8,20 @@ import { EventCard, type EventCardData } from "@/components/shared/event-card";
 
 type Attendee = { user_id: string };
 
+type Club = { name: string; cover_url: string | null };
+
 type UpcomingEvent = {
   id: string;
   title: string;
   event_date: string;
   location: string | null;
-  clubs: { name: string } | { name: string }[] | null;
+  clubs: Club | Club[] | null;
   event_attendees: Attendee[] | null;
 };
 
-function clubName(clubs: UpcomingEvent["clubs"]): string | null {
+function firstClub(clubs: UpcomingEvent["clubs"]): Club | null {
   if (!clubs) return null;
-  return Array.isArray(clubs) ? (clubs[0]?.name ?? null) : clubs.name;
+  return Array.isArray(clubs) ? (clubs[0] ?? null) : clubs;
 }
 
 export async function UpcomingEvents() {
@@ -33,7 +35,7 @@ export async function UpcomingEvents() {
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, title, event_date, location, clubs(name), event_attendees(user_id)",
+      "id, title, event_date, location, clubs(name, cover_url), event_attendees(user_id)",
     )
     .eq("status", "APPROVED")
     .gte("event_date", new Date().toISOString())
@@ -72,12 +74,14 @@ export async function UpcomingEvents() {
           <div className="flex snap-x snap-mandatory gap-4">
             {events.map((ev) => {
               const attendees = ev.event_attendees ?? [];
+              const club = firstClub(ev.clubs);
               const cardData: EventCardData = {
                 id: ev.id,
                 title: ev.title,
                 eventDate: ev.event_date,
                 location: ev.location,
-                clubName: clubName(ev.clubs),
+                clubName: club?.name ?? null,
+                coverUrl: club?.cover_url ?? null,
                 attendeeCount: attendees.length,
               };
               return (

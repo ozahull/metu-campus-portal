@@ -2,17 +2,15 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import {
   ArrowLeft,
   AtSign,
   CalendarDays,
-  Clock,
   ExternalLink,
   Images,
   Info,
   Mail,
-  MapPin,
   MessageCircle,
   Phone,
   SearchX,
@@ -27,9 +25,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
-import { formatDateTime } from "@/lib/datetime";
+import { EventCard, type EventCardData } from "@/components/shared/event-card";
 import { cn } from "@/lib/utils";
-import { RSVPButton } from "@/components/shared/rsvp-button";
 import { BadgeIconRow } from "@/components/badges";
 import { JoinButton } from "./join-button";
 
@@ -88,7 +85,6 @@ export default async function ClubDetailPage({
 }) {
   const { id } = await params;
   const t = await getTranslations("clubs");
-  const locale = await getLocale();
   const supabase = await createClient();
 
   const {
@@ -431,58 +427,37 @@ export default async function ClubDetailPage({
                 )}
               </TabsPanel>
 
-              {/* Etkinlikler */}
+              {/* Etkinlikler — paylaşılan fotoğraflı EventCard (kulübün kapağı
+                  etkinlik kapağı olarak; kulüp adı burada gereksiz → gizli). */}
               <TabsPanel value="events">
                 {events.length > 0 ? (
-                  <ul className="space-y-3">
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                     {events.map((ev) => {
                       const attendees = ev.event_attendees ?? [];
-                      const isAttending = attendees.some(
-                        (a) => a.user_id === user.id,
-                      );
+                      const cardData: EventCardData = {
+                        id: ev.id,
+                        title: ev.title,
+                        eventDate: ev.event_date,
+                        location: ev.location,
+                        clubName: null,
+                        category: club.category,
+                        coverUrl: club.cover_url,
+                        attendeeCount: attendees.length,
+                      };
                       return (
-                        <li
+                        <EventCard
                           key={ev.id}
-                          className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/40"
-                        >
-                          <Link
-                            href={`/events/${ev.id}`}
-                            className="font-semibold tracking-tight transition-colors hover:text-primary"
-                          >
-                            {ev.title}
-                          </Link>
-                          {ev.description && (
-                            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                              {ev.description}
-                            </p>
-                          )}
-                          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
-                            <span className="inline-flex items-center gap-1.5">
-                              <Clock className="size-3.5 text-primary" />
-                              {formatDateTime(ev.event_date, locale, "long")}
-                            </span>
-                            {ev.location && (
-                              <span className="inline-flex items-center gap-1.5">
-                                <MapPin className="size-3.5 text-primary" />
-                                {ev.location}
-                              </span>
-                            )}
-                          </div>
-                          <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3">
-                            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                              <Users className="size-3.5" />
-                              {t("attendeeCount", { count: attendees.length })}
-                            </span>
-                            <RSVPButton
-                              eventId={ev.id}
-                              userId={user.id}
-                              isAttending={isAttending}
-                            />
-                          </div>
-                        </li>
+                          event={cardData}
+                          rsvp={{
+                            userId: user.id,
+                            isAttending: attendees.some(
+                              (a) => a.user_id === user.id,
+                            ),
+                          }}
+                        />
                       );
                     })}
-                  </ul>
+                  </div>
                 ) : (
                   <EmptyState icon={CalendarDays} title={t("noEvents")} />
                 )}

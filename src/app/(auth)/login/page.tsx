@@ -54,7 +54,7 @@ function LoginCard() {
   }
 
   return (
-    <Card className="w-full max-w-sm shadow-[0_24px_60px_-28px_color-mix(in_oklab,var(--primary)_40%,transparent)]">
+    <Card className="w-full max-w-md shadow-[0_24px_60px_-28px_color-mix(in_oklab,var(--primary)_40%,transparent)]">
       <CardHeader className="space-y-3 text-center">
         <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
           <span className="font-display text-lg font-bold tracking-tight">KKK</span>

@@ -614,6 +614,7 @@
       "toasts": {
         "clubRequired": "Kulüp seçin.",
         "error": "Atama başarısız: {message}",
+        "notSaved": "Atama kaydedilemedi (yetki reddedildi). Lütfen tekrar deneyin.",
         "assigned": "Danışman atandı",
         "removed": "Danışman kaldırıldı"
       }

@@ -28,6 +28,17 @@ export function NotificationBell({
   const [unread, setUnread] = useState(initialUnread);
   const wrapRef = useRef<HTMLDivElement>(null);
 
+  // Sunucu (navbar) tazelendiğinde (router.refresh) otoritatif ilk veriyle
+  // senkronla. useState yalnız mount'ta prop alır; /notifications sayfasındaki
+  // "tümünü okundu işaretle" router.refresh() ile navbar'ı yeniden render eder
+  // ve buradaki senkron sayaç/badge'i (0'a) hemen düşürür — reload beklemeden.
+  // Prop'lar yalnız server yeniden render olunca değişir (istemci gezinme
+  // navbar'ı korur), bu yüzden yerel optimistic/realtime güncellemeler ezilmez.
+  useEffect(() => {
+    setItems(initialItems);
+    setUnread(initialUnread);
+  }, [initialItems, initialUnread]);
+
   // Son 10 bildirimi + okunmamış sayısını sunucudan tazele (otoritatif).
   const refresh = useCallback(async () => {
     const supabase = createClient();

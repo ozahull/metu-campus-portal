@@ -43,13 +43,23 @@ export function AdminAssignments({
     }
     setAdvBusy(true);
     const supabase = createClient();
-    const { error } = await supabase
+    // .select() ŞART: yazılan satırı geri okuruz. RLS USING (is_super_admin)
+    // satırı dışlarsa UPDATE 0 satır etkiler ve PostgREST HATA DÖNDÜRMEZ
+    // (error=null). .select() olmadan bu sessiz 0-satır yanlışlıkla "başarılı"
+    // sanılırdı. data boşsa gerçek durumu (kaydedilmedi) göster.
+    const { data, error } = await supabase
       .from("clubs")
       .update({ advisor_id: advUser || null })
-      .eq("id", advClub);
+      .eq("id", advClub)
+      .select("id, advisor_id");
     setAdvBusy(false);
     if (error) {
       toast.error(t("toasts.error", { message: error.message }));
+      return;
+    }
+    if (!data || data.length === 0) {
+      // 0 satır: RLS/yetki nedeniyle yazma gerçekleşmedi (sessiz başarısızlık).
+      toast.error(t("toasts.notSaved"));
       return;
     }
     toast.success(advUser ? t("toasts.assigned") : t("toasts.removed"));

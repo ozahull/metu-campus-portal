@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Loader2, Plus, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ import {
 
 export function NewClubForm() {
   const t = useTranslations("admin.newClub");
+  const router = useRouter();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,6 +52,9 @@ export function NewClubForm() {
     toast.success(t("toasts.success"));
     setName("");
     setDescription("");
+    // Sunucu bileşenlerini tazele: kulüp tablosu + Genel Bakış stat kartları
+    // (analytics RPC'leri) yeni kulübü reload beklemeden yansıtsın.
+    router.refresh();
   }
 
   return (

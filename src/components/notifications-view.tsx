@@ -80,6 +80,9 @@ export function NotificationsView({
       .from("notifications")
       .update({ read_at: nowIso })
       .is("read_at", null);
+    // Navbar'ı (server) tazele: bildirim zili badge'i taze okunmamış sayısıyla
+    // (0) yeniden render olsun — reload beklemeden. Zil prop'tan senkronlar.
+    router.refresh();
   }
 
   if (items.length === 0) {

@@ -614,6 +614,7 @@
       "toasts": {
         "clubRequired": "Select a club.",
         "error": "Assignment failed: {message}",
+        "notSaved": "Assignment could not be saved (permission denied). Please try again.",
         "assigned": "Advisor assigned",
         "removed": "Advisor removed"
       }

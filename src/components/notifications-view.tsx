@@ -91,10 +91,10 @@ export function NotificationsView({
       {hasUnread && (
         <div className="flex justify-end">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={markAllRead}
-            className="gap-1.5"
+            className="gap-1.5 rounded-full text-muted-foreground hover:text-foreground"
           >
             <CheckCheck className="size-4" />
             {t("markAllRead")}

@@ -46,13 +46,13 @@ export function ClubsCollection({
     <div className="space-y-6">
       {showSearch && (
         <div className="relative max-w-xl">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             placeholder={t("searchPlaceholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="h-11 pl-10 text-base"
+            className="h-11 rounded-full pl-11 text-base"
           />
         </div>
       )}
@@ -107,10 +107,10 @@ function CategoryChip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "h-9 rounded-full border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         active
           ? "border-primary bg-primary text-primary-foreground"
-          : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground",
+          : "border-border bg-card text-foreground hover:border-primary/50",
       )}
     >
       {label}

@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Award, ArrowRight, CalendarClock, Inbox, Users } from "lucide-react";
+import { Award, ArrowRight, CalendarClock, Crown, Inbox, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/datetime";
 import { PageShell } from "@/components/shared/page-shell";
+import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import {
   Card,
   CardContent,
@@ -24,9 +25,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") };
 }
 
+type ClubLite = { id: string; name: string; logo_url: string | null };
 type MembershipRow = {
   role: string;
-  clubs: { id: string; name: string } | { id: string; name: string }[] | null;
+  clubs: ClubLite | ClubLite[] | null;
 };
 
 type RsvpRow = {
@@ -58,6 +60,14 @@ export default async function ProfilePage() {
     (user.user_metadata?.full_name as string | undefined) ??
     user.email ??
     "";
+  const initials =
+    displayName
+      .trim()
+      .split(/\s+/)
+      .map((w) => w[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "?";
 
   // Bildirim tercihi (satır yoksa varsayılan MEMBER_CLUBS).
   const { data: pref } = await supabase
@@ -77,15 +87,22 @@ export default async function ProfilePage() {
   // Üye olunan kulüpler
   const { data: membershipRaw } = await supabase
     .from("club_members")
-    .select("role, clubs(id, name)")
+    .select("role, clubs(id, name, logo_url)")
     .eq("user_id", user.id);
 
   const memberships = ((membershipRaw ?? []) as unknown as MembershipRow[])
     .map((m) => {
       const c = Array.isArray(m.clubs) ? m.clubs[0] : m.clubs;
-      return c ? { id: c.id, name: c.name, role: m.role } : null;
+      return c
+        ? { id: c.id, name: c.name, logoUrl: c.logo_url, role: m.role }
+        : null;
     })
-    .filter((m): m is { id: string; name: string; role: string } => m !== null);
+    .filter(
+      (
+        m,
+      ): m is { id: string; name: string; logoUrl: string | null; role: string } =>
+        m !== null,
+    );
 
   // RSVP'lenen yaklaşan & onaylı etkinlikler
   const { data: rsvpRaw } = await supabase
@@ -104,9 +121,20 @@ export default async function ProfilePage() {
 
   return (
     <PageShell>
-      <header className="mb-8">
-        <h1 className="text-3xl font-extrabold tracking-tight">{t("title")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{displayName}</p>
+      <header className="mb-8 flex items-center gap-4">
+        <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,color-mix(in_oklab,var(--primary)_92%,transparent),color-mix(in_oklab,var(--accent-ember)_78%,transparent))] text-lg font-bold text-primary-foreground shadow-sm">
+          {initials}
+        </span>
+        <div className="min-w-0">
+          <h1 className="truncate text-2xl font-extrabold tracking-tight sm:text-3xl">
+            {displayName}
+          </h1>
+          {user.email && (
+            <p className="mt-0.5 truncate text-sm text-muted-foreground">
+              {user.email}
+            </p>
+          )}
+        </div>
       </header>
 
       <ProfileForm userId={user.id} initialName={profile?.full_name ?? ""} />
@@ -144,14 +172,32 @@ export default async function ProfilePage() {
               <ul className="space-y-2">
                 {memberships.map((m) => (
                   <li key={m.id}>
-                    <Link href={`/clubs/${m.id}`} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted/40 px-3 py-2.5 transition-colors hover:border-primary/40">
-                      <span className="truncate text-sm font-medium">{m.name}</span>
-                      <span className="flex items-center gap-2">
-                        {m.role.toUpperCase() === "ADMIN" && (
-                          <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">{t("presidentBadge")}</span>
-                        )}
-                        <ArrowRight className="size-4 text-muted-foreground" />
+                    <Link
+                      href={`/clubs/${m.id}`}
+                      className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/40"
+                    >
+                      <span className="relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted text-xs font-bold text-foreground">
+                        <ImageWithFallback
+                          src={m.logoUrl}
+                          alt=""
+                          sizes="36px"
+                          fallback={<span>{m.name.slice(0, 2).toUpperCase()}</span>}
+                        />
                       </span>
+                      <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                        {m.name}
+                      </span>
+                      {m.role.toUpperCase() === "ADMIN" ? (
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-accent-gold/45 bg-[color-mix(in_oklab,var(--accent-gold)_14%,transparent)] px-2 py-0.5 text-[10px] font-semibold text-accent-gold">
+                          <Crown className="size-3" />
+                          {t("presidentBadge")}
+                        </span>
+                      ) : (
+                        <span className="shrink-0 rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                          {t("memberBadge")}
+                        </span>
+                      )}
+                      <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
                     </Link>
                   </li>
                 ))}

@@ -31,6 +31,7 @@
   --color-border: var(--border);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
+  --color-overlay: var(--overlay);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-warning: var(--warning);
@@ -101,6 +102,10 @@
   /* Dil A sıcak aksanları (gradyan/ışıma uygulamaları R1-R2'de). */
   --accent-ember: oklch(0.559 0.168 37);
   --accent-gold: oklch(0.708 0.137 67);
+
+  /* Sıcak siyah karartma perdesi (lightbox — R3). Tek değer; .dark override
+     ETMEZ, böylece lightbox iki temada da sıcak koyu kalır (ham #000 değil). */
+  --overlay: oklch(0.16 0.02 42);
 
   /* Durum renkleri — iki dilde ortak (normalize edilmiş palet). */
   --success: oklch(0.527 0.137 150);

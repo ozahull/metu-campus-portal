@@ -21,9 +21,9 @@ export function BadgeShowcase({ earned }: { earned: string[] }) {
           <div
             key={code}
             className={cn(
-              "flex items-start gap-3 rounded-lg border p-3 transition-colors",
+              "flex items-start gap-3 rounded-xl border p-3 transition-colors",
               has
-                ? "border-primary/30 bg-primary/5"
+                ? "border-accent-gold/45 bg-[color-mix(in_oklab,var(--accent-gold)_8%,var(--card))]"
                 : "border-dashed border-border bg-muted/30",
             )}
           >
@@ -31,7 +31,7 @@ export function BadgeShowcase({ earned }: { earned: string[] }) {
               className={cn(
                 "flex size-10 shrink-0 items-center justify-center rounded-full",
                 has
-                  ? "bg-primary/15 text-primary"
+                  ? "border border-accent-gold/50 bg-[linear-gradient(135deg,color-mix(in_oklab,var(--accent-ember)_92%,transparent),color-mix(in_oklab,var(--accent-gold)_88%,transparent))] text-primary-foreground shadow-[0_0_0_6px_color-mix(in_oklab,var(--accent-gold)_14%,transparent),0_6px_20px_-4px_color-mix(in_oklab,var(--accent-ember)_35%,transparent)]"
                   : "bg-muted text-muted-foreground/60",
               )}
             >

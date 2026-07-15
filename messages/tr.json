@@ -106,6 +106,7 @@
     "myClubs": "Kulüplerim ({count})",
     "noClubs": "Henüz bir kulübe üye değilsiniz.",
     "presidentBadge": "BAŞKAN",
+    "memberBadge": "ÜYE",
     "myEvents": "Katılacağım Etkinlikler ({count})",
     "noEvents": "Yaklaşan katılımınız yok.",
     "toasts": {
@@ -716,6 +717,7 @@
     "deleteAria": "Fotoğrafı sil",
     "prev": "Önceki",
     "next": "Sonraki",
+    "hint": "← → ile gezin · Esc kapat",
     "toasts": {
       "tooMany": "En fazla {max} fotoğraf yükleyebilirsiniz.",
       "tooBig": "Her fotoğraf en fazla ~5MB olmalı.",

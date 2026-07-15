@@ -28,17 +28,31 @@ export function ClubCard({
 }) {
   const t = useTranslations("clubs");
   const initials = club.name.slice(0, 2).toUpperCase();
+  const watermark = (club.name?.trim()?.[0] ?? "•").toUpperCase();
 
   return (
     <Link
       href={`/clubs/${club.id}`}
       className={cn(
-        "group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "group flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_14px_34px_-14px_color-mix(in_oklab,var(--primary)_38%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         className,
       )}
     >
-      {/* Kapak */}
-      <div className="relative h-24 w-full overflow-hidden bg-gradient-to-br from-primary/25 via-muted to-muted">
+      {/* Kapak — foto ya da gün batımı gradyanı + filigran ilk harf (R2 dili) */}
+      <div className="relative h-24 w-full overflow-hidden">
+        {/* Gün batımı gradyan zemini (foto yoksa/yüklenemezse görünür) */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-[linear-gradient(140deg,color-mix(in_oklab,var(--primary)_88%,transparent),color-mix(in_oklab,var(--accent-ember)_72%,transparent))]"
+        />
+        {/* Filigran ilk harf */}
+        <span
+          aria-hidden="true"
+          className="absolute -right-2 -bottom-9 select-none font-display text-[7rem] leading-none font-black text-primary-foreground/15"
+        >
+          {watermark}
+        </span>
+        {/* Kapak fotoğrafı (varsa foto zemini kaplar) */}
         <ImageWithFallback
           src={club.cover_url}
           alt=""

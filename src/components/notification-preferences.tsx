@@ -82,34 +82,48 @@ export function NotificationPreferences({
                 disabled={busy !== null}
                 onClick={() => choose(value)}
                 className={cn(
-                  "relative flex flex-col items-start gap-1.5 rounded-lg border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60",
+                  "relative flex flex-col items-start gap-1.5 rounded-xl border p-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60",
                   active
-                    ? "border-primary bg-primary/10"
-                    : "border-border bg-card hover:bg-accent",
+                    ? "border-primary bg-primary text-primary-foreground shadow-[0_8px_22px_-12px_color-mix(in_oklab,var(--primary)_60%,transparent)]"
+                    : "border-border bg-card hover:border-accent-ember",
                 )}
               >
                 <span className="flex w-full items-center justify-between gap-2">
                   <Icon
                     className={cn(
                       "size-4",
-                      active ? "text-primary" : "text-muted-foreground",
+                      active ? "text-primary-foreground" : "text-muted-foreground",
                     )}
                   />
                   {busy === value ? (
-                    <Loader2 className="size-4 animate-spin text-primary" />
+                    <Loader2
+                      className={cn(
+                        "size-4 animate-spin",
+                        active ? "text-primary-foreground" : "text-primary",
+                      )}
+                    />
                   ) : (
-                    active && <Check className="size-4 text-primary" />
+                    active && (
+                      <span className="flex size-5 items-center justify-center rounded-full bg-accent-gold text-overlay shadow-sm">
+                        <Check className="size-3" strokeWidth={3} />
+                      </span>
+                    )
                   )}
                 </span>
                 <span
                   className={cn(
                     "text-sm font-medium",
-                    active ? "text-primary" : "text-foreground",
+                    active ? "text-primary-foreground" : "text-foreground",
                   )}
                 >
                   {t(value)}
                 </span>
-                <span className="text-xs text-muted-foreground">
+                <span
+                  className={cn(
+                    "text-xs",
+                    active ? "text-primary-foreground/80" : "text-muted-foreground",
+                  )}
+                >
                   {t(`${value}_desc`)}
                 </span>
               </button>

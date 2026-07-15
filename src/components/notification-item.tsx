@@ -40,23 +40,32 @@ export function NotificationItem({
       onClick={() => onActivate(n)}
       className={cn(
         "flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-        unread && "bg-primary/5",
+        unread && "bg-[color-mix(in_oklab,var(--accent-ember)_9%,transparent)]",
       )}
     >
       <span
         className={cn(
           "mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full",
-          unread ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground",
+          unread
+            ? "bg-[color-mix(in_oklab,var(--accent-ember)_16%,transparent)] text-accent-ember"
+            : "bg-muted text-muted-foreground",
         )}
       >
         <Icon className="size-4" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-2">
-          <span className="truncate text-sm font-medium">{primary}</span>
+          <span
+            className={cn(
+              "truncate text-sm",
+              unread ? "font-semibold" : "font-medium",
+            )}
+          >
+            {primary}
+          </span>
           {unread && (
             <span
-              className="size-2 shrink-0 rounded-full bg-primary"
+              className="size-2 shrink-0 rounded-full bg-accent-ember"
               aria-hidden
             />
           )}

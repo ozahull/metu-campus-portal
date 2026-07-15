@@ -106,6 +106,7 @@
     "myClubs": "My Clubs ({count})",
     "noClubs": "You are not a member of any club yet.",
     "presidentBadge": "PRESIDENT",
+    "memberBadge": "MEMBER",
     "myEvents": "My Upcoming Events ({count})",
     "noEvents": "You have no upcoming attendance.",
     "toasts": {
@@ -716,6 +717,7 @@
     "deleteAria": "Delete photo",
     "prev": "Previous",
     "next": "Next",
+    "hint": "← → to navigate · Esc to close",
     "toasts": {
       "tooMany": "You can upload at most {max} photos.",
       "tooBig": "Each photo must be at most ~5MB.",

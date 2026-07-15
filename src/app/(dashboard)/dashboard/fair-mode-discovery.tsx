@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { PartyPopper, Sparkles } from "lucide-react";
+import { Check, PartyPopper, Sparkles } from "lucide-react";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Badge } from "@/components/ui/badge";
@@ -112,12 +112,13 @@ export function FairModeDiscovery({
                   aria-pressed={active}
                   onClick={() => toggle(cat)}
                   className={cn(
-                    "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     active
                       ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-card text-foreground hover:border-primary/50",
+                      : "border-border bg-card text-foreground hover:border-accent-ember",
                   )}
                 >
+                  {active && <Check className="size-3.5" />}
                   {cat}
                 </button>
               );
@@ -142,7 +143,7 @@ export function FairModeDiscovery({
             return (
               <li
                 key={c.id}
-                className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4"
+                className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_14px_34px_-14px_color-mix(in_oklab,var(--primary)_38%,transparent)]"
               >
                 <div className="flex items-center gap-3">
                   <span className="relative flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted text-sm font-bold text-foreground">

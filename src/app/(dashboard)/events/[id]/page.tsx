@@ -9,7 +9,6 @@ import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { AddToCalendar } from "./add-to-calendar";
 import { EventPhotoWall, type EventPhoto } from "./event-photo-wall";
 import { TicketFlow, type MyTicket } from "./ticket-flow";
-import { formatPrice } from "@/lib/ticket-status";
 import { formatDateTime } from "@/lib/datetime";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +33,6 @@ export async function generateMetadata({
 type EventClub = {
   id: string;
   name: string;
-  iban: string | null;
   ticket_enabled: boolean;
   advisor_id: string | null;
   cover_url: string | null;
@@ -48,7 +46,6 @@ type EventDetail = {
   location: string | null;
   status: string;
   club_id: string;
-  ticket_price: number | null;
   ticket_capacity: number | null;
   ticket_deadline: string | null;
   clubs: EventClub | EventClub[] | null;
@@ -73,7 +70,7 @@ export default async function EventDetailPage({
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, title, description, event_date, location, status, club_id, ticket_price, ticket_capacity, ticket_deadline, clubs(id, name, iban, ticket_enabled, advisor_id, cover_url), event_attendees(user_id)",
+      "id, title, description, event_date, location, status, club_id, ticket_capacity, ticket_deadline, clubs(id, name, ticket_enabled, advisor_id, cover_url), event_attendees(user_id)",
     )
     .eq("id", id)
     .maybeSingle<EventDetail>();
@@ -91,14 +88,10 @@ export default async function EventDetailPage({
   const attendees = data.event_attendees ?? [];
   const isAttending = attendees.some((a) => a.user_id === user.id);
 
-  // Ücret rozeti için: fiyat tanımlı ve > 0 ise ücretli.
-  const priceNum = data.ticket_price !== null ? Number(data.ticket_price) : null;
-  const isPaid = priceNum !== null && priceNum > 0;
-
-  // Bilet akışı yalnızca kulüp bilet sistemini açtıysa VE etkinlik ücretliyse
-  // (ticket_price tanımlı ve > 0) gösterilir. Ücretsiz etkinlikte klasik RSVP
-  // korunur — aksi halde ücretsizde gereksiz dekont akışı tetikleniyor.
-  const ticketingOn = Boolean(club?.ticket_enabled) && isPaid;
+  // Bilet akışı OPT-IN: yalnızca kulüp bu etkinlikte katılım biletini (QR)
+  // açtıysa gösterilir (ticket_enabled). Ödeme/fiyat yok — bilet ücretsiz.
+  // Opt-in kapalıysa klasik RSVP (event_attendees) korunur.
+  const ticketingOn = Boolean(club?.ticket_enabled);
 
   // Kapak: etkinlikte alan yok → kulübün kapağı (tam URL). Kapasite barı:
   // ticket_capacity tanımlıysa katılımcı/kontenjan doluluk oranı.
@@ -152,7 +145,7 @@ export default async function EventDetailPage({
   if (ticketingOn) {
     const { data: t } = await supabase
       .from("tickets")
-      .select("id, token, status, receipt_url")
+      .select("id, token, status")
       .eq("event_id", data.id)
       .eq("user_id", user.id)
       .maybeSingle<MyTicket>();
@@ -206,11 +199,7 @@ export default async function EventDetailPage({
             )}
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary-foreground/25 bg-primary-foreground/15 px-3 py-1 text-xs font-medium text-primary-foreground backdrop-blur-sm">
               <Ticket className="size-3" />
-              {isPaid
-                ? t("priceBadge", {
-                    price: formatPrice(priceNum, locale) ?? t("free"),
-                  })
-                : t("free")}
+              {t("free")}
             </span>
           </div>
           <h1 className="mt-3 font-display text-3xl font-black tracking-tight text-balance text-primary-foreground drop-shadow-sm sm:text-4xl">

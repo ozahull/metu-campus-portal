@@ -1,34 +1,18 @@
-// Bilet durumları için ortak etiket/renk meta verisi.
+// Katılım bileti durumları için ortak etiket/renk meta verisi.
+// Ödeme kaldırıldı: yalnızca APPROVED (geçerli bilet) + CHECKED_IN kaldı.
 
-export type TicketStatus =
-  | "PENDING_PAYMENT"
-  | "SUBMITTED"
-  | "APPROVED"
-  | "REJECTED"
-  | "CHECKED_IN";
+export type TicketStatus = "APPROVED" | "CHECKED_IN";
 
-// cls'ler iki temada da okunur (bkz. event-status.ts): metin açık temada koyu,
-// koyu temada açık (dark:) varyant kullanır.
+// cls'ler yalnızca semantik durum token'larından (bkz. event-status.ts) —
+// iki temada da okunur; ham amber/emerald/violet YOK.
 export const TICKET_STATUS_META: Record<string, { label: string; cls: string }> = {
-  PENDING_PAYMENT: {
-    label: "Ödeme bekliyor",
-    cls: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
-  },
-  SUBMITTED: {
-    label: "Onay bekliyor",
-    cls: "border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-300",
-  },
   APPROVED: {
     label: "Onaylandı",
-    cls: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
-  },
-  REJECTED: {
-    label: "Reddedildi",
-    cls: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300",
+    cls: "border-success/30 bg-success/10 text-success",
   },
   CHECKED_IN: {
     label: "Giriş yapıldı",
-    cls: "border-violet-500/30 bg-violet-500/10 text-violet-700 dark:text-violet-300",
+    cls: "border-info/30 bg-info/10 text-info",
   },
 };
 
@@ -39,20 +23,4 @@ export function ticketStatusMeta(status: string) {
       cls: "border-border bg-muted text-muted-foreground",
     }
   );
-}
-
-// Bilet tutarını TRY olarak biçimlendirir (numeric string/number toleranslı).
-// locale aktif dile göre sayı/sembol biçimini belirler (varsayılan tr-TR).
-// Geçersiz/boş tutarda null döner; "ücretsiz" etiketini çağıran taraf çevirir.
-export function formatPrice(
-  price: number | string | null,
-  locale: string = "tr-TR",
-): string | null {
-  if (price === null) return null;
-  const n = typeof price === "string" ? Number(price) : price;
-  if (!Number.isFinite(n)) return null;
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency: "TRY",
-  }).format(n);
 }

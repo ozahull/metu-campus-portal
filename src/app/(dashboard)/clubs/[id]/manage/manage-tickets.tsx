@@ -7,6 +7,7 @@ import { Check, ExternalLink, Loader2, User, X } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
 export type PendingTicket = {
   id: string;
@@ -29,18 +30,11 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
   const [busyId, setBusyId] = useState<string | null>(null);
 
   async function decide(ticketId: string, decision: "approve" | "reject") {
-    let note: string | null = null;
-    if (decision === "reject") {
-      note = window.prompt(t("rejectPrompt"));
-      if (note === null) return; // iptal
-    }
-
     setBusyId(ticketId);
     const supabase = createClient();
     const { error } = await supabase.rpc("ticket_approve", {
       p_ticket_id: ticketId,
       p_decision: decision,
-      p_note: note?.trim() || undefined,
     });
     setBusyId(null);
     if (error) {
@@ -59,8 +53,8 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
           className="rounded-lg border border-border bg-card p-4"
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h4 className="font-semibold">{g.title}</h4>
-            <span className="text-xs text-muted-foreground">
+            <h4 className="font-medium">{g.title}</h4>
+            <span className="text-xs text-muted-foreground tabular-nums">
               {t("approved", { count: g.approvedCount })}
               {g.capacity !== null && t("capacity", { count: g.capacity })}
               {" · "}
@@ -79,7 +73,7 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
                 return (
                   <li
                     key={ticket.id}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-muted/40 px-3 py-2.5"
+                    className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-secondary/40 px-3 py-2.5"
                   >
                     <span className="inline-flex min-w-0 items-center gap-2 text-sm">
                       <User className="size-4 shrink-0 text-muted-foreground" />
@@ -107,7 +101,7 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
                         onClick={() => decide(ticket.id, "approve")}
                         disabled={busy}
                         size="sm"
-                        className="gap-1.5 bg-success font-medium text-success-foreground hover:bg-success/90"
+                        className="gap-1.5 font-medium"
                       >
                         {busy ? (
                           <Loader2 className="size-4 animate-spin" />
@@ -116,16 +110,25 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
                         )}
                         {t("approve")}
                       </Button>
-                      <Button
-                        onClick={() => decide(ticket.id, "reject")}
-                        disabled={busy}
-                        size="sm"
-                        variant="destructive"
-                        className="gap-1.5"
-                      >
-                        <X className="size-4" />
-                        {t("reject")}
-                      </Button>
+                      <ConfirmDialog
+                        trigger={
+                          <Button
+                            disabled={busy}
+                            size="sm"
+                            variant="destructive"
+                            className="gap-1.5"
+                          >
+                            <X className="size-4" />
+                            {t("reject")}
+                          </Button>
+                        }
+                        title={t("rejectConfirmTitle")}
+                        description={t("rejectConfirmBody", {
+                          name: ticket.full_name ?? t("unnamedUser"),
+                        })}
+                        confirmLabel={t("reject")}
+                        onConfirm={() => decide(ticket.id, "reject")}
+                      />
                     </div>
                   </li>
                 );

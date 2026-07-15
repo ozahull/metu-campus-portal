@@ -8,9 +8,11 @@ import {
   BadgeCheck,
   Camera,
   CameraOff,
+  KeyRound,
   Loader2,
   Search,
   User,
+  X,
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -40,6 +42,9 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<CheckinResult | null>(null);
   const [query, setQuery] = useState("");
+  const [manualCode, setManualCode] = useState("");
+  // Kamera izni reddedildi / açılamadı: toast yerine sabit hata ekranı.
+  const [cameraDenied, setCameraDenied] = useState(false);
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
   // Aynı QR'ın art arda okunmasını engelle.
@@ -86,6 +91,13 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
     router.refresh();
   }
 
+  async function verifyManual() {
+    const code = manualCode.trim().toUpperCase();
+    if (!code) return;
+    await doCheckin(code);
+    setManualCode("");
+  }
+
   async function stopScanner() {
     const inst = scannerRef.current;
     scannerRef.current = null;
@@ -127,7 +139,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
       } catch (err) {
         if (!cancelled) {
           setScanning(false);
-          toast.error(t("cameraError"));
+          setCameraDenied(true);
           console.error("[Checkin] kamera hatası:", err);
         }
       }
@@ -140,38 +152,75 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanning]);
 
+  function startScan() {
+    setResult(null);
+    setCameraDenied(false);
+    setScanning(true);
+  }
+
+  // Büyük, dolu-zeminli sonuç kartı: kapıda 3 metreden okunur. Zemin token'lı
+  // (bg-success / bg-destructive), metin foreground token'ı → iki temada kontrast.
+  const tone = result?.ok
+    ? {
+        card: "bg-success text-success-foreground",
+        btn: "bg-success-foreground text-success hover:bg-success-foreground/90",
+        title: t("resultApprovedTitle"),
+      }
+    : {
+        card: "bg-destructive text-destructive-foreground",
+        btn: "bg-destructive-foreground text-destructive hover:bg-destructive-foreground/90",
+        title: t("resultRejectedTitle"),
+      };
+
   return (
     <div className="space-y-6">
-      {/* Sonuç bandı */}
+      {/* Sonuç kartı — dev + yüksek kontrast (kapıda uzaktan okunur) */}
       {result && (
         <div
-          className={`flex items-center gap-3 rounded-xl border p-4 ${
-            result.ok
-              ? "border-success/30 bg-success/10"
-              : "border-destructive/30 bg-destructive/10"
-          }`}
+          className={`relative overflow-hidden rounded-2xl px-6 py-8 text-center shadow-lg ${tone.card}`}
         >
+          <button
+            onClick={() => setResult(null)}
+            aria-label={t("dismiss")}
+            className="absolute top-3 right-3 inline-flex size-9 items-center justify-center rounded-md opacity-70 transition-opacity hover:opacity-100"
+          >
+            <X className="size-5" />
+          </button>
+
           {result.ok ? (
-            <BadgeCheck className="size-6 shrink-0 text-success" />
+            <BadgeCheck className="mx-auto size-16" strokeWidth={2.25} />
           ) : (
-            <XCircle className="size-6 shrink-0 text-destructive" />
+            <XCircle className="mx-auto size-16" strokeWidth={2.25} />
           )}
-          <div className="min-w-0">
-            {result.ok ? (
-              <>
-                <p className="font-semibold text-success">
-                  {t("checkedInResult", { name: result.name ?? t("resultUser") })}
+
+          <p className="mt-3 text-2xl font-bold tracking-wide uppercase sm:text-3xl">
+            {tone.title}
+          </p>
+
+          {result.ok ? (
+            <>
+              <p className="mt-1 text-lg font-semibold sm:text-xl">
+                {result.name ?? t("resultUser")}
+              </p>
+              {result.event && (
+                <p className="mt-0.5 truncate text-sm opacity-80">
+                  {result.event}
                 </p>
-                {result.event && (
-                  <p className="truncate text-sm text-success/80">
-                    {result.event}
-                  </p>
-                )}
-              </>
-            ) : (
-              <p className="font-semibold text-destructive">{result.message}</p>
-            )}
-          </div>
+              )}
+            </>
+          ) : (
+            <p className="mx-auto mt-1 max-w-sm text-sm opacity-90">
+              {result.message}
+            </p>
+          )}
+
+          <button
+            onClick={startScan}
+            className={`mt-5 inline-flex h-11 items-center justify-center gap-1.5 rounded-lg px-5 text-sm font-semibold shadow-sm transition-colors ${tone.btn}`}
+          >
+            <Camera className="size-4" />
+            {t("scanNext")}
+          </button>
         </div>
       )}
 
@@ -184,9 +233,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
           </p>
           {scanning ? (
             <Button
-              onClick={() => {
-                setScanning(false);
-              }}
+              onClick={() => setScanning(false)}
               variant="outline"
               className="h-11 gap-1.5 px-4 text-sm"
             >
@@ -194,21 +241,20 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
               {t("stop")}
             </Button>
           ) : (
-            <Button
-              onClick={() => {
-                setResult(null);
-                setScanning(true);
-              }}
-              disabled={processing}
-              className="h-11 gap-1.5 px-4 text-sm font-medium"
-            >
-              {processing ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <Camera className="size-4" />
-              )}
-              {t("openCamera")}
-            </Button>
+            !cameraDenied && (
+              <Button
+                onClick={startScan}
+                disabled={processing}
+                className="h-11 gap-1.5 px-4 text-sm font-medium"
+              >
+                {processing ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Camera className="size-4" />
+                )}
+                {t("openCamera")}
+              </Button>
+            )
           )}
         </div>
 
@@ -219,11 +265,65 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
             scanning ? "block" : "hidden"
           }`}
         />
-        {!scanning && (
-          <p className="mt-3 text-xs text-muted-foreground">
-            {t("cameraHint")}
+        {scanning && (
+          <p className="mt-3 text-center text-xs text-muted-foreground">
+            {t("qrAlignHint")}
           </p>
         )}
+
+        {/* Kamera izni hatası ekranı */}
+        {!scanning && cameraDenied && (
+          <div className="mt-4 flex flex-col items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-6 text-center">
+            <CameraOff className="size-8 text-destructive" />
+            <p className="font-medium text-foreground">{t("cameraDeniedTitle")}</p>
+            <p className="max-w-xs text-sm text-muted-foreground">
+              {t("cameraDeniedBody")}
+            </p>
+            <Button onClick={startScan} className="mt-1 h-11 gap-1.5 px-4 text-sm">
+              <Camera className="size-4" />
+              {t("retry")}
+            </Button>
+          </div>
+        )}
+
+        {!scanning && !cameraDenied && (
+          <p className="mt-3 text-xs text-muted-foreground">{t("cameraHint")}</p>
+        )}
+      </div>
+
+      {/* Kod ile giriş (elle) */}
+      <div className="rounded-xl border border-border bg-card p-5">
+        <p className="inline-flex items-center gap-2 text-sm font-medium">
+          <KeyRound className="size-4 text-primary" />
+          {t("manualTitle")}
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Input
+            value={manualCode}
+            onChange={(e) => setManualCode(e.target.value.toUpperCase())}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") void verifyManual();
+            }}
+            placeholder={t("manualPlaceholder")}
+            disabled={processing}
+            inputMode="text"
+            autoCapitalize="characters"
+            className="h-11 min-w-0 flex-1 font-mono tracking-[0.2em] uppercase"
+          />
+          <Button
+            onClick={() => void verifyManual()}
+            disabled={processing || manualCode.trim() === ""}
+            className="h-11 shrink-0 gap-1.5 px-4 text-sm font-medium"
+          >
+            {processing ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <BadgeCheck className="size-4" />
+            )}
+            {t("verify")}
+          </Button>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">{t("manualHint")}</p>
       </div>
 
       {/* İsimle arama yedeği */}
@@ -263,7 +363,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
                   onClick={() => doCheckin(ticket.token)}
                   disabled={processing}
                   variant="outline"
-                  className="h-11 shrink-0 gap-1.5 px-4 text-sm border-success/40 text-success hover:bg-success/10"
+                  className="h-11 shrink-0 gap-1.5 border-success/40 px-4 text-sm text-success hover:bg-success/10"
                 >
                   {processing ? (
                     <Loader2 className="size-4 animate-spin" />

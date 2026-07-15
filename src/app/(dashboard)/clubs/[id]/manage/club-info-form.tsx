@@ -194,7 +194,7 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
           >
             <span
               className={cn(
-                "inline-block size-4 transform rounded-full bg-white shadow-sm transition-transform",
+                "inline-block size-4 transform rounded-full bg-primary-foreground shadow-sm transition-transform",
                 ticketEnabled ? "translate-x-6" : "translate-x-1",
               )}
             />

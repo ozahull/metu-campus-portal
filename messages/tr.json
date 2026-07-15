@@ -445,7 +445,12 @@
         "approved": "Onaylandı, okul onayına gönderildi",
         "rejected": "Etkinlik reddedildi",
         "changes": "Revizyon istendi"
-      }
+      },
+      "rejectConfirmTitle": "Etkinliği reddet",
+      "rejectConfirmBody": "\"{title}\" etkinliği reddedilecek. Başkan revizyonla tekrar gönderebilir. Emin misiniz?",
+      "changesPlaceholder": "Neyin düzeltilmesi gerektiğini yazın…",
+      "cancelChanges": "Vazgeç",
+      "sendChanges": "Revizyon Gönder"
     },
     "members": {
       "adminBadge": "YÖNETİCİ",
@@ -479,7 +484,9 @@
         "decideError": "İşlem başarısız: {message}",
         "approved": "Bilet onaylandı",
         "rejected": "Bilet reddedildi"
-      }
+      },
+      "rejectConfirmTitle": "Bileti reddet",
+      "rejectConfirmBody": "{name} adlı katılımcının bileti reddedilecek. Emin misiniz?"
     },
     "documents": {
       "title": "Belgeler",
@@ -705,7 +712,19 @@
     "resultUser": "Kullanıcı",
     "checkedInMessage": "Giriş yapıldı",
     "successToast": "Giriş: {name}",
-    "successFallback": "kullanıcı"
+    "successFallback": "kullanıcı",
+    "resultApprovedTitle": "GİRİŞ ONAYLANDI",
+    "resultRejectedTitle": "GEÇERSİZ BİLET",
+    "qrAlignHint": "QR kodu çerçeveye hizala",
+    "manualTitle": "Kod ile Giriş",
+    "manualPlaceholder": "BİLET KODU",
+    "manualHint": "Bilet kodunu elle girip doğrulayın.",
+    "verify": "Kodu Doğrula",
+    "cameraDeniedTitle": "Kamera açılamadı",
+    "cameraDeniedBody": "Kamera izni verin ya da kod/isimle giriş yapın.",
+    "retry": "Tekrar Dene",
+    "dismiss": "Kapat",
+    "scanNext": "Sonrakini Tara"
   },
   "photos": {
     "title": "Etkinlikten Kareler",

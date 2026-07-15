@@ -75,14 +75,14 @@ export function ManageMembers({
   }
 
   return (
-    <ul className="space-y-2">
+    <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
       {members.map((m) => {
         const isAdmin = m.role.toUpperCase() === "ADMIN";
         const busy = busyId === m.user_id;
         return (
           <li
             key={m.user_id}
-            className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/40"
+            className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-secondary/40"
           >
             <div className="flex min-w-0 items-center gap-3">
               <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
@@ -92,7 +92,7 @@ export function ManageMembers({
                 {m.full_name ?? t("unnamed")}
               </span>
               {isAdmin && (
-                <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                <span className="rounded-full border border-border bg-secondary px-2 py-0.5 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
                   {t("adminBadge")}
                 </span>
               )}

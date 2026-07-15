@@ -7,28 +7,28 @@ export type EventStatus =
   | "REJECTED"
   | "CHANGES_REQUESTED";
 
-// cls'ler iki temada da okunur: yarı saydam kenar/zemin her temada çalışır;
-// metin açık temada koyu (…-700), koyu temada açık (dark:…-300) varyant kullanır.
+// cls'ler yalnızca semantik durum token'larından — iki temada da okunur (token
+// koyu temada açık varyanta kendi döner). Dil B: soluk zemin + koyu/durum metin.
 export const STATUS_META: Record<string, { label: string; cls: string }> = {
   PENDING_ADVISOR: {
     label: "Danışman onayında",
-    cls: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+    cls: "border-warning/30 bg-warning/10 text-warning",
   },
   PENDING_SCHOOL: {
     label: "Okul onayında",
-    cls: "border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-300",
+    cls: "border-info/30 bg-info/10 text-info",
   },
   APPROVED: {
     label: "Onaylandı",
-    cls: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+    cls: "border-success/30 bg-success/10 text-success",
   },
   REJECTED: {
     label: "Reddedildi",
-    cls: "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300",
+    cls: "border-destructive/30 bg-destructive/10 text-destructive",
   },
   CHANGES_REQUESTED: {
     label: "Revizyon istendi",
-    cls: "border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-300",
+    cls: "border-warning/40 bg-warning/15 text-warning",
   },
 };
 

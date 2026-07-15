@@ -86,6 +86,9 @@ export function ManageEvents({
   const [editing, setEditing] = useState<ManageEvent | null>(null);
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+  // Danışman "revizyon iste" satır-içi not editörü (window.prompt YOK — Dil B).
+  const [noteFor, setNoteFor] = useState<string | null>(null);
+  const [note, setNote] = useState("");
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -258,25 +261,14 @@ export function ManageEvents({
   async function advisorDecide(
     ev: ManageEvent,
     decision: "approve" | "reject" | "changes",
+    noteArg?: string,
   ) {
-    let note: string | null = null;
-    if (decision !== "approve") {
-      note = window.prompt(
-        decision === "reject" ? t("rejectPrompt") : t("changesPrompt"),
-      );
-      if (note === null) return; // iptal
-      if (decision === "changes" && note.trim() === "") {
-        toast.error(t("toasts.changesNoteRequired"));
-        return;
-      }
-    }
-
     setBusyId(ev.id);
     const supabase = createClient();
     const { error } = await supabase.rpc("event_advisor_decision", {
       p_event_id: ev.id,
       p_decision: decision,
-      p_note: note?.trim() || undefined,
+      p_note: noteArg?.trim() || undefined,
     });
     setBusyId(null);
     if (error) {
@@ -290,6 +282,8 @@ export function ManageEvents({
           ? t("toasts.rejected")
           : t("toasts.changes"),
     );
+    setNoteFor(null);
+    setNote("");
     router.refresh();
   }
 
@@ -307,31 +301,31 @@ export function ManageEvents({
           {t("empty")}
         </p>
       ) : (
-        <ul className="space-y-2">
+        <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
           {events.map((ev) => {
             const meta = statusMeta(ev.status);
             const busy = busyId === ev.id;
             return (
               <li
                 key={ev.id}
-                className="rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/40"
+                className="relative border-l-2 border-transparent p-4 transition-colors focus-within:border-l-primary hover:bg-secondary/40"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="font-semibold">{ev.title}</h4>
-                      <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${meta.cls}`}>
+                      <h4 className="font-medium">{ev.title}</h4>
+                      <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium tracking-wide uppercase ${meta.cls}`}>
                         {t(`status.${ev.status}`)}
                       </span>
                     </div>
                     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1.5">
-                        <Clock className="size-3.5 text-primary" />
+                      <span className="inline-flex items-center gap-1.5 tabular-nums">
+                        <Clock className="size-3.5" />
                         {formatDateTime(ev.event_date, locale, "short")}
                       </span>
                       {ev.location && (
                         <span className="inline-flex items-center gap-1.5">
-                          <MapPin className="size-3.5 text-primary" />
+                          <MapPin className="size-3.5" />
                           {ev.location}
                         </span>
                       )}
@@ -357,9 +351,9 @@ export function ManageEvents({
 
                 {/* Revizyon notu + tekrar gönder */}
                 {ev.status === "CHANGES_REQUESTED" && (
-                  <div className="mt-3 rounded-md border border-orange-500/25 bg-orange-500/10 p-3">
+                  <div className="mt-3 rounded-md border border-warning/30 bg-warning/10 p-3">
                     {ev.review_note && (
-                      <p className="flex items-start gap-2 text-xs text-orange-700 dark:text-orange-300">
+                      <p className="flex items-start gap-2 text-xs text-warning">
                         <MessageSquareWarning className="mt-0.5 size-3.5 shrink-0" />
                         {ev.review_note}
                       </p>
@@ -371,18 +365,79 @@ export function ManageEvents({
                   </div>
                 )}
 
-                {/* Danışman kararları */}
+                {/* Danışman kararları (R4 diliyle: satır-içi not editörü + ConfirmDialog) */}
                 {canAdvisorDecide && ev.status === "PENDING_ADVISOR" && (
-                  <div className="mt-3 flex flex-wrap gap-2 border-t border-border pt-3">
-                    <Button onClick={() => advisorDecide(ev, "approve")} disabled={busy} size="sm" className="gap-1.5 bg-success font-medium text-success-foreground hover:bg-success/90">
-                      <Check className="size-4" /> {t("approve")}
-                    </Button>
-                    <Button onClick={() => advisorDecide(ev, "changes")} disabled={busy} size="sm" variant="outline" className="gap-1.5 border-orange-500/40 text-orange-700 hover:bg-orange-500/10 dark:text-orange-300">
-                      <MessageSquareWarning className="size-4" /> {t("requestChanges")}
-                    </Button>
-                    <Button onClick={() => advisorDecide(ev, "reject")} disabled={busy} size="sm" variant="destructive" className="gap-1.5">
-                      <X className="size-4" /> {t("reject")}
-                    </Button>
+                  <div className="mt-3 space-y-3 border-t border-border pt-3">
+                    <div className="flex flex-wrap gap-2">
+                      <Button onClick={() => advisorDecide(ev, "approve")} disabled={busy} size="sm" className="gap-1.5">
+                        {busy ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
+                        {t("approve")}
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setNote("");
+                          setNoteFor((v) => (v === ev.id ? null : ev.id));
+                        }}
+                        disabled={busy}
+                        size="sm"
+                        variant="outline"
+                        className="gap-1.5"
+                      >
+                        <MessageSquareWarning className="size-4" /> {t("requestChanges")}
+                      </Button>
+                      <ConfirmDialog
+                        trigger={
+                          <Button disabled={busy} size="sm" variant="destructive" className="gap-1.5">
+                            <X className="size-4" /> {t("reject")}
+                          </Button>
+                        }
+                        title={t("rejectConfirmTitle")}
+                        description={t("rejectConfirmBody", { title: ev.title })}
+                        confirmLabel={t("reject")}
+                        onConfirm={() => advisorDecide(ev, "reject")}
+                      />
+                    </div>
+
+                    {noteFor === ev.id && (
+                      <div className="space-y-2 rounded-md border border-border bg-secondary/40 p-3">
+                        <Textarea
+                          value={note}
+                          onChange={(e) => setNote(e.target.value)}
+                          rows={2}
+                          placeholder={t("changesPlaceholder")}
+                          disabled={busy}
+                          className="resize-none"
+                        />
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              setNoteFor(null);
+                              setNote("");
+                            }}
+                            disabled={busy}
+                          >
+                            {t("cancelChanges")}
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              if (note.trim() === "") {
+                                toast.error(t("toasts.changesNoteRequired"));
+                                return;
+                              }
+                              void advisorDecide(ev, "changes", note);
+                            }}
+                            disabled={busy}
+                            className="gap-1.5"
+                          >
+                            {busy && <Loader2 className="size-4 animate-spin" />}
+                            {t("sendChanges")}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 

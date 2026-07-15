@@ -445,7 +445,12 @@
         "approved": "Approved, submitted for school approval",
         "rejected": "Event rejected",
         "changes": "Changes requested"
-      }
+      },
+      "rejectConfirmTitle": "Reject event",
+      "rejectConfirmBody": "\"{title}\" will be rejected. The president can resubmit after revising. Are you sure?",
+      "changesPlaceholder": "Describe what needs to be fixed…",
+      "cancelChanges": "Cancel",
+      "sendChanges": "Send Revision"
     },
     "members": {
       "adminBadge": "ADMIN",
@@ -479,7 +484,9 @@
         "decideError": "Operation failed: {message}",
         "approved": "Ticket approved",
         "rejected": "Ticket rejected"
-      }
+      },
+      "rejectConfirmTitle": "Reject ticket",
+      "rejectConfirmBody": "The ticket for {name} will be rejected. Are you sure?"
     },
     "documents": {
       "title": "Documents",
@@ -705,7 +712,19 @@
     "resultUser": "User",
     "checkedInMessage": "Checked in",
     "successToast": "Checked in: {name}",
-    "successFallback": "user"
+    "successFallback": "user",
+    "resultApprovedTitle": "ENTRY APPROVED",
+    "resultRejectedTitle": "INVALID TICKET",
+    "qrAlignHint": "Align the QR code within the frame",
+    "manualTitle": "Check in by Code",
+    "manualPlaceholder": "TICKET CODE",
+    "manualHint": "Enter the ticket code manually and verify.",
+    "verify": "Verify Code",
+    "cameraDeniedTitle": "Camera unavailable",
+    "cameraDeniedBody": "Grant camera permission, or check in by code or name.",
+    "retry": "Try Again",
+    "dismiss": "Dismiss",
+    "scanNext": "Scan Next"
   },
   "photos": {
     "title": "Event Snapshots",

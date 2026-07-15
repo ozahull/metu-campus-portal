@@ -227,6 +227,8 @@
       "label": "Bilet",
       "yourTicket": "Biletiniz",
       "buy": "Bilet Al",
+      "free": "Ücretsiz",
+      "freeLabel": "Katılım Bileti",
       "salesClosed": "Bilet satışı kapandı",
       "rejectedNote": "Dekontunuz reddedildi. Lütfen ödemenizi kontrol edip yeniden yükleyin.",
       "amountDue": "Ödenecek tutar",
@@ -248,7 +250,7 @@
       },
       "toasts": {
         "buyError": "Bilet alınamadı: {message}",
-        "buyCreated": "Bilet talebiniz oluşturuldu. Ödeme yapıp dekontu yükleyin.",
+        "buyCreated": "Biletiniz oluşturuldu. QR kodunuz hazır.",
         "cancelConfirm": "Bilet talebinizi iptal etmek istiyor musunuz?",
         "cancelError": "İptal edilemedi: {message}",
         "cancelDone": "Bilet talebiniz iptal edildi.",

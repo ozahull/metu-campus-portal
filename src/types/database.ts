@@ -651,6 +651,10 @@ export type Database = {
           ticket_id: string
         }[]
       }
+      ticket_issue: {
+        Args: { p_event: string }
+        Returns: undefined
+      }
       ticket_submit_receipt: {
         Args: { p_receipt_url: string; p_ticket_id: string }
         Returns: undefined

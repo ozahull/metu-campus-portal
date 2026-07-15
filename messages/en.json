@@ -227,6 +227,8 @@
       "label": "Ticket",
       "yourTicket": "Your Ticket",
       "buy": "Buy Ticket",
+      "free": "Free",
+      "freeLabel": "Attendance Pass",
       "salesClosed": "Ticket sales closed",
       "rejectedNote": "Your receipt was rejected. Please check your payment and re-upload.",
       "amountDue": "Amount due",
@@ -248,7 +250,7 @@
       },
       "toasts": {
         "buyError": "Could not buy ticket: {message}",
-        "buyCreated": "Your ticket request has been created. Make the payment and upload the receipt.",
+        "buyCreated": "Your ticket is ready. Your QR code is available.",
         "cancelConfirm": "Do you want to cancel your ticket request?",
         "cancelError": "Could not cancel: {message}",
         "cancelDone": "Your ticket request has been cancelled.",

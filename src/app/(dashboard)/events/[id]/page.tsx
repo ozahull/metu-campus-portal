@@ -304,9 +304,6 @@ export default async function EventDetailPage({
             {ticketingOn ? (
               <TicketFlow
                 eventId={data.id}
-                userId={user.id}
-                clubIban={club?.iban ?? null}
-                price={data.ticket_price}
                 closesAtISO={data.ticket_deadline ?? data.event_date}
                 ticket={myTicket}
               />

@@ -226,6 +226,18 @@
     caret-color: var(--foreground);
     transition: background-color 9999s ease-out 0s;
   }
+  /*
+    Edge/IE, kullanıcı bir şifre alanına yazdığında sağ kenara kendi native
+    "şifre göster" (::-ms-reveal) ve "temizle" (::-ms-clear) kontrolünü basar.
+    Bu shadow-DOM ikonu özel göz (Eye) butonlarımızın üstüne binip tıklamayı
+    yutuyor (z-index çözmez — kontrol DOM'a ait değil). Tüm şifre inputlarında
+    native ikonları gizle; tek çalışan custom göz butonu kalsın
+    (login/register/reset/profile — 5 alan).
+  */
+  input[type="password"]::-ms-reveal,
+  input[type="password"]::-ms-clear {
+    display: none;
+  }
 }
 
 /*

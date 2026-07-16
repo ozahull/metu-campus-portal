@@ -133,6 +133,8 @@ export default function ResetPasswordPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={loading}
+                    data-1p-ignore="true"
+                    data-lpignore="true"
                     className="h-11 pr-10"
                     required
                   />
@@ -153,17 +155,34 @@ export default function ResetPasswordPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="confirm">{t("reset.confirmLabel")}</Label>
-                <Input
-                  id="confirm"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
-                  placeholder={t("reset.confirmPlaceholder")}
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  disabled={loading}
-                  className="h-11"
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="confirm"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder={t("reset.confirmPlaceholder")}
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                    disabled={loading}
+                    data-1p-ignore="true"
+                    data-lpignore="true"
+                    className="h-11 pr-10"
+                    required
+                  />
+                  {/* Aynı showPassword state'i iki alanı birden aç/kapatır (tek göz). */}
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="size-4" />
+                    ) : (
+                      <Eye className="size-4" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               <Button

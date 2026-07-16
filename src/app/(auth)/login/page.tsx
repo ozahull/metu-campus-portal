@@ -114,6 +114,8 @@ function LoginCard() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
+                data-1p-ignore="true"
+                data-lpignore="true"
                 className="h-11 pr-10"
                 required
               />

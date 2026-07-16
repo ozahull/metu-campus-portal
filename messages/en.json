@@ -316,6 +316,80 @@
     "coverAlt": "{name} cover image",
     "logoAlt": "{name} logo"
   },
+  "clubRequest": {
+    "metaTitle": "Start a Community",
+    "pageTitle": "Community Application",
+    "pageSubtitle": "Apply to the school administration to start a new campus community. Once approved, you become the club's advisor.",
+    "cta": {
+      "title": "Want to start a community?",
+      "body": "As an advisor, you can apply to establish a new campus community.",
+      "button": "Apply to start a community"
+    },
+    "form": {
+      "nameLabel": "Community name",
+      "namePlaceholder": "e.g. Robotics Club",
+      "descriptionLabel": "Short description",
+      "descriptionPlaceholder": "Describe the community's purpose in a few sentences (optional).",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "e.g. Technology, Art, Sports (optional)",
+      "rationaleLabel": "Rationale",
+      "rationalePlaceholder": "Why should this community exist? Provide a rationale to help the school administration decide.",
+      "submit": "Submit application",
+      "resubmit": "Resubmit"
+    },
+    "pending": {
+      "title": "Your application is under review",
+      "body": "Your application has been sent to the school administration. You'll be notified once a decision is made.",
+      "submittedAt": "Submitted: {date}",
+      "nameLabel": "Community name",
+      "categoryLabel": "Category",
+      "descriptionLabel": "Description",
+      "rationaleLabel": "Rationale",
+      "empty": "—"
+    },
+    "changes": {
+      "title": "Changes requested",
+      "body": "The school administration requested changes to your application. Update the information below according to the note and resubmit.",
+      "noteLabel": "Note from the administration"
+    },
+    "approved": {
+      "title": "Your application was approved!",
+      "body": "Congratulations — the “{name}” community has been created and you are its advisor. Head to the club management panel to appoint a president and add events.",
+      "viewClub": "View your club",
+      "newRequest": "Start another application"
+    },
+    "rejected": {
+      "title": "Your application was rejected",
+      "body": "This application was not approved by the school administration. Review the reason and submit a new application.",
+      "noteLabel": "Reason for rejection",
+      "reapply": "Apply again"
+    },
+    "documents": {
+      "title": "Documents",
+      "emphasizeNote": "— you can attach documents supporting your application",
+      "open": "Open",
+      "noLink": "No link",
+      "deleteAria": "Delete document",
+      "notePlaceholder": "Note (optional)",
+      "upload": "Upload document",
+      "hint": "Image (JPG/PNG) or PDF.",
+      "toasts": {
+        "uploadError": "Could not upload document: {message}",
+        "saveError": "Could not save document: {message}",
+        "uploaded": "Document uploaded.",
+        "deleteError": "Could not delete: {message}",
+        "deleted": "Document deleted."
+      }
+    },
+    "toasts": {
+      "nameRequired": "Community name is required.",
+      "rationaleRequired": "Rationale is required.",
+      "submitted": "Your application has been submitted.",
+      "resubmitted": "Your application has been resubmitted.",
+      "submitError": "Could not submit application: {message}",
+      "resubmitError": "Could not resubmit application: {message}"
+    }
+  },
   "manage": {
     "shell": {
       "back": "Back to Club",

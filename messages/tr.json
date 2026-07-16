@@ -316,6 +316,80 @@
     "coverAlt": "{name} kapak görseli",
     "logoAlt": "{name} logosu"
   },
+  "clubRequest": {
+    "metaTitle": "Topluluk Aç",
+    "pageTitle": "Topluluk Açma Başvurusu",
+    "pageSubtitle": "Yeni bir kampüs topluluğu kurmak için başvurunu okul yönetimine ilet. Onaylandığında kulübün danışmanı sen olursun.",
+    "cta": {
+      "title": "Bir topluluk açmak ister misin?",
+      "body": "Hoca olarak yeni bir kampüs topluluğu kurmak için başvuru yapabilirsin.",
+      "button": "Topluluk açma başvurusu"
+    },
+    "form": {
+      "nameLabel": "Topluluk adı",
+      "namePlaceholder": "örn. Robotik Kulübü",
+      "descriptionLabel": "Kısa açıklama",
+      "descriptionPlaceholder": "Topluluğun amacını birkaç cümleyle anlat (opsiyonel).",
+      "categoryLabel": "Kategori",
+      "categoryPlaceholder": "örn. Teknoloji, Sanat, Spor (opsiyonel)",
+      "rationaleLabel": "Gerekçe",
+      "rationalePlaceholder": "Bu topluluk neden kurulmalı? Okul yönetiminin kararına yardımcı olacak gerekçeyi yaz.",
+      "submit": "Başvuruyu gönder",
+      "resubmit": "Yeniden gönder"
+    },
+    "pending": {
+      "title": "Başvurun incelemede",
+      "body": "Başvurun okul yönetimine iletildi. Karar verildiğinde bilgilendirileceksin.",
+      "submittedAt": "Gönderim tarihi: {date}",
+      "nameLabel": "Topluluk adı",
+      "categoryLabel": "Kategori",
+      "descriptionLabel": "Açıklama",
+      "rationaleLabel": "Gerekçe",
+      "empty": "—"
+    },
+    "changes": {
+      "title": "Revizyon istendi",
+      "body": "Okul yönetimi başvurunda değişiklik istedi. Aşağıdaki notu dikkate alarak bilgileri güncelle ve yeniden gönder.",
+      "noteLabel": "Okul yönetiminin notu"
+    },
+    "approved": {
+      "title": "Başvurun onaylandı!",
+      "body": "Tebrikler — “{name}” topluluğu kuruldu ve danışmanı sen oldun. Başkan atamak ve etkinlik eklemek için kulüp yönetim paneline gidebilirsin.",
+      "viewClub": "Kulübünü görüntüle",
+      "newRequest": "Yeni başvuru yap"
+    },
+    "rejected": {
+      "title": "Başvurun reddedildi",
+      "body": "Bu başvuru okul yönetimi tarafından onaylanmadı. Gerekçeyi inceleyip yeni bir başvuru yapabilirsin.",
+      "noteLabel": "Red gerekçesi",
+      "reapply": "Yeniden başvur"
+    },
+    "documents": {
+      "title": "Belgeler",
+      "emphasizeNote": "— başvurunu destekleyen belge ekleyebilirsin",
+      "open": "Aç",
+      "noLink": "Bağlantı yok",
+      "deleteAria": "Belgeyi sil",
+      "notePlaceholder": "Açıklama (opsiyonel)",
+      "upload": "Belge Yükle",
+      "hint": "Görsel (JPG/PNG) veya PDF.",
+      "toasts": {
+        "uploadError": "Belge yüklenemedi: {message}",
+        "saveError": "Belge kaydedilemedi: {message}",
+        "uploaded": "Belge yüklendi.",
+        "deleteError": "Silinemedi: {message}",
+        "deleted": "Belge silindi."
+      }
+    },
+    "toasts": {
+      "nameRequired": "Topluluk adı gerekli.",
+      "rationaleRequired": "Gerekçe gerekli.",
+      "submitted": "Başvurun gönderildi.",
+      "resubmitted": "Başvurun yeniden gönderildi.",
+      "submitError": "Başvuru gönderilemedi: {message}",
+      "resubmitError": "Başvuru yeniden gönderilemedi: {message}"
+    }
+  },
   "manage": {
     "shell": {
       "back": "Kulübe Dön",

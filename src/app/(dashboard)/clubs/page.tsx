@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { Plus, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { cn } from "@/lib/utils";
 import { PageShell } from "@/components/shared/page-shell";
+import { buttonVariants } from "@/components/ui/button";
 import { ClubsCollection } from "@/components/shared/clubs-collection";
 import type { Club } from "@/components/shared/club-card";
 
@@ -34,6 +38,17 @@ export default async function ClubsPage() {
   if (!user) {
     redirect("/login");
   }
+
+  // Rol: yalnız HOCA'ya "topluluk aç" CTA'sı gösterilir (nav'a kalıcı link
+  // eklenmez — kapsam dışı). Diğer sorgular/RLS aynen korunur.
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  const isAdvisor =
+    profile?.role?.toString().trim().toUpperCase() === "ADVISOR";
+  const tReq = await getTranslations("clubRequest");
 
   // NOT: category/logo/cover + üye sayısı (club_members(count)) yalnızca kart
   // sunumu için EK olarak çekilir; filtreleme/RLS/mutasyon aynen korunur.
@@ -68,6 +83,34 @@ export default async function ClubsPage() {
           {t("listSubtitle")}
         </p>
       </header>
+
+      {isAdvisor && (
+        <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-primary/25 bg-primary/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Sparkles className="size-5" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-base font-semibold tracking-tight">
+                {tReq("cta.title")}
+              </h2>
+              <p className="mt-0.5 text-sm text-pretty text-muted-foreground">
+                {tReq("cta.body")}
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/clubs/new"
+            className={cn(
+              buttonVariants({ size: "sm" }),
+              "shrink-0 gap-1.5 font-medium",
+            )}
+          >
+            <Plus className="size-4" />
+            {tReq("cta.button")}
+          </Link>
+        </div>
+      )}
 
       <ClubsCollection clubs={clubs} showSearch />
     </PageShell>

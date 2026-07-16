@@ -65,7 +65,7 @@ export default async function AdminPage() {
     .order("name", { ascending: true });
   const { data: usersRaw } = await supabase
     .from("profiles")
-    .select("id, full_name")
+    .select("id, full_name, role")
     .order("full_name", { ascending: true });
 
   const clubOptions: Option[] = (clubsRaw ?? []).map((c) => ({
@@ -81,6 +81,17 @@ export default async function AdminPage() {
     id: u.id,
     label: u.full_name ?? t("unnamedUser"),
   }));
+  // HOCA (ADVISOR) rol atama listeleri — profiles.role tabanlı; clubs.advisor_id
+  // (kulübün akademik danışmanı) kavramından BAĞIMSIZ. role SELECT'te kolon-grant
+  // ile açıktır (email değil). Aday = 'USER' (hoca yapılabilir); hoca = 'ADVISOR'.
+  const roleOf = (r: string | null | undefined) =>
+    r?.toString().trim().toUpperCase();
+  const roleCandidates: Option[] = (usersRaw ?? [])
+    .filter((u) => roleOf(u.role) === "USER")
+    .map((u) => ({ id: u.id, label: u.full_name ?? t("unnamedUser") }));
+  const advisors: Option[] = (usersRaw ?? [])
+    .filter((u) => roleOf(u.role) === "ADVISOR")
+    .map((u) => ({ id: u.id, label: u.full_name ?? t("unnamedUser") }));
   const clubSettings: ClubSetting[] = (clubsRaw ?? []).map((c) => ({
     id: c.id,
     name: c.name,
@@ -200,6 +211,8 @@ export default async function AdminPage() {
           clubOptions={clubOptions}
           userOptions={userOptions}
           clubAdvisors={clubAdvisors}
+          roleCandidates={roleCandidates}
+          advisors={advisors}
           fairEnabled={fairEnabled}
           userId={user.id}
         />

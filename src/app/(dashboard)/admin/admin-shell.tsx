@@ -17,6 +17,7 @@ import { AdminApprovals, type PendingEvent } from "./admin-approvals";
 import { AdminSettings, type ClubSetting } from "./admin-settings";
 import { NewClubForm } from "./new-club-form";
 import { AdminAssignments, type Option } from "./admin-assignments";
+import { AdminRoles } from "./admin-roles";
 import {
   AdminAnalytics,
   type ClubStat,
@@ -40,6 +41,8 @@ export function AdminShell({
   clubOptions,
   userOptions,
   clubAdvisors,
+  roleCandidates,
+  advisors,
   fairEnabled,
   userId,
 }: {
@@ -51,6 +54,8 @@ export function AdminShell({
   clubOptions: Option[];
   userOptions: Option[];
   clubAdvisors: Record<string, string | null>;
+  roleCandidates: Option[];
+  advisors: Option[];
   fairEnabled: boolean;
   userId: string;
 }) {
@@ -161,11 +166,14 @@ export function AdminShell({
         </AdminTabPanel>
 
         <AdminTabPanel value="assignments">
-          <AdminAssignments
-            clubs={clubOptions}
-            users={userOptions}
-            clubAdvisors={clubAdvisors}
-          />
+          <div className="space-y-6">
+            <AdminAssignments
+              clubs={clubOptions}
+              users={userOptions}
+              clubAdvisors={clubAdvisors}
+            />
+            <AdminRoles candidates={roleCandidates} advisors={advisors} />
+          </div>
         </AdminTabPanel>
 
         <AdminTabPanel value="analytics">

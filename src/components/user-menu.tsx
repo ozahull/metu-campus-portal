@@ -34,7 +34,18 @@ export function UserMenu({
   const router = useRouter();
   const t = useTranslations("userMenu");
   const tNav = useTranslations("nav");
+  const tRoles = useTranslations("roles");
   const [loading, setLoading] = useState(false);
+
+  // Rol rozetini çevir (ham 'USER'/'ADVISOR'/'SUPER_ADMIN' yerine). ADVISOR →
+  // "Hoca"; SUPER_ADMIN → "Süper yönetici"; diğer → "Üye".
+  const roleKey = role.toString().trim().toUpperCase();
+  const roleLabel =
+    roleKey === "SUPER_ADMIN"
+      ? tRoles("superAdmin")
+      : roleKey === "ADVISOR"
+        ? tRoles("advisor")
+        : tRoles("user");
 
   async function handleSignOut() {
     setLoading(true);
@@ -64,7 +75,7 @@ export function UserMenu({
               {email}
             </span>
             <span className="mt-1 inline-flex w-fit items-center rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium tracking-wide text-primary">
-              {role}
+              {roleLabel}
             </span>
           </div>
         </DropdownMenuLabel>

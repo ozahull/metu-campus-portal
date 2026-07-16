@@ -30,6 +30,11 @@
     "signingOut": "Signing out…",
     "language": "Language"
   },
+  "roles": {
+    "user": "Member",
+    "advisor": "Advisor",
+    "superAdmin": "Super admin"
+  },
   "notifications": {
     "title": "Notifications",
     "bellAria": "Notifications ({count} unread)",
@@ -577,6 +582,24 @@
         "notSaved": "Assignment could not be saved (permission denied). Please try again.",
         "assigned": "Advisor assigned",
         "removed": "Advisor removed"
+      }
+    },
+    "roles": {
+      "title": "Advisor Role",
+      "desc": "Make a user an advisor or revoke the role. Advisors will be able to apply to open a community even without belonging to a club (permissions come in a later stage).",
+      "userLabel": "User",
+      "userPlaceholder": "Select…",
+      "promote": "Make Advisor",
+      "demote": "Remove Advisor Role",
+      "noCandidates": "No user available to make an advisor.",
+      "currentTitle": "Current Advisors",
+      "noneAssigned": "No advisors yet.",
+      "toasts": {
+        "userRequired": "Select a user.",
+        "error": "Operation failed: {message}",
+        "notSaved": "Role could not be saved (permission denied). Please try again.",
+        "promoted": "User made an advisor",
+        "demoted": "Advisor role removed"
       }
     },
     "approvals": {

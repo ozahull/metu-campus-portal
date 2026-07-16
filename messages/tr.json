@@ -30,6 +30,11 @@
     "signingOut": "Çıkış yapılıyor…",
     "language": "Dil"
   },
+  "roles": {
+    "user": "Üye",
+    "advisor": "Hoca",
+    "superAdmin": "Süper yönetici"
+  },
   "notifications": {
     "title": "Bildirimler",
     "bellAria": "Bildirimler ({count} okunmamış)",
@@ -577,6 +582,24 @@
         "notSaved": "Atama kaydedilemedi (yetki reddedildi). Lütfen tekrar deneyin.",
         "assigned": "Danışman atandı",
         "removed": "Danışman kaldırıldı"
+      }
+    },
+    "roles": {
+      "title": "Hoca Rolü",
+      "desc": "Bir kullanıcıyı hoca yapın veya rolünü geri alın. Hocalar, kulübe bağlı olmadan da topluluk açma başvurusu yapabilecek (yetki sonraki aşamada).",
+      "userLabel": "Kullanıcı",
+      "userPlaceholder": "Seçin…",
+      "promote": "Hoca Yap",
+      "demote": "Hoca Rolünü Kaldır",
+      "noCandidates": "Hoca yapılabilecek kullanıcı yok.",
+      "currentTitle": "Mevcut Hocalar",
+      "noneAssigned": "Henüz hoca yok.",
+      "toasts": {
+        "userRequired": "Kullanıcı seçin.",
+        "error": "İşlem başarısız: {message}",
+        "notSaved": "Rol kaydedilemedi (yetki reddedildi). Lütfen tekrar deneyin.",
+        "promoted": "Kullanıcı hoca yapıldı",
+        "demoted": "Hoca rolü kaldırıldı"
       }
     },
     "approvals": {

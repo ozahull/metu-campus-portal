@@ -610,12 +610,17 @@ export type Database = {
       }
       event_photos_notify: { Args: { p_event_id: string }; Returns: number }
       event_submit: { Args: { p_event_id: string }; Returns: string }
+      is_advisor: { Args: never; Returns: boolean }
       is_club_admin: { Args: { p_club_id: string }; Returns: boolean }
       is_club_advisor: { Args: { p_club_id: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
       set_notification_preference: {
         Args: { p_scope: string }
         Returns: undefined
+      }
+      set_user_role: {
+        Args: { p_role: string; p_user_id: string }
+        Returns: string
       }
       ticket_checkin: {
         Args: { p_token: string }

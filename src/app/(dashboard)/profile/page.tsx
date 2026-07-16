@@ -2,7 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Award, ArrowRight, CalendarClock, Crown, Inbox, Users } from "lucide-react";
+import {
+  Award,
+  ArrowRight,
+  CalendarClock,
+  Crown,
+  GraduationCap,
+  Inbox,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/datetime";
 import { PageShell } from "@/components/shared/page-shell";
@@ -41,6 +50,7 @@ type RsvpRow = {
 export default async function ProfilePage() {
   const t = await getTranslations("profile");
   const tBadges = await getTranslations("badges");
+  const tRoles = await getTranslations("roles");
   const locale = await getLocale();
   const supabase = await createClient();
 
@@ -51,9 +61,19 @@ export default async function ProfilePage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name")
+    .select("full_name, role")
     .eq("id", user.id)
     .maybeSingle();
+
+  // Rol rozeti (yalnız görsel): ADVISOR → "Hoca", SUPER_ADMIN → "Süper yönetici".
+  // Sıradan üyeye (USER) rozet gösterilmez (gürültüyü azalt). Yetki Aşama 2'de.
+  const roleKey = profile?.role?.toString().trim().toUpperCase();
+  const roleBadge =
+    roleKey === "SUPER_ADMIN"
+      ? { label: tRoles("superAdmin"), Icon: ShieldCheck }
+      : roleKey === "ADVISOR"
+        ? { label: tRoles("advisor"), Icon: GraduationCap }
+        : null;
 
   const displayName =
     profile?.full_name ??
@@ -133,6 +153,12 @@ export default async function ProfilePage() {
             <p className="mt-0.5 truncate text-sm text-muted-foreground">
               {user.email}
             </p>
+          )}
+          {roleBadge && (
+            <span className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+              <roleBadge.Icon className="size-3.5" />
+              {roleBadge.label}
+            </span>
           )}
         </div>
       </header>

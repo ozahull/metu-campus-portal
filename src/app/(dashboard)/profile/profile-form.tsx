@@ -113,6 +113,15 @@ export function ProfileForm({
             <div className="space-y-2">
               <Label htmlFor="new-password">{t("passwordCard.label")}</Label>
               <div className="relative">
+                {/*
+                  Edge/IE, kullanıcı şifre alanına yazdığında sağ kenara kendi
+                  native "şifre göster" (::-ms-reveal) + "temizle" (::-ms-clear)
+                  ikonunu basar; bu shadow-DOM kontrolü özel göz butonumuzun
+                  üstüne binip tıklamayı yutuyordu (z-index çözmez — DOM'a ait
+                  değil). Native ikonları gizleyip tek çalışan göz bırakıyoruz.
+                  data-*ignore: 1Password/LastPass gibi eklentilerin overlay
+                  ikonunu da bastırır (aynı bölgede çakışan 3. parti kaynak).
+                */}
                 <Input
                   id="new-password"
                   type={showPassword ? "text" : "password"}
@@ -121,7 +130,9 @@ export function ProfileForm({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={pwBusy}
-                  className="pr-10"
+                  data-1p-ignore="true"
+                  data-lpignore="true"
+                  className="pr-10 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden"
                   required
                 />
                 <button

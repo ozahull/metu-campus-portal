@@ -57,9 +57,11 @@ export default async function AdminPage() {
   }
 
   // Atama formları için kulüp ve kullanıcı listeleri (email OKUNMAZ; full_name).
+  // advisor_id de çekilir: atama formu MEVCUT danışmanı gösterip önseçebilsin
+  // (kaydedilen atamanın reload sonrası GÖRÜNMESİ için read-back — bkz. §9 bugfix).
   const { data: clubsRaw } = await supabase
     .from("clubs")
-    .select("id, name, requires_advisor_approval")
+    .select("id, name, requires_advisor_approval, advisor_id")
     .order("name", { ascending: true });
   const { data: usersRaw } = await supabase
     .from("profiles")
@@ -70,6 +72,11 @@ export default async function AdminPage() {
     id: c.id,
     label: c.name,
   }));
+  // Kulüp → mevcut danışman id eşlemesi (atama formu read-back'i için).
+  const clubAdvisors: Record<string, string | null> = {};
+  for (const c of clubsRaw ?? []) {
+    clubAdvisors[c.id] = c.advisor_id ?? null;
+  }
   const userOptions: Option[] = (usersRaw ?? []).map((u) => ({
     id: u.id,
     label: u.full_name ?? t("unnamedUser"),
@@ -192,6 +199,7 @@ export default async function AdminPage() {
           memberGrowth={memberGrowth}
           clubOptions={clubOptions}
           userOptions={userOptions}
+          clubAdvisors={clubAdvisors}
           fairEnabled={fairEnabled}
           userId={user.id}
         />

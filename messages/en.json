@@ -567,6 +567,9 @@
       "clubPlaceholder": "Select…",
       "advisorLabel": "Advisor",
       "advisorNone": "(No advisor)",
+      "currentAdvisor": "Current advisor",
+      "currentTitle": "Current Assignments",
+      "noneAssigned": "No club has an advisor assigned yet.",
       "submit": "Save Advisor",
       "toasts": {
         "clubRequired": "Select a club.",

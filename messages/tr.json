@@ -567,6 +567,9 @@
       "clubPlaceholder": "Seçin…",
       "advisorLabel": "Danışman",
       "advisorNone": "(Danışman yok)",
+      "currentAdvisor": "Mevcut danışman",
+      "currentTitle": "Mevcut Atamalar",
+      "noneAssigned": "Henüz danışman atanmış kulüp yok.",
       "submit": "Danışmanı Kaydet",
       "toasts": {
         "clubRequired": "Kulüp seçin.",

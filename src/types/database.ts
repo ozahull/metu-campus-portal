@@ -111,6 +111,121 @@ export type Database = {
           },
         ]
       }
+      club_request_documents: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_url: string
+          id: string
+          note: string | null
+          request_id: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_url: string
+          id?: string
+          note?: string | null
+          request_id: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          note?: string | null
+          request_id?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_request_documents_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "club_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_request_documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      club_requests: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_club_id: string | null
+          description: string | null
+          id: string
+          name: string
+          rationale: string | null
+          requested_by: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_club_id?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          rationale?: string | null
+          requested_by: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_club_id?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          rationale?: string | null
+          requested_by?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "club_requests_created_club_id_fkey"
+            columns: ["created_club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "club_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clubs: {
         Row: {
           advisor_id: string | null
@@ -599,6 +714,29 @@ export type Database = {
           p_title: string
         }
         Returns: number
+      }
+      club_request_decide: {
+        Args: { p_decision: string; p_note?: string; p_request_id: string }
+        Returns: string
+      }
+      club_request_resubmit: {
+        Args: {
+          p_category: string
+          p_description: string
+          p_name: string
+          p_rationale: string
+          p_request_id: string
+        }
+        Returns: string
+      }
+      club_request_submit: {
+        Args: {
+          p_category: string
+          p_description: string
+          p_name: string
+          p_rationale: string
+        }
+        Returns: string
       }
       event_advisor_decision: {
         Args: { p_decision: string; p_event_id: string; p_note?: string }

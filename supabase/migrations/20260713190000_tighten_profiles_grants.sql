@@ -11,4 +11,4 @@ revoke insert on public.profiles from authenticated;
 revoke update on public.profiles from authenticated;
 
 grant insert (id, email, full_name) on public.profiles to authenticated;
-grant update (full_name, email) on public.profiles to authenticated;
+grant update (full_name, email) on public.profiles to authenticated; 

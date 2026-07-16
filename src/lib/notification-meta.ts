@@ -8,6 +8,7 @@ import {
   Bell,
   CalendarCheck,
   CalendarPlus,
+  ClipboardPlus,
   Clock,
   Images,
   Megaphone,
@@ -33,6 +34,7 @@ const ICONS: Record<string, LucideIcon> = {
   MEMBERSHIP: UserRoundCheck,
   EVENT_PHOTOS: Images,
   BADGE_EARNED: Award,
+  CLUB_REQUEST: ClipboardPlus,
 };
 
 export function notificationIcon(type: string): LucideIcon {

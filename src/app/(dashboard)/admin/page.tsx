@@ -8,6 +8,7 @@ import { PageShell } from "@/components/shared/page-shell";
 import { AdminShell } from "./admin-shell";
 import { type Option } from "./admin-assignments";
 import { type PendingEvent } from "./admin-approvals";
+import { type PendingClubRequest } from "./admin-club-requests";
 import { type ClubSetting } from "./admin-settings";
 import type { EventDocument } from "../clubs/[id]/manage/event-documents";
 import {
@@ -17,6 +18,8 @@ import {
 } from "./admin-analytics";
 
 const DOC_BUCKET = "event-docs";
+// Topluluk açma başvurusu belgeleri ayrı PRIVATE bucket (event-docs'a dokunma).
+const DOC_BUCKET_REQ = "club-request-docs";
 
 // Route Cache'i devre dışı bırak: rol kontrolü her istekte güncel veriyle yapılsın.
 export const dynamic = "force-dynamic";
@@ -165,6 +168,77 @@ export default async function AdminPage() {
     documents: docsByEvent[e.id] ?? [],
   }));
 
+  // Topluluk açma başvuruları (PENDING) — Aşama 2 Commit C. Başvuran hoca adı
+  // için requested_by → full_name eşlemesi usersRaw'dan (ekstra sorgu YOK).
+  const nameById = new Map<string, string>();
+  for (const u of usersRaw ?? []) {
+    nameById.set(u.id, u.full_name ?? t("unnamedUser"));
+  }
+
+  const { data: reqRaw } = await supabase
+    .from("club_requests")
+    .select(
+      "id, name, description, category, rationale, created_at, requested_by",
+    )
+    .eq("status", "PENDING")
+    .order("created_at", { ascending: true });
+
+  const reqBase = (reqRaw ?? []) as {
+    id: string;
+    name: string;
+    description: string | null;
+    category: string | null;
+    rationale: string | null;
+    created_at: string;
+    requested_by: string;
+  }[];
+
+  // Başvuru belgeleri: signed URL ile (public URL ASLA; docsByEvent deseninin
+  // kopyası, ayrı club-request-docs bucket). Okul yalnız görüntüler → canDelete=false.
+  const reqDocs: Record<string, EventDocument[]> = {};
+  const reqIds = reqBase.map((r) => r.id);
+  if (reqIds.length > 0) {
+    const { data: reqDocRaw } = await supabase
+      .from("club_request_documents")
+      .select("id, request_id, file_url, file_name, note")
+      .in("request_id", reqIds)
+      .order("created_at", { ascending: true });
+
+    for (const d of (reqDocRaw ?? []) as {
+      id: string;
+      request_id: string;
+      file_url: string;
+      file_name: string;
+      note: string | null;
+    }[]) {
+      let signedUrl: string | null = null;
+      if (d.file_url) {
+        const { data: signed } = await supabase.storage
+          .from(DOC_BUCKET_REQ)
+          .createSignedUrl(d.file_url, 120);
+        signedUrl = signed?.signedUrl ?? null;
+      }
+      (reqDocs[d.request_id] ??= []).push({
+        id: d.id,
+        file_name: d.file_name,
+        note: d.note,
+        signedUrl,
+        canDelete: false,
+      });
+    }
+  }
+
+  const clubRequests: PendingClubRequest[] = reqBase.map((r) => ({
+    id: r.id,
+    name: r.name,
+    description: r.description,
+    category: r.category,
+    rationale: r.rationale,
+    requester_name: nameById.get(r.requested_by) ?? t("unnamedUser"),
+    created_at: r.created_at,
+    documents: reqDocs[r.id] ?? [],
+  }));
+
   // Analitik (yalnız SUPER_ADMIN — RPC'ler is_super_admin() içeriyor).
   const [
     { data: overviewRows },
@@ -205,6 +279,7 @@ export default async function AdminPage() {
         <AdminShell
           overview={overview}
           pending={pending}
+          clubRequests={clubRequests}
           clubSettings={clubSettings}
           clubStats={clubStats}
           memberGrowth={memberGrowth}

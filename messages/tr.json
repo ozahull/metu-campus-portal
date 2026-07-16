@@ -51,7 +51,14 @@
       "CLUB_ANNOUNCEMENT": "Duyuru",
       "MEMBERSHIP": "Kulübe hoş geldiniz",
       "EVENT_PHOTOS": "Etkinlik fotoğrafları",
-      "BADGE_EARNED": "Yeni rozet kazandın"
+      "BADGE_EARNED": "Yeni rozet kazandın",
+      "CLUB_REQUEST": "Topluluk başvurusu"
+    },
+    "clubRequest": {
+      "NEW": "Yeni topluluk başvurusu",
+      "APPROVED": "Başvurun onaylandı",
+      "REJECTED": "Başvurun reddedildi",
+      "CHANGES_REQUESTED": "Başvurunda revizyon istendi"
     },
     "prefs": {
       "title": "Bildirim Tercihleri",
@@ -595,6 +602,7 @@
       "tabOverview": "Genel Bakış",
       "tabClubs": "Kulüpler",
       "tabApprovals": "Onay Kuyruğu",
+      "tabClubRequests": "Topluluk Başvuruları",
       "tabAssignments": "Atamalar",
       "tabAnalytics": "Analitik",
       "tabReport": "Dönem Raporu",
@@ -703,6 +711,31 @@
         "changes": "Revizyon istendi",
         "settingError": "Güncellenemedi: {message}",
         "settingUpdated": "Onay ayarı güncellendi"
+      }
+    },
+    "clubRequests": {
+      "queueTitle": "Topluluk Başvuru Kuyruğu",
+      "queueDesc": "Hocaların açtığı topluluk başvuruları. Onaylanınca gerçek kulüp oluşur ve başvuran hoca danışman olur.",
+      "emptyQueue": "Bekleyen başvuru yok.",
+      "requesterLabel": "Başvuran",
+      "descriptionLabel": "Açıklama",
+      "rationaleLabel": "Gerekçe",
+      "approve": "Onayla",
+      "requestChanges": "Revizyon",
+      "reject": "Reddet",
+      "changesPlaceholder": "Neyin düzeltilmesi gerektiğini yazın…",
+      "rejectPlaceholder": "Reddetme gerekçesini yazın (hocaya iletilecek)…",
+      "sendChanges": "Revizyon Gönder",
+      "cancelChanges": "Vazgeç",
+      "rejectConfirmTitle": "Başvuruyu reddet",
+      "rejectConfirmBody": "\"{name}\" başvurusu reddedilecek. Başvuran hoca gerekçeyle bilgilendirilecek.",
+      "toasts": {
+        "approved": "Başvuru onaylandı ve kulüp oluşturuldu",
+        "rejected": "Başvuru reddedildi",
+        "changes": "Revizyon istendi",
+        "decideError": "İşlem başarısız: {message}",
+        "changesNoteRequired": "Revizyon için bir not girin.",
+        "rejectNoteRequired": "Reddetme gerekçesi girin."
       }
     },
     "analytics": {

@@ -5,6 +5,10 @@ import { formatDateTime } from "@/lib/datetime";
 import { notificationIcon, type AppNotification } from "@/lib/notification-meta";
 import { cn } from "@/lib/utils";
 
+// CLUB_REQUEST bildiriminde body bir MAKİNE token'ı taşır (veri değil); bilinen
+// token'lar UI'da yerelleştirilir, tanınmayan/boş değerde genel etikete düşülür.
+const CLUB_REQUEST_TOKENS = ["NEW", "APPROVED", "REJECTED", "CHANGES_REQUESTED"];
+
 /**
  * Tek bir bildirim satırı (hem zil panelinde hem /notifications sayfasında
  * kullanılır). Sistem tiplerinde başlık i18n etiketidir, alt satır veri
@@ -24,14 +28,27 @@ export function NotificationItem({
   const Icon = notificationIcon(n.type);
   const isAnnounce = n.type === "CLUB_ANNOUNCEMENT";
   const isBadge = n.type === "BADGE_EARNED";
-  const primary = isAnnounce ? n.title : t(`type.${n.type}`);
-  // BADGE_EARNED'te title = rozet kodu; kod → isim çevirisi. Duyuruda gövde,
-  // diğer sistem tiplerinde başlık alanı (etkinlik/kulüp adı) alt satırdır.
+  const isClubRequest = n.type === "CLUB_REQUEST";
+  // CLUB_REQUEST'te primary = body token'ına göre değişen etiket (kime
+  // gösterildiğine göre metin — NEW yöneticiye, diğerleri başvurana). Bilinmeyen/
+  // boş token'da sessizce bozulma yerine genel t("type.CLUB_REQUEST")'e düş.
+  const primary = isAnnounce
+    ? n.title
+    : isClubRequest
+      ? n.body && CLUB_REQUEST_TOKENS.includes(n.body)
+        ? t(`clubRequest.${n.body}`)
+        : t("type.CLUB_REQUEST")
+      : t(`type.${n.type}`);
+  // BADGE_EARNED'te title = rozet kodu; kod → isim çevirisi. CLUB_REQUEST'te
+  // title = topluluk adı (veri). Duyuruda gövde, diğer sistem tiplerinde başlık
+  // alanı (etkinlik/kulüp adı) alt satırdır.
   const secondary = isAnnounce
     ? n.body
     : isBadge
       ? tb(`${n.title}.name`)
-      : n.title;
+      : isClubRequest
+        ? n.title
+        : n.title;
   const unread = !n.read_at;
 
   return (

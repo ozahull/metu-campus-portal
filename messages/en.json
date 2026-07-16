@@ -51,7 +51,14 @@
       "CLUB_ANNOUNCEMENT": "Announcement",
       "MEMBERSHIP": "Welcome to the club",
       "EVENT_PHOTOS": "Event photos",
-      "BADGE_EARNED": "You earned a badge"
+      "BADGE_EARNED": "You earned a badge",
+      "CLUB_REQUEST": "Community application"
+    },
+    "clubRequest": {
+      "NEW": "New community application",
+      "APPROVED": "Your application was approved",
+      "REJECTED": "Your application was rejected",
+      "CHANGES_REQUESTED": "Changes requested on your application"
     },
     "prefs": {
       "title": "Notification Preferences",
@@ -595,6 +602,7 @@
       "tabOverview": "Overview",
       "tabClubs": "Clubs",
       "tabApprovals": "Approvals",
+      "tabClubRequests": "Community Requests",
       "tabAssignments": "Assignments",
       "tabAnalytics": "Analytics",
       "tabReport": "Term Report",
@@ -703,6 +711,31 @@
         "changes": "Changes requested",
         "settingError": "Could not update: {message}",
         "settingUpdated": "Approval setting updated"
+      }
+    },
+    "clubRequests": {
+      "queueTitle": "Community Request Queue",
+      "queueDesc": "Community applications opened by advisors. Once approved, a real club is created and the applicant becomes its advisor.",
+      "emptyQueue": "No pending applications.",
+      "requesterLabel": "Applicant",
+      "descriptionLabel": "Description",
+      "rationaleLabel": "Rationale",
+      "approve": "Approve",
+      "requestChanges": "Request changes",
+      "reject": "Reject",
+      "changesPlaceholder": "Describe what needs to be revised…",
+      "rejectPlaceholder": "Write the reason for rejection (shared with the advisor)…",
+      "sendChanges": "Send revision",
+      "cancelChanges": "Cancel",
+      "rejectConfirmTitle": "Reject application",
+      "rejectConfirmBody": "The \"{name}\" application will be rejected. The applicant advisor will be notified with the reason.",
+      "toasts": {
+        "approved": "Application approved and club created",
+        "rejected": "Application rejected",
+        "changes": "Changes requested",
+        "decideError": "Action failed: {message}",
+        "changesNoteRequired": "Enter a note for the revision.",
+        "rejectNoteRequired": "Enter a reason for rejection."
       }
     },
     "analytics": {

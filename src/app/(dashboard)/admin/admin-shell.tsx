@@ -6,6 +6,7 @@ import {
   BarChart3,
   Building2,
   ClipboardCheck,
+  ClipboardPlus,
   FileText,
   LayoutDashboard,
   SlidersHorizontal,
@@ -14,6 +15,10 @@ import {
 import { AdminTabs, AdminTabsList, AdminTab, AdminTabPanel } from "./admin-tabs";
 import { AdminOverview } from "./admin-overview";
 import { AdminApprovals, type PendingEvent } from "./admin-approvals";
+import {
+  AdminClubRequests,
+  type PendingClubRequest,
+} from "./admin-club-requests";
 import { AdminSettings, type ClubSetting } from "./admin-settings";
 import { NewClubForm } from "./new-club-form";
 import { AdminAssignments, type Option } from "./admin-assignments";
@@ -35,6 +40,7 @@ import { TermReport } from "./term-report";
 export function AdminShell({
   overview,
   pending,
+  clubRequests,
   clubSettings,
   clubStats,
   memberGrowth,
@@ -48,6 +54,7 @@ export function AdminShell({
 }: {
   overview: Overview | null;
   pending: PendingEvent[];
+  clubRequests: PendingClubRequest[];
   clubSettings: ClubSetting[];
   clubStats: ClubStat[];
   memberGrowth: MemberGrowthPoint[];
@@ -63,6 +70,7 @@ export function AdminShell({
   const locale = useLocale();
   const [tab, setTab] = useState("overview");
   const pendingCount = pending.length;
+  const clubRequestCount = clubRequests.length;
 
   return (
     <AdminTabs value={tab} onValueChange={(v) => setTab(v as string)}>
@@ -77,6 +85,15 @@ export function AdminShell({
           {pendingCount > 0 && (
             <span className="ml-auto rounded-full bg-primary/10 px-1.5 text-xs text-primary tabular-nums">
               {pendingCount}
+            </span>
+          )}
+        </AdminTab>
+        <AdminTab value="clubRequests">
+          <ClipboardPlus />
+          {t("tabClubRequests")}
+          {clubRequestCount > 0 && (
+            <span className="ml-auto rounded-full bg-primary/10 px-1.5 text-xs text-primary tabular-nums">
+              {clubRequestCount}
             </span>
           )}
         </AdminTab>
@@ -115,6 +132,10 @@ export function AdminShell({
 
         <AdminTabPanel value="approvals">
           <AdminApprovals pending={pending} userId={userId} />
+        </AdminTabPanel>
+
+        <AdminTabPanel value="clubRequests">
+          <AdminClubRequests clubRequests={clubRequests} userId={userId} />
         </AdminTabPanel>
 
         <AdminTabPanel value="clubs">

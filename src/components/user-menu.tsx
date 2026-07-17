@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { LogOut, ShieldCheck, UserRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,7 @@ type UserMenuProps = {
   role: string;
   isSuperAdmin: boolean;
   initials: string;
+  avatarUrl?: string | null;
 };
 
 export function UserMenu({
@@ -30,6 +31,7 @@ export function UserMenu({
   role,
   isSuperAdmin,
   initials,
+  avatarUrl,
 }: UserMenuProps) {
   const router = useRouter();
   const t = useTranslations("userMenu");
@@ -59,6 +61,7 @@ export function UserMenu({
     <DropdownMenu>
       <DropdownMenuTrigger className="rounded-full outline-none transition focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
         <Avatar className="size-9 border border-border">
+          {avatarUrl && <AvatarImage src={avatarUrl} alt={fullName} />}
           <AvatarFallback className="bg-primary text-sm font-semibold text-primary-foreground">
             {initials}
           </AvatarFallback>

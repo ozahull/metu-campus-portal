@@ -26,6 +26,10 @@ import {
 import { NotificationPreferences } from "@/components/notification-preferences";
 import { BadgeShowcase } from "@/components/badges";
 import { ProfileForm } from "./profile-form";
+import { ProfileDetailsForm } from "./profile-details-form";
+
+// PRIVATE 'avatars' bucket — erişim yalnız signed URL ile (public URL YOK).
+const AVATAR_BUCKET = "avatars";
 
 export const dynamic = "force-dynamic";
 
@@ -104,6 +108,28 @@ export default async function ProfilePage() {
     .eq("user_id", user.id);
   const earnedBadges = (badgeRows ?? []).map((b) => b.badge_code);
 
+  // Zengin profil alanları (bio/department/class_year/avatar_url) broad SELECT'e
+  // KAPALI (kolon-grant: yalnız id/full_name/role). Kendi zengin alanlarını
+  // get_profile RPC'siyle çek (self → tüm alanlar dolu gelir).
+  const { data: detailsRaw } = await supabase.rpc("get_profile", {
+    p_uid: user.id,
+  });
+  const details = detailsRaw as unknown as {
+    bio: string | null;
+    department: string | null;
+    class_year: string | null;
+    avatar_url: string | null;
+  } | null;
+
+  // Mevcut avatar önizlemesi: PRIVATE bucket → signed URL (public URL YOK).
+  let avatarSignedUrl: string | null = null;
+  if (details?.avatar_url) {
+    const { data: signed } = await supabase.storage
+      .from(AVATAR_BUCKET)
+      .createSignedUrl(details.avatar_url, 120);
+    avatarSignedUrl = signed?.signedUrl ?? null;
+  }
+
   // Üye olunan kulüpler
   const { data: membershipRaw } = await supabase
     .from("club_members")
@@ -164,6 +190,18 @@ export default async function ProfilePage() {
       </header>
 
       <ProfileForm userId={user.id} initialName={profile?.full_name ?? ""} />
+
+      <div className="mt-6">
+        <ProfileDetailsForm
+          userId={user.id}
+          initialBio={details?.bio ?? ""}
+          initialDepartment={details?.department ?? ""}
+          initialClassYear={details?.class_year ?? ""}
+          initialAvatarUrl={avatarSignedUrl}
+          initials={initials}
+          displayName={displayName}
+        />
+      </div>
 
       <div className="mt-6">
         <NotificationPreferences initialScope={notifScope} />

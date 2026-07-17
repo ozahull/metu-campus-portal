@@ -128,6 +128,41 @@
       "passwordShort": "Password must be at least 6 characters.",
       "passwordUpdated": "Password updated",
       "passwordError": "Could not update password: {message}"
+    },
+    "detailsCard": {
+      "title": "Your profile info",
+      "description": "This information appears on your profile page.",
+      "bioLabel": "About",
+      "bioPlaceholder": "Tell us a bit about yourself…",
+      "departmentLabel": "Department",
+      "departmentPlaceholder": "Computer Engineering",
+      "classYearLabel": "Year",
+      "classYearPlaceholder": "3rd year",
+      "avatarLabel": "Profile photo",
+      "avatarChange": "Change photo",
+      "avatarUpload": "Upload photo"
+    },
+    "detailsToasts": {
+      "updated": "Your profile info was updated",
+      "error": "Could not update your info. Please try again.",
+      "avatarUpdated": "Your profile photo was updated",
+      "avatarError": "Could not upload photo. Please try again.",
+      "avatarTooBig": "File is too large (2 MB max).",
+      "avatarType": "Please choose an image file."
+    }
+  },
+  "personProfile": {
+    "notFoundTitle": "Profile not found",
+    "editProfile": "Edit profile",
+    "aboutTitle": "About",
+    "department": "Department",
+    "classYear": "Year",
+    "clubsTitle": "Clubs",
+    "noClubs": "Not affiliated with any club yet.",
+    "relation": {
+      "advisor": "Advisor",
+      "president": "President",
+      "member": "Member"
     }
   },
   "auth": {

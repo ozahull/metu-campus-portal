@@ -51,6 +51,20 @@ export async function Navbar() {
   const role = profile?.role ?? "USER";
   const isSuperAdmin = role.toString().trim().toUpperCase() === "SUPER_ADMIN";
 
+  // Kendi avatarı (varsa). avatar_url broad SELECT'e KAPALI (kolon-grant: yalnız
+  // id/full_name/role) → get_profile RPC ile okunur (self → avatar_url dolu).
+  // PRIVATE 'avatars' bucket olduğundan signed URL üretilir (public URL YOK).
+  // Yoksa UserMenu baş harf fallback'ine düşer.
+  const { data: meRaw } = await supabase.rpc("get_profile", { p_uid: user.id });
+  const me = meRaw as unknown as { avatar_url: string | null } | null;
+  let avatarUrl: string | null = null;
+  if (me?.avatar_url) {
+    const { data: signed } = await supabase.storage
+      .from("avatars")
+      .createSignedUrl(me.avatar_url, 120);
+    avatarUrl = signed?.signedUrl ?? null;
+  }
+
   // Zil için ilk veri: son 10 bildirim + okunmamış sayısı (RLS: yalnız kendi
   // satırları). Sonrası istemcide realtime + 60 sn polling ile canlı güncellenir.
   const { data: notifRaw } = await supabase
@@ -103,6 +117,7 @@ export async function Navbar() {
             role={role}
             isSuperAdmin={isSuperAdmin}
             initials={getInitials(fullName, email)}
+            avatarUrl={avatarUrl}
           />
 
           <NavMobile />

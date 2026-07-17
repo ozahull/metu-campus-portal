@@ -128,6 +128,41 @@
       "passwordShort": "Şifre en az 6 karakter olmalıdır.",
       "passwordUpdated": "Şifre güncellendi",
       "passwordError": "Şifre güncellenemedi: {message}"
+    },
+    "detailsCard": {
+      "title": "Profil bilgilerin",
+      "description": "Bu bilgiler profil sayfanda görünür.",
+      "bioLabel": "Hakkında",
+      "bioPlaceholder": "Kendinden kısaca bahset…",
+      "departmentLabel": "Bölüm",
+      "departmentPlaceholder": "Bilgisayar Mühendisliği",
+      "classYearLabel": "Sınıf",
+      "classYearPlaceholder": "3. sınıf",
+      "avatarLabel": "Profil fotoğrafı",
+      "avatarChange": "Fotoğrafı değiştir",
+      "avatarUpload": "Fotoğraf yükle"
+    },
+    "detailsToasts": {
+      "updated": "Profil bilgilerin güncellendi",
+      "error": "Bilgiler güncellenemedi. Lütfen tekrar deneyin.",
+      "avatarUpdated": "Profil fotoğrafın güncellendi",
+      "avatarError": "Fotoğraf yüklenemedi. Lütfen tekrar deneyin.",
+      "avatarTooBig": "Dosya çok büyük (en fazla 2 MB).",
+      "avatarType": "Lütfen bir görsel dosyası seçin."
+    }
+  },
+  "personProfile": {
+    "notFoundTitle": "Profil bulunamadı",
+    "editProfile": "Profili düzenle",
+    "aboutTitle": "Hakkında",
+    "department": "Bölüm",
+    "classYear": "Sınıf",
+    "clubsTitle": "Kulüpleri",
+    "noClubs": "Henüz bir kulübe bağlı değil.",
+    "relation": {
+      "advisor": "Danışman",
+      "president": "Başkan",
+      "member": "Üye"
     }
   },
   "auth": {

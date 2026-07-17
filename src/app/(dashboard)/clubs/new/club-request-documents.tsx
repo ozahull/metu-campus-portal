@@ -64,7 +64,9 @@ export function ClubRequestDocuments({
     if (uploadError) {
       setLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      toast.error(t("toasts.uploadError", { message: uploadError.message }));
+      // Ham backend mesajını kullanıcıya SIZDIRMA (RLS/policy detayı); yalnız debug.
+      console.error("[club-request-documents] yükleme hatası:", uploadError.message);
+      toast.error(t("toasts.uploadError"));
       return;
     }
 
@@ -82,7 +84,8 @@ export function ClubRequestDocuments({
     setLoading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (insertError) {
-      toast.error(t("toasts.saveError", { message: insertError.message }));
+      console.error("[club-request-documents] kayıt hatası:", insertError.message);
+      toast.error(t("toasts.saveError"));
       return;
     }
     setNote("");
@@ -99,7 +102,8 @@ export function ClubRequestDocuments({
       .eq("id", doc.id);
     setLoading(false);
     if (error) {
-      toast.error(t("toasts.deleteError", { message: error.message }));
+      console.error("[club-request-documents] silme hatası:", error.message);
+      toast.error(t("toasts.deleteError"));
       return;
     }
     toast.success(t("toasts.deleted"));

@@ -381,10 +381,10 @@
       "upload": "Upload document",
       "hint": "Image (JPG/PNG) or PDF.",
       "toasts": {
-        "uploadError": "Could not upload document: {message}",
-        "saveError": "Could not save document: {message}",
+        "uploadError": "Could not upload the document. Please try again.",
+        "saveError": "Could not save the document. Please try again.",
         "uploaded": "Document uploaded.",
-        "deleteError": "Could not delete: {message}",
+        "deleteError": "Could not delete the document. Please try again.",
         "deleted": "Document deleted."
       }
     },
@@ -544,11 +544,11 @@
       "upload": "Upload Document",
       "hint": "Image (JPG/PNG) or PDF.",
       "toasts": {
-        "uploadError": "Could not upload document: {message}",
-        "saveError": "Could not save document: {message}",
+        "uploadError": "Could not upload the document. Please try again.",
+        "saveError": "Could not save the document. Please try again.",
         "uploaded": "Document uploaded.",
         "deleteConfirm": "Do you want to delete the document \"{name}\"?",
-        "deleteError": "Could not delete: {message}",
+        "deleteError": "Could not delete the document. Please try again.",
         "deleted": "Document deleted."
       }
     },

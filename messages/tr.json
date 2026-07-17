@@ -381,10 +381,10 @@
       "upload": "Belge Yükle",
       "hint": "Görsel (JPG/PNG) veya PDF.",
       "toasts": {
-        "uploadError": "Belge yüklenemedi: {message}",
-        "saveError": "Belge kaydedilemedi: {message}",
+        "uploadError": "Belge yüklenemedi. Lütfen tekrar deneyin.",
+        "saveError": "Belge kaydedilemedi. Lütfen tekrar deneyin.",
         "uploaded": "Belge yüklendi.",
-        "deleteError": "Silinemedi: {message}",
+        "deleteError": "Belge silinemedi. Lütfen tekrar deneyin.",
         "deleted": "Belge silindi."
       }
     },
@@ -544,11 +544,11 @@
       "upload": "Belge Yükle",
       "hint": "Görsel (JPG/PNG) veya PDF.",
       "toasts": {
-        "uploadError": "Belge yüklenemedi: {message}",
-        "saveError": "Belge kaydedilemedi: {message}",
+        "uploadError": "Belge yüklenemedi. Lütfen tekrar deneyin.",
+        "saveError": "Belge kaydedilemedi. Lütfen tekrar deneyin.",
         "uploaded": "Belge yüklendi.",
         "deleteConfirm": "\"{name}\" belgesini silmek istiyor musunuz?",
-        "deleteError": "Silinemedi: {message}",
+        "deleteError": "Belge silinemedi. Lütfen tekrar deneyin.",
         "deleted": "Belge silindi."
       }
     },

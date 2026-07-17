@@ -62,7 +62,9 @@ export function EventDocuments({
     if (uploadError) {
       setLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      toast.error(t("toasts.uploadError", { message: uploadError.message }));
+      // Ham backend mesajını kullanıcıya SIZDIRMA (RLS/policy detayı); yalnız debug.
+      console.error("[event-documents] yükleme hatası:", uploadError.message);
+      toast.error(t("toasts.uploadError"));
       return;
     }
 
@@ -78,7 +80,8 @@ export function EventDocuments({
     setLoading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (insertError) {
-      toast.error(t("toasts.saveError", { message: insertError.message }));
+      console.error("[event-documents] kayıt hatası:", insertError.message);
+      toast.error(t("toasts.saveError"));
       return;
     }
     setNote("");
@@ -95,7 +98,8 @@ export function EventDocuments({
       .eq("id", doc.id);
     setLoading(false);
     if (error) {
-      toast.error(t("toasts.deleteError", { message: error.message }));
+      console.error("[event-documents] silme hatası:", error.message);
+      toast.error(t("toasts.deleteError"));
       return;
     }
     toast.success(t("toasts.deleted"));

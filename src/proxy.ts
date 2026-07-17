@@ -10,7 +10,7 @@ import type { Database } from "@/types/database";
  * Not: Yönlendirme (login'e atma vb.) kuralları, arayüz hazır olduğunda
  * aşağıdaki `user` kontrolü üzerinden eklenebilir.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(

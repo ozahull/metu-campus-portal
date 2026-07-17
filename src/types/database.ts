@@ -557,18 +557,30 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          bio: string | null
+          class_year: string | null
+          department: string | null
           email: string | null
           full_name: string | null
           id: string
           role: string
         }
         Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          class_year?: string | null
+          department?: string | null
           email?: string | null
           full_name?: string | null
           id: string
           role?: string
         }
         Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          class_year?: string | null
+          department?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
@@ -748,10 +760,21 @@ export type Database = {
       }
       event_photos_notify: { Args: { p_event_id: string }; Returns: number }
       event_submit: { Args: { p_event_id: string }; Returns: string }
+      get_profile: { Args: { p_uid: string }; Returns: Json }
       is_advisor: { Args: never; Returns: boolean }
       is_club_admin: { Args: { p_club_id: string }; Returns: boolean }
       is_club_advisor: { Args: { p_club_id: string }; Returns: boolean }
+      is_public_profile: { Args: { p_uid: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      search_public_profiles: {
+        Args: { p_query: string }
+        Returns: {
+          department: string | null
+          full_name: string
+          id: string
+          role: string
+        }[]
+      }
       set_notification_preference: {
         Args: { p_scope: string }
         Returns: undefined

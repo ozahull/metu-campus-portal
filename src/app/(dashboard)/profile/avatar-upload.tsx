@@ -47,8 +47,8 @@ export function AvatarUpload({
     const supabase = createClient();
 
     // Path deseni storage policy tarafından zorunlu: klasör = kullanıcının kendi
-    // id'si (avatars_insert → foldername[1] = auth.uid()). upsert: aynı yolu üzerine
-    // yaz. Eski dosya bucket'ta kalabilir (kapsam dışı temizlik — race'e girme).
+    // id'si (avatars_insert → foldername[1] = auth.uid()). Timestamp'li yol
+    // cache-busting için gerekli; eski dosyalar en sonda temizlenir (aşağıda).
     const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
     const path = `${userId}/${Date.now()}.${ext}`;
 
@@ -84,6 +84,33 @@ export function AvatarUpload({
     toast.success(t("detailsToasts.avatarUpdated"));
     // Navbar avatarı da tazelensin.
     router.refresh();
+
+    // Orphan temizliği — kasıtlı olarak EN SONDA ve NON-FATAL: yükleme +
+    // avatar_url güncellemesi başarıyla bittikten sonra klasördeki eski
+    // dosyaları sil. Hata olursa sessizce geç (worst case orphan kalır =
+    // eski davranış, regresyon değil).
+    try {
+      const { data: existing, error: listError } = await supabase.storage
+        .from(AVATAR_BUCKET)
+        .list(userId);
+      if (listError) {
+        console.warn("[avatar-upload] eski avatar listeleme hatası:", listError);
+        return;
+      }
+      const stale = (existing ?? [])
+        .map((f) => `${userId}/${f.name}`)
+        .filter((p) => p !== path);
+      if (stale.length) {
+        const { error: removeError } = await supabase.storage
+          .from(AVATAR_BUCKET)
+          .remove(stale);
+        if (removeError) {
+          console.warn("[avatar-upload] eski avatar silme hatası:", removeError);
+        }
+      }
+    } catch (cleanupError) {
+      console.warn("[avatar-upload] eski avatar temizliği başarısız:", cleanupError);
+    }
   }
 
   return (

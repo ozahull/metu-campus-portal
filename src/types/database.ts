@@ -285,6 +285,78 @@ export type Database = {
           },
         ]
       }
+      conversation_reads: {
+        Row: {
+          conversation_id: string
+          last_read_at: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          last_read_at?: string
+          user_id?: string
+        }
+        Update: {
+          conversation_id?: string
+          last_read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_reads_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_reads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          advisor_user_id: string | null
+          club_id: string | null
+          created_at: string
+          id: string
+          type: string
+        }
+        Insert: {
+          advisor_user_id?: string | null
+          club_id?: string | null
+          created_at?: string
+          id?: string
+          type: string
+        }
+        Update: {
+          advisor_user_id?: string | null
+          club_id?: string | null
+          created_at?: string
+          id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_advisor_user_id_fkey"
+            columns: ["advisor_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_attendees: {
         Row: {
           created_at: string
@@ -459,6 +531,42 @@ export type Database = {
           {
             foreignKeyName: "events_reviewed_by_fkey"
             columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          sender_user_id: string
+        }
+        // Kolon-grant gerçeği (4A): istemci YALNIZ (conversation_id, body)
+        // yazabilir; sender_user_id DEFAULT auth.uid() ile dolar, gönderilirse
+        // 42501. Insert tipi bu yüzden bilinçli olarak dar tutuldu.
+        Insert: {
+          body: string
+          conversation_id: string
+        }
+        Update: {
+          body?: string
+          conversation_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_user_id_fkey"
+            columns: ["sender_user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -718,6 +826,14 @@ export type Database = {
           rsvp_total: number
         }[]
       }
+      can_access_conversation: {
+        Args: { p_conv: string }
+        Returns: boolean
+      }
+      can_write_conversation: {
+        Args: { p_conv: string }
+        Returns: boolean
+      }
       club_announce: {
         Args: {
           p_body: string
@@ -762,10 +878,33 @@ export type Database = {
       event_submit: { Args: { p_event_id: string }; Returns: string }
       get_profile: { Args: { p_uid: string }; Returns: Json }
       is_advisor: { Args: never; Returns: boolean }
+      is_advisor_of_club: { Args: { p_club: string }; Returns: boolean }
       is_club_admin: { Args: { p_club_id: string }; Returns: boolean }
       is_club_advisor: { Args: { p_club_id: string }; Returns: boolean }
+      is_president_of_club: { Args: { p_club: string }; Returns: boolean }
       is_public_profile: { Args: { p_uid: string }; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      list_my_conversations: {
+        Args: Record<string, never>
+        Returns: {
+          club_id: string | null
+          club_name: string | null
+          conversation_id: string
+          counterpart_label: string | null
+          last_message_at: string | null
+          last_message_preview: string | null
+          type: string
+          unread_count: number
+        }[]
+      }
+      open_conversation: {
+        Args: {
+          p_advisor_user_id?: string
+          p_club_id?: string
+          p_type: string
+        }
+        Returns: string
+      }
       search_public_profiles: {
         Args: { p_query: string }
         Returns: {

@@ -14,6 +14,7 @@
     "communities": "Topluluklar",
     "events": "Etkinlikler",
     "calendar": "Takvimim",
+    "messages": "Mesajlar",
     "adminPanel": "Yönetim Paneli",
     "openMenu": "Menüyü aç",
     "closeMenu": "Menüyü kapat",
@@ -63,7 +64,8 @@
       "MEMBERSHIP": "Kulübe hoş geldiniz",
       "EVENT_PHOTOS": "Etkinlik fotoğrafları",
       "BADGE_EARNED": "Yeni rozet kazandın",
-      "CLUB_REQUEST": "Topluluk başvurusu"
+      "CLUB_REQUEST": "Topluluk başvurusu",
+      "MESSAGE": "Yeni mesaj"
     },
     "clubRequest": {
       "NEW": "Yeni topluluk başvurusu",
@@ -85,6 +87,28 @@
         "error": "Güncellenemedi: {message}"
       }
     }
+  },
+  "messages": {
+    "title": "Mesajlar",
+    "empty": "Henüz mesaj kanalınız yok.",
+    "emptyHint": "Rolünüze bağlı kanallar (okul yönetimi, danışman, başkan) burada listelenir.",
+    "threadEmpty": "Henüz mesaj yok.",
+    "backToInbox": "Mesajlara dön",
+    "composerPlaceholder": "Mesajınızı yazın…",
+    "send": "Gönder",
+    "sendError": "Mesaj gönderilemedi. Lütfen tekrar deneyin.",
+    "readOnly": "Bu kanal okul yönetiminin tek yönlü bilgilendirme kanalıdır; mesajları okuyabilirsiniz ancak yanıt yazamazsınız.",
+    "counterpart": {
+      "SCHOOL_ADMIN": "Okul Yönetimi",
+      "ADVISOR": "Danışman",
+      "PRESIDENT": "Başkan"
+    },
+    "channelType": {
+      "ADMIN_ADVISOR": "Okul Yönetimi ↔ Danışman",
+      "ADVISOR_PRESIDENT": "Danışman ↔ Başkan",
+      "ADMIN_PRESIDENT": "Okul Yönetimi → Başkan (tek yön)"
+    },
+    "unreadBadgeAria": "{count} okunmamış mesaj"
   },
   "badges": {
     "title": "Rozetler",

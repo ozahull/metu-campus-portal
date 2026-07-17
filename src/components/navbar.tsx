@@ -78,6 +78,21 @@ export async function Navbar() {
     .select("id", { count: "exact", head: true })
     .is("read_at", null);
 
+  // Mesaj kanalları (Aşama 4B): RPC yalnız erişilebilir MEVCUT kanalları
+  // döndürür — kanalı olmayan kullanıcı (sıradan öğrenci) linki hiç görmez.
+  const { data: convRaw, error: convError } = await supabase.rpc(
+    "list_my_conversations",
+  );
+  if (convError) {
+    console.error("[navbar] list_my_conversations hatası:", convError);
+  }
+  const convRows = convRaw ?? [];
+  const showMessages = convRows.length > 0;
+  const messagesUnread = convRows.reduce(
+    (sum, row) => sum + row.unread_count,
+    0,
+  );
+
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-4 sm:px-6 lg:px-8">
@@ -95,7 +110,10 @@ export async function Navbar() {
 
         {/* Linkler logonun hemen yanında, sola kümeli (Linear/GitHub deseni) */}
         <nav className="hidden items-center gap-1 md:flex">
-          <NavLinks />
+          <NavLinks
+            showMessages={showMessages}
+            messagesUnread={messagesUnread}
+          />
         </nav>
 
         {/* Sağ: ml-auto ile sağa yaslı — tema + dil + (bildirim yeri) + avatar;
@@ -125,7 +143,10 @@ export async function Navbar() {
             avatarUrl={avatarUrl}
           />
 
-          <NavMobile />
+          <NavMobile
+            showMessages={showMessages}
+            messagesUnread={messagesUnread}
+          />
         </div>
       </div>
     </header>

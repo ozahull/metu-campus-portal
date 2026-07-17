@@ -10,7 +10,13 @@ import { NavLinks } from "@/components/nav-links";
  * Mobil gezinme: hamburger → sağdan açılan drawer. İçinde ana linkler (aktif
  * göstergeli). Bir linke tıklayınca drawer kapanır.
  */
-export function NavMobile() {
+export function NavMobile({
+  showMessages = false,
+  messagesUnread = 0,
+}: {
+  showMessages?: boolean;
+  messagesUnread?: number;
+}) {
   const [open, setOpen] = useState(false);
   const t = useTranslations("nav");
 
@@ -37,7 +43,12 @@ export function NavMobile() {
               <X className="size-5" />
             </Dialog.Close>
           </div>
-          <NavLinks variant="mobile" onNavigate={() => setOpen(false)} />
+          <NavLinks
+            variant="mobile"
+            onNavigate={() => setOpen(false)}
+            showMessages={showMessages}
+            messagesUnread={messagesUnread}
+          />
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>

@@ -3,10 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { CalendarClock, CalendarDays, Home, Users } from "lucide-react";
+import {
+  CalendarClock,
+  CalendarDays,
+  Home,
+  MessagesSquare,
+  Users,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const links = [
+const baseLinks = [
   { href: "/dashboard", key: "home", icon: Home },
   { href: "/clubs", key: "communities", icon: Users },
   { href: "/events", key: "events", icon: CalendarDays },
@@ -16,16 +22,32 @@ const links = [
 /**
  * Ana gezinme linkleri, aktif sayfa göstergeli. Masaüstünde yatay pill'ler,
  * mobilde tam genişlik satırlar (drawer içinde). Aktiflik usePathname ile.
+ * "Mesajlar" koşulludur: yalnız en az bir mesaj kanalı olan kullanıcıya
+ * görünür (showMessages — navbar list_my_conversations'tan besler).
  */
 export function NavLinks({
   variant = "desktop",
   onNavigate,
+  showMessages = false,
+  messagesUnread = 0,
 }: {
   variant?: "desktop" | "mobile";
   onNavigate?: () => void;
+  showMessages?: boolean;
+  messagesUnread?: number;
 }) {
   const pathname = usePathname();
   const t = useTranslations("nav");
+  const tMessages = useTranslations("messages");
+
+  const links = showMessages
+    ? [
+        ...baseLinks,
+        { href: "/messages", key: "messages", icon: MessagesSquare } as const,
+      ]
+    : [...baseLinks];
+
+  const unreadBadge = messagesUnread > 99 ? "99+" : String(messagesUnread);
 
   return (
     <>
@@ -53,6 +75,16 @@ export function NavLinks({
           >
             <Icon className={variant === "desktop" ? "size-4" : "size-5"} />
             {t(key)}
+            {key === "messages" && messagesUnread > 0 && (
+              <span
+                aria-label={tMessages("unreadBadgeAria", {
+                  count: messagesUnread,
+                })}
+                className="inline-flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-4 text-primary-foreground"
+              >
+                {unreadBadge}
+              </span>
+            )}
           </Link>
         );
       })}

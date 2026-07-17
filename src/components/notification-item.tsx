@@ -29,26 +29,36 @@ export function NotificationItem({
   const isAnnounce = n.type === "CLUB_ANNOUNCEMENT";
   const isBadge = n.type === "BADGE_EARNED";
   const isClubRequest = n.type === "CLUB_REQUEST";
+  const isMessage = n.type === "MESSAGE";
   // CLUB_REQUEST'te primary = body token'ına göre değişen etiket (kime
   // gösterildiğine göre metin — NEW yöneticiye, diğerleri başvurana). Bilinmeyen/
   // boş token'da sessizce bozulma yerine genel t("type.CLUB_REQUEST")'e düş.
-  const primary = isAnnounce
-    ? n.title
-    : isClubRequest
-      ? n.body && CLUB_REQUEST_TOKENS.includes(n.body)
-        ? t(`clubRequest.${n.body}`)
-        : t("type.CLUB_REQUEST")
-      : t(`type.${n.type}`);
-  // BADGE_EARNED'te title = rozet kodu; kod → isim çevirisi. CLUB_REQUEST'te
-  // title = topluluk adı (veri). Duyuruda gövde, diğer sistem tiplerinde başlık
-  // alanı (etkinlik/kulüp adı) alt satırdır.
-  const secondary = isAnnounce
-    ? n.body
-    : isBadge
-      ? tb(`${n.title}.name`)
+  // MESSAGE'ta title = gönderen adı (VERİ); ad yoksa trigger 'MESSAGE' makine
+  // token'ı yazar → genel t("type.MESSAGE") etiketine düş.
+  const primary = isMessage
+    ? n.title === "MESSAGE"
+      ? t("type.MESSAGE")
+      : n.title
+    : isAnnounce
+      ? n.title
       : isClubRequest
-        ? n.title
-        : n.title;
+        ? n.body && CLUB_REQUEST_TOKENS.includes(n.body)
+          ? t(`clubRequest.${n.body}`)
+          : t("type.CLUB_REQUEST")
+        : t(`type.${n.type}`);
+  // BADGE_EARNED'te title = rozet kodu; kod → isim çevirisi. CLUB_REQUEST'te
+  // title = topluluk adı (veri). Duyuruda ve MESSAGE'ta gövde (duyuru içeriği /
+  // mesaj önizlemesi), diğer sistem tiplerinde başlık alanı (etkinlik/kulüp
+  // adı) alt satırdır.
+  const secondary = isMessage
+    ? n.body
+    : isAnnounce
+      ? n.body
+      : isBadge
+        ? tb(`${n.title}.name`)
+        : isClubRequest
+          ? n.title
+          : n.title;
   const unread = !n.read_at;
 
   return (

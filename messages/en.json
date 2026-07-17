@@ -14,6 +14,7 @@
     "communities": "Communities",
     "events": "Events",
     "calendar": "My Calendar",
+    "messages": "Messages",
     "adminPanel": "Admin Panel",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
@@ -63,7 +64,8 @@
       "MEMBERSHIP": "Welcome to the club",
       "EVENT_PHOTOS": "Event photos",
       "BADGE_EARNED": "You earned a badge",
-      "CLUB_REQUEST": "Community application"
+      "CLUB_REQUEST": "Community application",
+      "MESSAGE": "New message"
     },
     "clubRequest": {
       "NEW": "New community application",
@@ -85,6 +87,28 @@
         "error": "Could not update: {message}"
       }
     }
+  },
+  "messages": {
+    "title": "Messages",
+    "empty": "You have no message channels yet.",
+    "emptyHint": "Channels tied to your role (school administration, advisor, president) appear here.",
+    "threadEmpty": "No messages yet.",
+    "backToInbox": "Back to messages",
+    "composerPlaceholder": "Write your message…",
+    "send": "Send",
+    "sendError": "Message could not be sent. Please try again.",
+    "readOnly": "This is a one-way channel from the school administration; you can read messages but cannot reply.",
+    "counterpart": {
+      "SCHOOL_ADMIN": "School Administration",
+      "ADVISOR": "Advisor",
+      "PRESIDENT": "President"
+    },
+    "channelType": {
+      "ADMIN_ADVISOR": "School Administration ↔ Advisor",
+      "ADVISOR_PRESIDENT": "Advisor ↔ President",
+      "ADMIN_PRESIDENT": "School Administration → President (one-way)"
+    },
+    "unreadBadgeAria": "{count} unread messages"
   },
   "badges": {
     "title": "Badges",

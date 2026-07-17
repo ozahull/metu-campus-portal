@@ -12,6 +12,7 @@ import {
   Clock,
   Images,
   Megaphone,
+  MessagesSquare,
   UserRoundCheck,
   type LucideIcon,
 } from "lucide-react";
@@ -35,6 +36,7 @@ const ICONS: Record<string, LucideIcon> = {
   EVENT_PHOTOS: Images,
   BADGE_EARNED: Award,
   CLUB_REQUEST: ClipboardPlus,
+  MESSAGE: MessagesSquare,
 };
 
 export function notificationIcon(type: string): LucideIcon {

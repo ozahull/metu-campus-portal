@@ -7,7 +7,9 @@ import {
   ArrowLeft,
   AtSign,
   CalendarDays,
+  Crown,
   ExternalLink,
+  GraduationCap,
   Images,
   Info,
   Mail,
@@ -107,10 +109,12 @@ export default async function ClubDetailPage({
     console.error("[ClubDetail] Kulüp çekme hatası:", error);
   }
 
-  // Kulüp üyelerini ve profillerini (isim) çek.
+  // Kulüp üyelerini ve profillerini (isim) çek. role, başkanı (ADMIN)
+  // ayırt etmek için — club_members SELECT'i herkese açık, profiles tarafında
+  // yalnız broad-grant alanları (id, full_name) embed'lenir.
   const { data: membersRaw, error: membersError } = await supabase
     .from("club_members")
-    .select("user_id(id, full_name)")
+    .select("role, user_id(id, full_name)")
     .eq("club_id", id);
 
   if (membersError) {
@@ -118,11 +122,35 @@ export default async function ClubDetailPage({
   }
 
   // Embed sonucunu düz bir profil listesine normalize et.
-  const members: MemberProfile[] = (
-    (membersRaw ?? []) as { user_id: MemberProfile | MemberProfile[] | null }[]
-  )
-    .map((row) => (Array.isArray(row.user_id) ? row.user_id[0] : row.user_id))
+  type MemberRow = {
+    role: string;
+    user_id: MemberProfile | MemberProfile[] | null;
+  };
+  const memberRows = (membersRaw ?? []) as MemberRow[];
+  const unwrapMember = (row: MemberRow) =>
+    Array.isArray(row.user_id) ? row.user_id[0] : row.user_id;
+
+  const members: MemberProfile[] = memberRows
+    .map(unwrapMember)
     .filter((p): p is MemberProfile => Boolean(p));
+
+  // Başkan(lar): club_members.role='ADMIN' — /u/[id] linki için (Aşama 3C).
+  const presidents: MemberProfile[] = memberRows
+    .filter((row) => row.role?.toString().trim().toUpperCase() === "ADMIN")
+    .map(unwrapMember)
+    .filter((p): p is MemberProfile => Boolean(p));
+
+  // Danışman adı: yalnız id + full_name seç (profiles broad SELECT kolon-grant'ı
+  // id/full_name/role ile sınırlı — email/bio vb. ASLA seçilmez).
+  let advisor: MemberProfile | null = null;
+  if (club?.advisor_id) {
+    const { data: advisorRow } = await supabase
+      .from("profiles")
+      .select("id, full_name")
+      .eq("id", club.advisor_id)
+      .maybeSingle<MemberProfile>();
+    advisor = advisorRow ?? null;
+  }
 
   // Mevcut kullanıcı bu kulübe üye mi?
   const isMember = members.some((m) => m.id === user.id);
@@ -360,6 +388,36 @@ export default async function ClubDetailPage({
                   </p>
                 </section>
 
+                {/* Yönetim: danışman + başkan(lar), /u/[id] profiline linkli
+                    (Aşama 3C). Alan boşsa kart hiç görünmez. */}
+                {(advisor || presidents.length > 0) && (
+                  <section className="rounded-xl border border-border bg-card p-5">
+                    <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+                      <Users className="size-4 text-primary" />
+                      {t("leadershipTitle")}
+                    </h2>
+                    <ul className="mt-3 space-y-3">
+                      {advisor && (
+                        <LeaderRow
+                          icon={GraduationCap}
+                          label={t("advisorLabel")}
+                          person={advisor}
+                          fallbackName={t("unnamedMember")}
+                        />
+                      )}
+                      {presidents.map((p) => (
+                        <LeaderRow
+                          key={p.id}
+                          icon={Crown}
+                          label={t("presidentLabel")}
+                          person={p}
+                          fallbackName={t("unnamedMember")}
+                        />
+                      ))}
+                    </ul>
+                  </section>
+                )}
+
                 {gallery.length > 0 && (
                   <section className="rounded-xl border border-border bg-card p-5">
                     <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
@@ -491,6 +549,39 @@ export default async function ClubDetailPage({
         )}
       </div>
     </main>
+  );
+}
+
+/** Yönetim satırı: ikon + rol etiketi + /u/[id] profiline linkli isim.
+ *  Link vurgusu mevcut token'lardan (hover'da primary + altı çizili). */
+function LeaderRow({
+  icon: Icon,
+  label,
+  person,
+  fallbackName,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  person: { id: string; full_name: string | null };
+  fallbackName: string;
+}) {
+  return (
+    <li className="flex items-center gap-3">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-muted text-muted-foreground">
+        <Icon className="size-4" />
+      </span>
+      <div className="min-w-0">
+        <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+          {label}
+        </p>
+        <Link
+          href={`/u/${person.id}`}
+          className="block truncate text-sm font-semibold text-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"
+        >
+          {person.full_name ?? fallbackName}
+        </Link>
+      </div>
+    </li>
   );
 }
 

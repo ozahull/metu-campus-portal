@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { NavLinks } from "@/components/nav-links";
 import { NavMobile } from "@/components/nav-mobile";
+import { PeopleSearch } from "@/components/people-search";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationBell } from "@/components/notification-bell";
@@ -100,6 +101,10 @@ export async function Navbar() {
         {/* Sağ: ml-auto ile sağa yaslı — tema + dil + (bildirim yeri) + avatar;
             mobilde hamburger. Ortada esneyen boşluk kalır. */}
         <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
+          {/* Genel kişi arama (Aşama 3C): desktop'ta inline combobox, mobilde
+              ikon → üstten sheet. Veri yalnız search_public_profiles RPC. */}
+          <PeopleSearch />
+
           <ThemeSwitcher />
           <LanguageSwitcher />
 

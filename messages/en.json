@@ -16,7 +16,18 @@
     "calendar": "My Calendar",
     "adminPanel": "Admin Panel",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "search": {
+      "placeholder": "Search people…",
+      "open": "Search people",
+      "close": "Close search",
+      "listLabel": "People results",
+      "loading": "Searching…",
+      "noResults": "No results",
+      "minChars": "Type at least 2 characters",
+      "badgeAdvisor": "Advisor",
+      "badgeAdmin": "Administrator"
+    }
   },
   "theme": {
     "toggle": "Toggle theme",
@@ -352,6 +363,9 @@
     "upcomingEvents": "Upcoming Events",
     "noEvents": "No events yet",
     "membersTitle": "Management & Members",
+    "leadershipTitle": "Leadership",
+    "advisorLabel": "Advisor",
+    "presidentLabel": "President",
     "noMembers": "Be the first to join this club!",
     "unnamedMember": "Unnamed Member",
     "attendeeCount": "{count} attending",

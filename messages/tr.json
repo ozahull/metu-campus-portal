@@ -16,7 +16,18 @@
     "calendar": "Takvimim",
     "adminPanel": "Yönetim Paneli",
     "openMenu": "Menüyü aç",
-    "closeMenu": "Menüyü kapat"
+    "closeMenu": "Menüyü kapat",
+    "search": {
+      "placeholder": "Kişi ara…",
+      "open": "Kişi ara",
+      "close": "Aramayı kapat",
+      "listLabel": "Kişi sonuçları",
+      "loading": "Aranıyor…",
+      "noResults": "Sonuç bulunamadı",
+      "minChars": "En az 2 karakter yazın",
+      "badgeAdvisor": "Hoca",
+      "badgeAdmin": "Yönetici"
+    }
   },
   "theme": {
     "toggle": "Temayı değiştir",
@@ -352,6 +363,9 @@
     "upcomingEvents": "Yaklaşan Etkinlikler",
     "noEvents": "Henüz etkinlik bulunmuyor",
     "membersTitle": "Yönetim & Üyeler",
+    "leadershipTitle": "Yönetim",
+    "advisorLabel": "Danışman",
+    "presidentLabel": "Başkan",
     "noMembers": "Bu kulübe ilk katılan siz olun!",
     "unnamedMember": "İsimsiz Üye",
     "attendeeCount": "{count} Kişi Katılıyor",

@@ -93,6 +93,9 @@ function RequestRow({
   // Tek satır-içi editör; iki mod: revizyon notu veya reddetme gerekçesi.
   const [mode, setMode] = useState<null | "changes" | "reject">(null);
   const [note, setNote] = useState("");
+  // Optimistic gizleme: karar başarılı olunca kart anında kaybolsun; server
+  // round-trip (router.refresh) tamamlanana kadar stale görünmesin.
+  const [done, setDone] = useState(false);
 
   async function decide(
     decision: "approve" | "reject" | "changes",
@@ -119,6 +122,7 @@ function RequestRow({
     );
     setMode(null);
     setNote("");
+    setDone(true); // router.refresh()'ten ÖNCE: kart anında kaybolur, sayaç görsel azalır.
     router.refresh();
   }
 
@@ -134,6 +138,9 @@ function RequestRow({
     }
     void decide("changes", note);
   }
+
+  // Karar verildiyse kart anında yok olur; kesin listeyi router.refresh() getirir.
+  if (done) return null;
 
   return (
     <li className="relative border-l-2 border-transparent p-4 transition-colors focus-within:border-l-primary hover:bg-secondary/40">
@@ -235,6 +242,11 @@ function RequestRow({
             disabled={busy}
             className="resize-none"
           />
+          {mode === "reject" && (
+            <p className="text-xs text-muted-foreground">
+              {t("rejectNoteHint")}
+            </p>
+          )}
           <div className="flex justify-end gap-2">
             <Button
               size="sm"
@@ -255,7 +267,13 @@ function RequestRow({
             ) : (
               <ConfirmDialog
                 trigger={
-                  <Button size="sm" variant="destructive" disabled={busy}>
+                  // Not boşken dialog HİÇ açılmasın: buton pasif, kullanıcı önce
+                  // gerekçe yazsın. onConfirm'deki guard savunma amaçlı kalır.
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    disabled={busy || note.trim() === ""}
+                  >
                     {busy && <Loader2 className="size-4 animate-spin" />}
                     {t("reject")}
                   </Button>

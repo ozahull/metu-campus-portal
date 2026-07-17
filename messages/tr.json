@@ -725,6 +725,7 @@
       "reject": "Reddet",
       "changesPlaceholder": "Neyin düzeltilmesi gerektiğini yazın…",
       "rejectPlaceholder": "Reddetme gerekçesini yazın (hocaya iletilecek)…",
+      "rejectNoteHint": "Reddetmek için önce gerekçe girin.",
       "sendChanges": "Revizyon Gönder",
       "cancelChanges": "Vazgeç",
       "rejectConfirmTitle": "Başvuruyu reddet",

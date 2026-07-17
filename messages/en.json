@@ -725,6 +725,7 @@
       "reject": "Reject",
       "changesPlaceholder": "Describe what needs to be revised…",
       "rejectPlaceholder": "Write the reason for rejection (shared with the advisor)…",
+      "rejectNoteHint": "Enter a reason before rejecting.",
       "sendChanges": "Send revision",
       "cancelChanges": "Cancel",
       "rejectConfirmTitle": "Reject application",

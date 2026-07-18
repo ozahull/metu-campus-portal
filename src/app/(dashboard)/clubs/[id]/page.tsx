@@ -22,6 +22,7 @@ import {
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { categoryLabel } from "@/lib/category";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
@@ -89,6 +90,7 @@ export default async function ClubDetailPage({
   const { id } = await params;
   const t = await getTranslations("clubs");
   const tMessages = await getTranslations("messages");
+  const tCategories = await getTranslations("categories");
   const supabase = await createClient();
 
   const {
@@ -293,7 +295,8 @@ export default async function ClubDetailPage({
                   <div className="pb-1">
                     <Badge variant="primary">
                       <Users className="size-3" />
-                      {club.category ?? t("defaultCategory")}
+                      {categoryLabel(club.category, tCategories) ??
+                        t("defaultCategory")}
                     </Badge>
                     <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">
                       {club.name}
@@ -314,11 +317,14 @@ export default async function ClubDetailPage({
                       {t("manage")}
                     </Link>
                   )}
-                  <JoinButton
-                    clubId={club.id}
-                    userId={user.id}
-                    isMember={isMember}
-                  />
+                  {/* Kulübü yönetene (okul/danışman/başkan) katılma teklif edilmez. */}
+                  {!canManage && (
+                    <JoinButton
+                      clubId={club.id}
+                      userId={user.id}
+                      isMember={isMember}
+                    />
+                  )}
                 </div>
               </div>
             </div>

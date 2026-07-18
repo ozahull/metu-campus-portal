@@ -23,8 +23,8 @@ type TicketFlowProps = {
   ticket: MyTicket | null;
 };
 
-// Ücretsiz katılım bileti akışı (ödeme yok): "Bilet Al" → ticket_issue RPC ile
-// bilet DOĞRUDAN APPROVED doğar → QR + token gösterilir → kapıda check-in.
+// Ücretsiz katılım bileti akışı (ödeme yok): "Yerini Ayırt" → ticket_issue RPC
+// ile bilet DOĞRUDAN APPROVED doğar → QR + token gösterilir → kapıda check-in.
 export function TicketFlow({ eventId, closesAtISO, ticket }: TicketFlowProps) {
   const router = useRouter();
   const t = useTranslations("events.ticket");

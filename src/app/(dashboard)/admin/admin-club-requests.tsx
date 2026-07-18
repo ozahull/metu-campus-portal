@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { categoryLabel } from "@/lib/category";
 import { formatDateTime } from "@/lib/datetime";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -88,6 +89,7 @@ function RequestRow({
 }) {
   const router = useRouter();
   const t = useTranslations("admin.clubRequests");
+  const tCategories = useTranslations("categories");
   const locale = useLocale();
   const [busy, setBusy] = useState(false);
   // Tek satır-içi editör; iki mod: revizyon notu veya reddetme gerekçesi.
@@ -158,7 +160,7 @@ function RequestRow({
             {req.category && (
               <span className="inline-flex items-center gap-1.5">
                 <Tag className="size-3.5" />
-                {req.category}
+                {categoryLabel(req.category, tCategories)}
               </span>
             )}
           </div>

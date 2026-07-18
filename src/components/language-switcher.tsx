@@ -1,7 +1,6 @@
 "use client";
 
 import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Check, Languages } from "lucide-react";
 import { setLocale } from "@/i18n/locale-actions";
@@ -19,9 +18,9 @@ const localeLabels: Record<Locale, string> = {
   en: "English",
 };
 
-/** Dil değiştirici (navbar). Cookie tabanlı; seçimden sonra router.refresh(). */
+/** Dil değiştirici (navbar). Cookie tabanlı; setLocale aksiyonu route'u
+ *  sunucu tarafında refresh() ile yeniden render ettirir (Next 16). */
 export function LanguageSwitcher() {
-  const router = useRouter();
   const t = useTranslations("userMenu");
   const activeLocale = useLocale();
   const [isPending, startTransition] = useTransition();
@@ -30,7 +29,6 @@ export function LanguageSwitcher() {
     if (locale === activeLocale) return;
     startTransition(async () => {
       await setLocale(locale);
-      router.refresh();
     });
   }
 

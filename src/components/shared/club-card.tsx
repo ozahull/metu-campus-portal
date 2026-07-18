@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
+import { categoryLabel } from "@/lib/category";
 import { cn } from "@/lib/utils";
 
 export type Club = {
@@ -27,6 +28,7 @@ export function ClubCard({
   className?: string;
 }) {
   const t = useTranslations("clubs");
+  const tCategories = useTranslations("categories");
   const initials = club.name.slice(0, 2).toUpperCase();
   const watermark = (club.name?.trim()?.[0] ?? "•").toUpperCase();
 
@@ -79,7 +81,11 @@ export function ClubCard({
         </h3>
 
         <div className="flex flex-wrap items-center gap-2">
-          {club.category && <Badge variant="primary">{club.category}</Badge>}
+          {club.category && (
+            <Badge variant="primary">
+              {categoryLabel(club.category, tCategories)}
+            </Badge>
+          )}
           {typeof club.memberCount === "number" && (
             <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
               <Users className="size-3.5" />

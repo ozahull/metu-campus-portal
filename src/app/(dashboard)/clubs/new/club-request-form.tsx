@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { categoryLabel } from "@/lib/category";
 import { formatDateTime } from "@/lib/datetime";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -58,6 +59,7 @@ export function ClubRequestForm({
 }) {
   const router = useRouter();
   const t = useTranslations("clubRequest");
+  const tCategories = useTranslations("categories");
   const locale = useLocale();
 
   // "Yeni başvuru yap"/"Yeniden başvur" → mevcut kayıt PENDING/APPROVED/REJECTED
@@ -161,7 +163,10 @@ export function ClubRequestForm({
             <SummaryRow label={t("pending.nameLabel")} value={existing.name} />
             <SummaryRow
               label={t("pending.categoryLabel")}
-              value={existing.category || t("pending.empty")}
+              value={
+                categoryLabel(existing.category, tCategories) ??
+                t("pending.empty")
+              }
             />
             <SummaryRow
               label={t("pending.descriptionLabel")}

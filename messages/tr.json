@@ -332,10 +332,10 @@
     "downloadIcs": ".ics indir",
     "ticket": {
       "yourTicket": "Biletiniz",
-      "buy": "Bilet Al",
+      "buy": "Yerini Ayırt",
       "free": "Ücretsiz",
       "freeLabel": "Katılım Bileti",
-      "salesClosed": "Bilet alımı kapandı",
+      "salesClosed": "Katılım kaydı kapandı",
       "qrHint": "Bu QR kodu girişte gösterin.",
       "checkedInNote": "Girişiniz yapıldı. İyi eğlenceler!",
       "status": {
@@ -343,7 +343,7 @@
         "CHECKED_IN": "Giriş yapıldı"
       },
       "toasts": {
-        "buyError": "Bilet alınamadı: {message}",
+        "buyError": "Bilet oluşturulamadı: {message}",
         "buyCreated": "Biletiniz oluşturuldu. QR kodunuz hazır."
       }
     }
@@ -937,5 +937,25 @@
       "deleteError": "Silinemedi: {message}",
       "deleted": "Fotoğraf silindi"
     }
+  },
+  "categories": {
+    "technology": "Teknoloji",
+    "sports": "Spor",
+    "arts": "Sanat",
+    "music": "Müzik",
+    "science": "Bilim",
+    "culture": "Kültür",
+    "literature": "Edebiyat",
+    "social": "Sosyal",
+    "academic": "Akademik",
+    "games": "Oyun",
+    "dance": "Dans",
+    "theatre": "Tiyatro",
+    "photography": "Fotoğrafçılık",
+    "nature": "Doğa",
+    "volunteering": "Gönüllülük",
+    "entrepreneurship": "Girişimcilik",
+    "engineering": "Mühendislik",
+    "media": "Medya"
   }
 }

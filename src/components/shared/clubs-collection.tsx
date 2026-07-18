@@ -6,6 +6,7 @@ import { Search, SearchX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ClubCard, type Club } from "@/components/shared/club-card";
+import { categoryLabel } from "@/lib/category";
 import { cn } from "@/lib/utils";
 
 /**
@@ -21,6 +22,7 @@ export function ClubsCollection({
   showSearch?: boolean;
 }) {
   const t = useTranslations("clubs");
+  const tCategories = useTranslations("categories");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>("");
 
@@ -64,10 +66,11 @@ export function ClubsCollection({
             active={category === ""}
             onClick={() => setCategory("")}
           />
+          {/* Etiket çevrilir; filtre eşleşmesi HAM DB değeriyle kalır. */}
           {categories.map((c) => (
             <CategoryChip
               key={c}
-              label={c}
+              label={categoryLabel(c, tCategories) ?? c}
               active={category === c}
               onClick={() => setCategory(c)}
             />

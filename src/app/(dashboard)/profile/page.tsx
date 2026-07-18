@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/datetime";
+import { resolveDisplayName } from "@/lib/display-name";
 import { PageShell } from "@/components/shared/page-shell";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import {
@@ -79,11 +80,13 @@ export default async function ProfilePage() {
         ? { label: tRoles("advisor"), Icon: GraduationCap }
         : null;
 
+  // İsim yoksa e-postanın @ öncesi kısmı — ham e-posta başlıkta gösterilmez.
   const displayName =
-    profile?.full_name ??
-    (user.user_metadata?.full_name as string | undefined) ??
-    user.email ??
-    "";
+    resolveDisplayName(
+      profile?.full_name ??
+        (user.user_metadata?.full_name as string | undefined),
+      user.email,
+    ) ?? "";
   const initials =
     displayName
       .trim()

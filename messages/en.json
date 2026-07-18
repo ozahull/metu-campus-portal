@@ -332,10 +332,10 @@
     "downloadIcs": "Download .ics",
     "ticket": {
       "yourTicket": "Your Ticket",
-      "buy": "Buy Ticket",
+      "buy": "Get Ticket",
       "free": "Free",
       "freeLabel": "Attendance Pass",
-      "salesClosed": "Ticket sales closed",
+      "salesClosed": "Registration closed",
       "qrHint": "Show this QR code at the entrance.",
       "checkedInNote": "You're checked in. Enjoy!",
       "status": {
@@ -343,7 +343,7 @@
         "CHECKED_IN": "Checked in"
       },
       "toasts": {
-        "buyError": "Could not buy ticket: {message}",
+        "buyError": "Could not get ticket: {message}",
         "buyCreated": "Your ticket is ready. Your QR code is available."
       }
     }
@@ -937,5 +937,25 @@
       "deleteError": "Could not delete: {message}",
       "deleted": "Photo deleted"
     }
+  },
+  "categories": {
+    "technology": "Technology",
+    "sports": "Sports",
+    "arts": "Arts",
+    "music": "Music",
+    "science": "Science",
+    "culture": "Culture",
+    "literature": "Literature",
+    "social": "Social",
+    "academic": "Academic",
+    "games": "Games",
+    "dance": "Dance",
+    "theatre": "Theatre",
+    "photography": "Photography",
+    "nature": "Nature",
+    "volunteering": "Volunteering",
+    "entrepreneurship": "Entrepreneurship",
+    "engineering": "Engineering",
+    "media": "Media"
   }
 }

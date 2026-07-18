@@ -6,6 +6,7 @@ import { Search, SearchX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/shared/empty-state";
 import { EventCard, type EventCardData } from "@/components/shared/event-card";
+import { categoryLabel } from "@/lib/category";
 import { cn } from "@/lib/utils";
 
 export type EventRow = {
@@ -42,6 +43,7 @@ export function EventsExplorer({
   userId: string;
 }) {
   const t = useTranslations("events");
+  const tCategories = useTranslations("categories");
   const [query, setQuery] = useState("");
   const [club, setClub] = useState("");
   const [category, setCategory] = useState("");
@@ -109,6 +111,7 @@ export function EventsExplorer({
           >
             {t("allCategories")}
           </button>
+          {/* Etiket çevrilir; filtre eşleşmesi HAM DB değeriyle kalır. */}
           {categories.map((c) => (
             <button
               key={c}
@@ -117,7 +120,7 @@ export function EventsExplorer({
               onClick={() => setCategory((prev) => (prev === c ? "" : c))}
               className={chipCls(category === c)}
             >
-              {c}
+              {categoryLabel(c, tCategories)}
             </button>
           ))}
         </div>

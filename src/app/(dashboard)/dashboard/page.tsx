@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import type { LucideIcon } from "lucide-react";
 import { CalendarCheck, Compass, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { resolveDisplayName } from "@/lib/display-name";
 import { PageShell } from "@/components/shared/page-shell";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { ClubsGrid } from "./clubs-grid";
@@ -100,17 +101,20 @@ export default async function DashboardPage({
     );
   }).length;
 
+  // İsim yoksa e-postanın @ öncesi kısmı — ham e-posta karşılamada gösterilmez.
   const displayName =
-    profile?.full_name ??
-    (user.user_metadata?.full_name as string | undefined) ??
-    user.email;
+    resolveDisplayName(
+      profile?.full_name ??
+        (user.user_metadata?.full_name as string | undefined),
+      user.email,
+    ) ?? "";
 
   return (
     <PageShell>
       {/* İşlevsel karşılama: isim + hızlı istatistikler */}
       <header className="mb-10">
         <h1 className="font-display text-2xl font-black tracking-tight text-balance sm:text-3xl">
-          {t("welcome", { name: displayName ?? "" })}
+          {t("welcome", { name: displayName })}
         </h1>
         <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">
           {t("subtitle")}

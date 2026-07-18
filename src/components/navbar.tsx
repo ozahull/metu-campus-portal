@@ -9,6 +9,7 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationBell } from "@/components/notification-bell";
 import { UserMenu } from "@/components/user-menu";
 import type { AppNotification } from "@/lib/notification-meta";
+import { resolveDisplayName } from "@/lib/display-name";
 
 export const dynamic = "force-dynamic";
 
@@ -45,10 +46,13 @@ export async function Navbar() {
     .maybeSingle();
 
   const email = user.email ?? "";
+  // İsim yoksa e-postanın @ öncesi kısmı — ham e-posta isim olarak gösterilmez.
   const fullName =
-    profile?.full_name ??
-    (user.user_metadata?.full_name as string | undefined) ??
-    email;
+    resolveDisplayName(
+      profile?.full_name ??
+        (user.user_metadata?.full_name as string | undefined),
+      email,
+    ) ?? "";
   const role = profile?.role ?? "USER";
   const isSuperAdmin = role.toString().trim().toUpperCase() === "SUPER_ADMIN";
 

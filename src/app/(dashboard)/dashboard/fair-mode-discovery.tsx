@@ -7,6 +7,7 @@ import { Check, PartyPopper, Sparkles } from "lucide-react";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Badge } from "@/components/ui/badge";
+import { categoryLabel } from "@/lib/category";
 import { cn } from "@/lib/utils";
 import { JoinButton } from "../clubs/[id]/join-button";
 
@@ -30,6 +31,7 @@ export function FairModeDiscovery({
   initialInterests: string[];
 }) {
   const t = useTranslations("fair");
+  const tCategories = useTranslations("categories");
   const memberSet = useMemo(() => new Set(memberClubIds), [memberClubIds]);
 
   const categories = useMemo(() => {
@@ -119,7 +121,8 @@ export function FairModeDiscovery({
                   )}
                 >
                   {active && <Check className="size-3.5" />}
-                  {cat}
+                  {/* Etiket çevrilir; seçim/URL HAM DB değeriyle kalır. */}
+                  {categoryLabel(cat, tCategories)}
                 </button>
               );
             })}
@@ -163,7 +166,7 @@ export function FairModeDiscovery({
                     </Link>
                     {c.category && (
                       <Badge variant="primary" className="mt-0.5">
-                        {c.category}
+                        {categoryLabel(c.category, tCategories)}
                       </Badge>
                     )}
                   </div>

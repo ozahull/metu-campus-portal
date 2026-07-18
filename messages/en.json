@@ -112,6 +112,7 @@
     "send": "Send",
     "sendError": "Message could not be sent. Please try again.",
     "readOnly": "This is a one-way channel from the school administration; you can read messages but cannot reply.",
+    "deletedUser": "Deleted user",
     "counterpart": {
       "SCHOOL_ADMIN": "School Administration",
       "ADVISOR": "Advisor",
@@ -182,6 +183,15 @@
     "memberBadge": "MEMBER",
     "myEvents": "My Upcoming Events ({count})",
     "noEvents": "You have no upcoming attendance.",
+    "visibility": {
+      "title": "Profile Privacy",
+      "desc": "Manage the visibility of your public profile.",
+      "label": "Hide my profile from search",
+      "note": "When on, your bio, department, and year are visible only to you and school administration, and you won't appear in people search. Your name and role remain visible in club and member lists.",
+      "toastHidden": "Your profile is now hidden.",
+      "toastVisible": "Your profile is now visible.",
+      "toastError": "Could not update: {message}"
+    },
     "toasts": {
       "nameTooShort": "Please enter your full name.",
       "nameUpdated": "Name updated",

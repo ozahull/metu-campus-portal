@@ -112,6 +112,7 @@
     "send": "Gönder",
     "sendError": "Mesaj gönderilemedi. Lütfen tekrar deneyin.",
     "readOnly": "Bu kanal okul yönetiminin tek yönlü bilgilendirme kanalıdır; mesajları okuyabilirsiniz ancak yanıt yazamazsınız.",
+    "deletedUser": "Silinmiş kullanıcı",
     "counterpart": {
       "SCHOOL_ADMIN": "Okul Yönetimi",
       "ADVISOR": "Danışman",
@@ -182,6 +183,15 @@
     "memberBadge": "ÜYE",
     "myEvents": "Katılacağım Etkinlikler ({count})",
     "noEvents": "Yaklaşan katılımınız yok.",
+    "visibility": {
+      "title": "Profil Gizliliği",
+      "desc": "Kamusal profilinin görünürlüğünü yönet.",
+      "label": "Profilimi aramada gizle",
+      "note": "Açık olduğunda hakkında, bölüm ve sınıf bilgin yalnızca sana ve okul yönetimine görünür; kişi aramasında çıkmazsın. Adın ve rolün kulüp ve üye listelerinde görünmeye devam eder.",
+      "toastHidden": "Profilin artık gizli.",
+      "toastVisible": "Profilin artık görünür.",
+      "toastError": "Güncellenemedi: {message}"
+    },
     "toasts": {
       "nameTooShort": "Lütfen ad ve soyadınızı eksiksiz girin.",
       "nameUpdated": "İsim güncellendi",

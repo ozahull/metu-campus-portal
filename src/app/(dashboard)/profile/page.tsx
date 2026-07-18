@@ -25,6 +25,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { NotificationPreferences } from "@/components/notification-preferences";
+import { ProfileVisibilityToggle } from "@/components/profile-visibility-toggle";
 import { BadgeShowcase } from "@/components/badges";
 import { ProfileForm } from "./profile-form";
 import { ProfileDetailsForm } from "./profile-details-form";
@@ -122,6 +123,7 @@ export default async function ProfilePage() {
     department: string | null;
     class_year: string | null;
     avatar_url: string | null;
+    hide_profile: boolean | null;
   } | null;
 
   // Mevcut avatar önizlemesi: PRIVATE bucket → signed URL (public URL YOK).
@@ -168,6 +170,13 @@ export default async function ProfilePage() {
     )
     .sort((a, b) => a.event_date.localeCompare(b.event_date));
 
+  // Profil gizleme ayarı yalnız KAMUSAL rol sahiplerine (okul/danışman/başkan)
+  // gösterilir; sıradan öğrencinin zengin profili zaten yalnız kendine görünür.
+  const isPublicRole =
+    roleKey === "SUPER_ADMIN" ||
+    roleKey === "ADVISOR" ||
+    memberships.some((m) => m.role.toUpperCase() === "ADMIN");
+
   return (
     <PageShell>
       <header className="mb-8 flex items-center gap-4">
@@ -209,6 +218,15 @@ export default async function ProfilePage() {
       <div className="mt-6">
         <NotificationPreferences initialScope={notifScope} />
       </div>
+
+      {isPublicRole && (
+        <div className="mt-6">
+          <ProfileVisibilityToggle
+            userId={user.id}
+            initialHidden={details?.hide_profile ?? false}
+          />
+        </div>
+      )}
 
       <Card className="mt-6">
         <CardHeader>

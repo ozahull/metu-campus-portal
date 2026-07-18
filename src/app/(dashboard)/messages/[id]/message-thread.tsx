@@ -13,7 +13,8 @@ import { cn } from "@/lib/utils";
 
 export type ThreadMessage = {
   id: string;
-  sender_user_id: string;
+  // Gönderen silinmişse SET NULL ile null olur ("silinmiş kullanıcı").
+  sender_user_id: string | null;
   body: string;
   created_at: string;
   sender: { full_name: string | null } | null;
@@ -143,11 +144,19 @@ export function MessageThread({
                         : "border border-border bg-card",
                     )}
                   >
-                    {!mine && m.sender?.full_name && (
-                      <p className="mb-0.5 text-xs font-semibold text-primary">
-                        {m.sender.full_name}
-                      </p>
-                    )}
+                    {!mine &&
+                      (m.sender_user_id === null ? (
+                        // Gönderen hesabı silinmiş (FK SET NULL) → mesaj kalır.
+                        <p className="mb-0.5 text-xs font-semibold text-muted-foreground italic">
+                          {t("deletedUser")}
+                        </p>
+                      ) : (
+                        m.sender?.full_name && (
+                          <p className="mb-0.5 text-xs font-semibold text-primary">
+                            {m.sender.full_name}
+                          </p>
+                        )
+                      ))}
                     <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
                       {m.body}
                     </p>

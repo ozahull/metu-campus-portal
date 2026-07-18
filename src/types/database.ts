@@ -543,7 +543,7 @@ export type Database = {
           conversation_id: string
           created_at: string
           id: string
-          sender_user_id: string
+          sender_user_id: string | null
         }
         // Kolon-grant gerçeği (4A): istemci YALNIZ (conversation_id, body)
         // yazabilir; sender_user_id DEFAULT auth.uid() ile dolar, gönderilirse
@@ -671,6 +671,7 @@ export type Database = {
           department: string | null
           email: string | null
           full_name: string | null
+          hide_profile: boolean
           id: string
           role: string
         }
@@ -681,6 +682,7 @@ export type Database = {
           department?: string | null
           email?: string | null
           full_name?: string | null
+          hide_profile?: boolean
           id: string
           role?: string
         }
@@ -691,6 +693,7 @@ export type Database = {
           department?: string | null
           email?: string | null
           full_name?: string | null
+          hide_profile?: boolean
           id?: string
           role?: string
         }

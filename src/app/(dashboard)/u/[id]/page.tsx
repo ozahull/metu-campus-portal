@@ -130,9 +130,14 @@ export default async function PersonProfilePage({
   // open_conversation'ın kendi şartıyla birebir — hatalı buton göstermez.
   // Bakanın süper yönetici rolü yalnız başkasının profilinde gerekir; o
   // durumda bir kez okunur. Gerçek yetki RPC + RLS'te.
+  // Self'lik OTURUMDAN türetilir, RPC can_edit'inden DEĞİL: can_edit
+  // (p_uid = auth.uid()) auth bağlamı REST çağrısına taşınamazsa false değil
+  // SQL NULL döner; null && ... self dalını sessizce düşürürken !null admin
+  // dalını ayakta bırakır (4C QA 2a asimetrisi).
+  const isSelf = user.id === profile.id;
   const personIsAdvisor = profile.clubs.some((c) => c.relation === "advisor");
   let viewerIsSuperAdmin = false;
-  if (personIsAdvisor && !profile.can_edit) {
+  if (personIsAdvisor && !isSelf) {
     const { data: viewerProfile } = await supabase
       .from("profiles")
       .select("role")
@@ -164,9 +169,9 @@ export default async function PersonProfilePage({
           )}
         </div>
 
-        {(profile.can_edit || (personIsAdvisor && viewerIsSuperAdmin)) && (
+        {(isSelf || (personIsAdvisor && viewerIsSuperAdmin)) && (
           <div className="flex shrink-0 flex-wrap items-center gap-2">
-            {profile.can_edit && (
+            {isSelf && (
               <Link
                 href="/profile"
                 className={cn(
@@ -179,7 +184,7 @@ export default async function PersonProfilePage({
               </Link>
             )}
             {/* Danışmanın yönetime proaktif yolu (self) — Aşama 4C. */}
-            {profile.can_edit && personIsAdvisor && (
+            {isSelf && personIsAdvisor && (
               <ComposeButton
                 type="ADMIN_ADVISOR"
                 advisorUserId={profile.id}
@@ -187,7 +192,7 @@ export default async function PersonProfilePage({
               />
             )}
             {/* Okul yönetimi → danışman kişi profili — Aşama 4C. */}
-            {!profile.can_edit && viewerIsSuperAdmin && personIsAdvisor && (
+            {!isSelf && viewerIsSuperAdmin && personIsAdvisor && (
               <ComposeButton
                 type="ADMIN_ADVISOR"
                 advisorUserId={profile.id}

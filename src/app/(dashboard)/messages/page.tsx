@@ -104,7 +104,7 @@ export default async function MessagesPage() {
 
                   <span className="flex shrink-0 flex-col items-end gap-1.5">
                     {row.last_message_at && (
-                      <span className="text-[11px] text-muted-foreground/80">
+                      <span className="text-[11px] text-muted-foreground">
                         {formatDateTime(row.last_message_at, locale, "short")}
                       </span>
                     )}

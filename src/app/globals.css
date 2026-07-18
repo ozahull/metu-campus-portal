@@ -44,6 +44,8 @@
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
+  --color-disabled: var(--disabled);
+  --color-disabled-foreground: var(--disabled-foreground);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
@@ -89,12 +91,22 @@
   /* METU kırmızısı — değişmiyor (marka çapası). */
   --primary: oklch(0.48 0.15 27);
   --primary-foreground: oklch(0.985 0.006 27);
+  /* primary METİN/İKON olarak (WCAG AA): açık temada primary'nin kendisi;
+     koyu temada .dark'ta zemine karşı açılmış ton. text-primary utility'si
+     bu değişkene bağlanır (aşağıdaki @layer utilities bloğu). */
+  --primary-text: var(--primary);
 
   --secondary: oklch(0.928 0.016 82);
   --secondary-foreground: oklch(0.3 0.022 55);
 
   --muted: oklch(0.928 0.016 82);
-  --muted-foreground: oklch(0.505 0.022 60);
+  /* 0.505→0.49: 11px zaman damgaları dahil küçük metin ≥4.5 (WCAG AA). */
+  --muted-foreground: oklch(0.49 0.022 60);
+
+  /* Devre dışı kontroller — opacity YERİNE token çifti: durum sönük görünür
+     ama metin okunur kalır (her iki temada ≥4.5, bkz. ui/button). */
+  --disabled: oklch(0.902 0.012 82);
+  --disabled-foreground: oklch(0.46 0.02 60);
 
   --accent: oklch(0.918 0.02 78);
   --accent-foreground: oklch(0.3 0.022 55);
@@ -107,8 +119,10 @@
      ETMEZ, böylece lightbox iki temada da sıcak koyu kalır (ham #000 değil). */
   --overlay: oklch(0.16 0.02 42);
 
-  /* Durum renkleri — iki dilde ortak (normalize edilmiş palet). */
-  --success: oklch(0.527 0.137 150);
+  /* Durum renkleri — iki dilde ortak (normalize edilmiş palet).
+     success 0.527→0.44: text-success küçük metni bg-success/10-25 tonları
+     üstünde de ≥4.5 versin (RSVP rozeti, durum çipleri, alert). */
+  --success: oklch(0.44 0.132 150);
   --success-foreground: oklch(0.985 0.02 150);
 
   --warning: oklch(0.555 0.146 49);
@@ -152,15 +166,21 @@
   --popover: oklch(0.252 0.017 51);
   --popover-foreground: oklch(0.936 0.016 65);
 
-  /* Koyu tema kırmızısı (#A32A2A). */
+  /* Koyu tema kırmızısı (#A32A2A) — buton ZEMİNİ olarak kalır (beyaz metinle
+     ~6.9:1). METİN olarak koyu yüzeylerde 2.1-2.5 verdiğinden text-primary
+     --primary-text ile açılmış tona bağlanır (en koyu yüzeyde ≥4.8). */
   --primary: oklch(0.477 0.158 26);
   --primary-foreground: oklch(0.985 0.008 27);
+  --primary-text: color-mix(in oklab, var(--primary) 58%, white);
 
   --secondary: oklch(0.3 0.018 50);
   --secondary-foreground: oklch(0.936 0.016 65);
 
   --muted: oklch(0.3 0.018 50);
   --muted-foreground: oklch(0.72 0.016 62);
+
+  --disabled: oklch(0.29 0.014 45);
+  --disabled-foreground: oklch(0.69 0.014 60);
 
   --accent: oklch(0.315 0.02 50);
   --accent-foreground: oklch(0.936 0.016 65);
@@ -237,6 +257,22 @@
   input[type="password"]::-ms-reveal,
   input[type="password"]::-ms-clear {
     display: none;
+  }
+}
+
+/*
+  PRIMARY METİN VARYANTI (WCAG AA — kontrast süpürmesi).
+  text-primary utility'si --primary-text'e bağlanır: açık temada var(--primary)
+  (aynı görünüm), koyu temada color-mix ile açılmış ton. bg-primary /
+  border-primary DEĞİŞMEZ — buton zeminleri ve beyaz-üstü-kırmızı korunur.
+  Koddaki tüm kullanım biçimleri kapsanır: çıplak sınıf + hover: +
+  group-hover:. Yeni bir varyantla text-primary kullanırsan buraya da ekle.
+*/
+@layer utilities {
+  .text-primary,
+  .hover\:text-primary:hover,
+  .group:hover .group-hover\:text-primary {
+    color: var(--primary-text);
   }
 }
 
@@ -338,6 +374,9 @@
     --input: #d4d4d8;
     --primary: #841515;
     --primary-foreground: #ffffff;
+    /* Koyu temadayken yazdırmada da kağıt üstünde marka kırmızısı kalsın
+       (.dark'ın açılmış --primary-text'i beyaz kağıtta okunmaz olurdu). */
+    --primary-text: var(--primary);
   }
   .print-hide {
     display: none !important;

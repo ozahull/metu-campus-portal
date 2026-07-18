@@ -155,7 +155,7 @@ export function MessageThread({
                       className={cn(
                         "mt-1 text-[11px]",
                         mine
-                          ? "text-primary-foreground/70"
+                          ? "text-primary-foreground/85"
                           : "text-muted-foreground",
                       )}
                     >

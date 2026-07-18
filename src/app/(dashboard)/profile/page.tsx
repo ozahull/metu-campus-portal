@@ -124,6 +124,7 @@ export default async function ProfilePage() {
     class_year: string | null;
     avatar_url: string | null;
     hide_profile: boolean | null;
+    name_verified: boolean | null;
   } | null;
 
   // Mevcut avatar önizlemesi: PRIVATE bucket → signed URL (public URL YOK).
@@ -201,7 +202,12 @@ export default async function ProfilePage() {
         </div>
       </header>
 
-      <ProfileForm userId={user.id} initialName={profile?.full_name ?? ""} />
+      <ProfileForm
+        userId={user.id}
+        initialName={profile?.full_name ?? ""}
+        email={user.email ?? ""}
+        nameVerified={details?.name_verified ?? false}
+      />
 
       <div className="mt-6">
         <ProfileDetailsForm

@@ -13,6 +13,11 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isAllowedEmail } from "@/lib/auth";
+import {
+  deriveNameFromEmail,
+  isDerivableEmail,
+  nameMatchesEmail,
+} from "@/lib/name-from-email";
 import { AuthShell } from "@/components/shared/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,17 +41,42 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  // Kullanıcı ad alanlarına elle dokundu mu? Dokunmadıysa e-postadan otomatik
+  // doldurulur; dokunduysa (Türkçe düzeltme) otomatik doldurma durur.
+  const [nameEdited, setNameEdited] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmSent, setConfirmSent] = useState(false);
 
+  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
   const emailValid = email.length === 0 || isAllowedEmail(email);
+  // Doğrulanabilir (ad.soyad) e-postada ad, e-posta ile eşleşmeli. Format dışı
+  // e-postada (nokta yok) doğrulama uygulanmaz (serbest).
+  const nameMatches = !isDerivableEmail(email) || nameMatchesEmail(fullName, email);
+  const showNameMismatch =
+    isAllowedEmail(email) &&
+    firstName.trim().length > 0 &&
+    lastName.trim().length > 0 &&
+    !nameMatches;
   const formValid =
     firstName.trim().length > 0 &&
     lastName.trim().length > 0 &&
     isAllowedEmail(email) &&
-    password.length >= 6;
+    password.length >= 6 &&
+    nameMatches;
+
+  // E-posta değişince ad alanlarını (kullanıcı henüz dokunmadıysa) otomatik doldur.
+  function onEmailChange(value: string) {
+    setEmail(value);
+    if (!nameEdited) {
+      const derived = deriveNameFromEmail(value);
+      if (derived) {
+        setFirstName(derived.first);
+        setLastName(derived.last);
+      }
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -56,6 +86,11 @@ export default function RegisterPage() {
       setError(t("register.domainError"));
       return;
     }
+    // Sunucu (handle_new_user) da doğrular; burada anlık geri bildirim için.
+    if (isDerivableEmail(email) && !nameMatchesEmail(fullName, email)) {
+      setError(t("register.nameMismatch"));
+      return;
+    }
     if (password.length < 6) {
       setError(t("register.passwordShort"));
       return;
@@ -63,7 +98,6 @@ export default function RegisterPage() {
 
     setLoading(true);
     const supabase = createClient();
-    const fullName = `${firstName.trim()} ${lastName.trim()}`;
     const normalizedEmail = email.trim().toLowerCase();
 
     const { data, error: signUpError } = await supabase.auth.signUp({
@@ -159,8 +193,12 @@ export default function RegisterPage() {
                     autoComplete="given-name"
                     placeholder={t("register.firstNamePlaceholder")}
                     value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    onChange={(e) => {
+                      setNameEdited(true);
+                      setFirstName(e.target.value);
+                    }}
                     disabled={loading}
+                    aria-invalid={showNameMismatch}
                     className="h-11"
                     required
                   />
@@ -172,13 +210,22 @@ export default function RegisterPage() {
                     autoComplete="family-name"
                     placeholder={t("register.lastNamePlaceholder")}
                     value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    onChange={(e) => {
+                      setNameEdited(true);
+                      setLastName(e.target.value);
+                    }}
                     disabled={loading}
+                    aria-invalid={showNameMismatch}
                     className="h-11"
                     required
                   />
                 </div>
               </div>
+              {showNameMismatch && (
+                <p className="-mt-2 text-xs text-destructive">
+                  {t("register.nameMismatch")}
+                </p>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="email">{t("register.emailLabel")}</Label>
@@ -189,7 +236,7 @@ export default function RegisterPage() {
                   autoComplete="email"
                   placeholder="ad.soyad@metu.edu.tr"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => onEmailChange(e.target.value)}
                   disabled={loading}
                   aria-invalid={!emailValid}
                   className="h-11"

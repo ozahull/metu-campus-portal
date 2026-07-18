@@ -946,6 +946,7 @@ export type Database = {
       search_public_profiles: {
         Args: { p_query: string }
         Returns: {
+          class_year: string | null
           department: string | null
           full_name: string
           id: string

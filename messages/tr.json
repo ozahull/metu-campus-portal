@@ -196,6 +196,7 @@
     },
     "toasts": {
       "nameTooShort": "Lütfen ad ve soyadınızı eksiksiz girin.",
+      "nameMismatch": "Adınız e-posta adresinizle eşleşmeli.",
       "nameUpdated": "İsim güncellendi",
       "nameError": "Güncellenemedi: {message}",
       "passwordShort": "Şifre en az 6 karakter olmalıdır.",
@@ -262,6 +263,7 @@
       "errorTitle": "Kayıt yapılamadı",
       "domainError": "Sadece @metu.edu.tr veya @ncc.metu.edu.tr uzantılı mail kullanılabilir.",
       "passwordShort": "Şifre en az 6 karakter olmalıdır.",
+      "nameMismatch": "Adınız e-posta adresinizle eşleşmeli.",
       "profileError": "Profil kaydedilemedi: {message}",
       "confirmTitle": "Onay maili gönderildi",
       "confirmBody": "E-postanıza gelen onay linkine tıklayarak hesabınızı etkinleştirin. (Spam klasörünü de kontrol edin.)",

@@ -196,6 +196,7 @@
     },
     "toasts": {
       "nameTooShort": "Please enter your full name.",
+      "nameMismatch": "Your name must match your email address.",
       "nameUpdated": "Name updated",
       "nameError": "Could not update: {message}",
       "passwordShort": "Password must be at least 6 characters.",
@@ -262,6 +263,7 @@
       "errorTitle": "Registration failed",
       "domainError": "Only @metu.edu.tr or @ncc.metu.edu.tr email addresses are allowed.",
       "passwordShort": "Password must be at least 6 characters.",
+      "nameMismatch": "Your name must match your email address.",
       "profileError": "Could not save profile: {message}",
       "confirmTitle": "Confirmation email sent",
       "confirmBody": "Activate your account by clicking the confirmation link sent to your email. (Also check your spam folder.)",

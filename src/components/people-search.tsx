@@ -24,6 +24,7 @@ type PersonHit = {
   full_name: string;
   role: string;
   department: string | null;
+  class_year: string | null;
 };
 
 const MIN_QUERY = 2;
@@ -202,9 +203,11 @@ function ResultsList({
             <p className="truncate text-sm font-semibold text-foreground">
               {hit.full_name}
             </p>
-            {hit.department && (
+            {/* Ayırt edici ikinci satır: "bölüm · sınıf" (biri yoksa diğeri).
+                İkisi de yoksa satır çıkmaz; rol rozeti zaten ayırt eder. */}
+            {(hit.department || hit.class_year) && (
               <p className="truncate text-xs text-muted-foreground">
-                {hit.department}
+                {[hit.department, hit.class_year].filter(Boolean).join(" · ")}
               </p>
             )}
           </div>

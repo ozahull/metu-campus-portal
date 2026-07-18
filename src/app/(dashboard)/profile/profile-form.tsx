@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Eye, EyeOff, KeyRound, Loader2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { isDerivableEmail, nameMatchesEmail } from "@/lib/name-from-email";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,9 +21,15 @@ import {
 export function ProfileForm({
   userId,
   initialName,
+  email,
+  nameVerified,
 }: {
   userId: string;
   initialName: string;
+  // Doğrulanmış (name_verified) kullanıcılar için ad e-posta ile eşleşmeli.
+  // Eski kullanıcılar (nameVerified=false) serbest → doğrulama uygulanmaz.
+  email: string;
+  nameVerified: boolean;
 }) {
   const router = useRouter();
   const t = useTranslations("profile");
@@ -30,6 +37,10 @@ export function ProfileForm({
 
   const [name, setName] = useState(initialName);
   const [nameBusy, setNameBusy] = useState(false);
+
+  // Doğrulanmış hesapta, ad.soyad e-postasında ad e-posta ile eşleşmeli.
+  const nameMismatch =
+    nameVerified && isDerivableEmail(email) && !nameMatchesEmail(name, email);
 
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -39,6 +50,11 @@ export function ProfileForm({
     e.preventDefault();
     if (name.trim().length < 3) {
       toast.error(t("toasts.nameTooShort"));
+      return;
+    }
+    // Sunucu (enforce_verified_name trigger) da doğrular; anlık geri bildirim için.
+    if (nameMismatch) {
+      toast.error(t("toasts.nameMismatch"));
       return;
     }
     setNameBusy(true);
@@ -88,10 +104,15 @@ export function ProfileForm({
           <form onSubmit={saveName} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="full-name">{t("nameCard.label")}</Label>
-              <Input id="full-name" value={name} onChange={(e) => setName(e.target.value)} disabled={nameBusy} required />
+              <Input id="full-name" value={name} onChange={(e) => setName(e.target.value)} disabled={nameBusy} aria-invalid={nameMismatch} required />
+              {nameMismatch && (
+                <p className="text-xs text-destructive">
+                  {t("toasts.nameMismatch")}
+                </p>
+              )}
             </div>
             <div className="flex justify-end">
-              <Button type="submit" disabled={nameBusy} className="gap-2 font-medium">
+              <Button type="submit" disabled={nameBusy || nameMismatch} className="gap-2 font-medium">
                 {nameBusy && <Loader2 className="size-4 animate-spin" />}
                 {tCommon("save")}
               </Button>

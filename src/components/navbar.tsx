@@ -53,8 +53,21 @@ export async function Navbar() {
         (user.user_metadata?.full_name as string | undefined),
       email,
     ) ?? "";
-  const role = profile?.role ?? "USER";
-  const isSuperAdmin = role.toString().trim().toUpperCase() === "SUPER_ADMIN";
+  const roleKey = (profile?.role ?? "USER").toString().trim().toUpperCase();
+  const isSuperAdmin = roleKey === "SUPER_ADMIN";
+
+  // Etkin rol (D24): küresel rol USER olan kulüp başkanı navbar'da "Üye"
+  // görünmesin — herhangi bir kulüpte club_members.role='ADMIN' satırı varsa
+  // rozet "Başkan" olur. Küresel roller (okul/danışman) başkanlığı ezer.
+  let displayRole = roleKey;
+  if (roleKey !== "SUPER_ADMIN" && roleKey !== "ADVISOR") {
+    const { count: presidencyCount } = await supabase
+      .from("club_members")
+      .select("club_id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("role", "ADMIN");
+    displayRole = (presidencyCount ?? 0) > 0 ? "PRESIDENT" : roleKey;
+  }
 
   // Kendi avatarı (varsa). avatar_url broad SELECT'e KAPALI (kolon-grant: yalnız
   // id/full_name/role) → get_profile RPC ile okunur (self → avatar_url dolu).
@@ -141,7 +154,7 @@ export async function Navbar() {
           <UserMenu
             fullName={fullName}
             email={email}
-            role={role}
+            role={displayRole}
             isSuperAdmin={isSuperAdmin}
             initials={getInitials(fullName, email)}
             avatarUrl={avatarUrl}

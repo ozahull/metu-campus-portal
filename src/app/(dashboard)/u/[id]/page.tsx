@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { roleLabel } from "@/lib/role-label";
 import { PageShell } from "@/components/shared/page-shell";
 import { ComposeButton } from "@/components/messaging/compose-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -87,7 +88,7 @@ export default async function PersonProfilePage({
 }) {
   const { id } = await params;
   const t = await getTranslations("personProfile");
-  const tRoles = await getTranslations("roles");
+  const tRoleLabels = await getTranslations("roleLabels");
   const tMessages = await getTranslations("messages");
   const supabase = await createClient();
 
@@ -114,14 +115,14 @@ export default async function PersonProfilePage({
     avatarUrl = signed?.signedUrl ?? null;
   }
 
-  // Rol rozeti: SUPER_ADMIN → "Süper yönetici", ADVISOR → "Hoca". USER'a rozet
-  // yok (profile/page.tsx deseniyle birebir).
+  // Rol rozeti (etiket merkezî roleLabel'dan — D24). USER'a rozet yok
+  // (profile/page.tsx deseniyle birebir).
   const roleKey = profile.role?.toString().trim().toUpperCase();
   const roleBadge =
     roleKey === "SUPER_ADMIN"
-      ? { label: tRoles("superAdmin"), Icon: ShieldCheck }
+      ? { label: roleLabel(roleKey, tRoleLabels), Icon: ShieldCheck }
       : roleKey === "ADVISOR"
-        ? { label: tRoles("advisor"), Icon: GraduationCap }
+        ? { label: roleLabel(roleKey, tRoleLabels), Icon: GraduationCap }
         : null;
 
   const hasAbout = !!profile.bio || !!profile.department || !!profile.class_year;
@@ -278,16 +279,16 @@ export default async function PersonProfilePage({
                     {c.relation === "advisor" ? (
                       <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
                         <GraduationCap className="size-3" />
-                        {t("relation.advisor")}
+                        {roleLabel(c.relation, tRoleLabels)}
                       </span>
                     ) : c.relation === "president" ? (
                       <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-accent-gold/45 bg-[color-mix(in_oklab,var(--accent-gold)_14%,transparent)] px-2 py-0.5 text-[10px] font-semibold text-accent-gold">
                         <Crown className="size-3" />
-                        {t("relation.president")}
+                        {roleLabel(c.relation, tRoleLabels)}
                       </span>
                     ) : (
                       <span className="shrink-0 rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                        {t("relation.member")}
+                        {roleLabel(c.relation, tRoleLabels)}
                       </span>
                     )}
                   </Link>

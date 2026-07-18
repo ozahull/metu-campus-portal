@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { categoryLabel } from "@/lib/category";
+import { roleLabel } from "@/lib/role-label";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
@@ -92,6 +93,7 @@ export default async function ClubDetailPage({
   const t = await getTranslations("clubs");
   const tMessages = await getTranslations("messages");
   const tCategories = await getTranslations("categories");
+  const tRoleLabels = await getTranslations("roleLabels");
   const supabase = await createClient();
 
   const {
@@ -138,6 +140,15 @@ export default async function ClubDetailPage({
   const members: MemberProfile[] = memberRows
     .map(unwrapMember)
     .filter((p): p is MemberProfile => Boolean(p));
+
+  // Üye sekmesi için rol bilgisiyle liste (D24): başkan satırı diğer
+  // ekranlarla aynı "Başkan" etiketini taşır — etiketsiz kalmaz.
+  const memberList = memberRows
+    .map((row) => {
+      const p = unwrapMember(row);
+      return p ? { ...p, isPresident: row.role?.toString().trim().toUpperCase() === "ADMIN" } : null;
+    })
+    .filter((p): p is MemberProfile & { isPresident: boolean } => Boolean(p));
 
   // Başkan(lar): club_members.role='ADMIN' — /u/[id] linki için (Aşama 3C).
   const presidents: MemberProfile[] = memberRows
@@ -415,7 +426,7 @@ export default async function ClubDetailPage({
                         {advisor && (
                           <LeaderRow
                             icon={GraduationCap}
-                            label={t("advisorLabel")}
+                            label={roleLabel("ADVISOR", tRoleLabels)}
                             person={advisor}
                             fallbackName={t("unnamedMember")}
                           />
@@ -424,7 +435,7 @@ export default async function ClubDetailPage({
                           <LeaderRow
                             key={p.id}
                             icon={Crown}
-                            label={t("presidentLabel")}
+                            label={roleLabel("PRESIDENT", tRoleLabels)}
                             person={p}
                             fallbackName={t("unnamedMember")}
                           />
@@ -569,9 +580,9 @@ export default async function ClubDetailPage({
 
               {/* Üyeler */}
               <TabsPanel value="members">
-                {members.length > 0 ? (
+                {memberList.length > 0 ? (
                   <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    {members.map((m) => (
+                    {memberList.map((m) => (
                       <li
                         key={m.id}
                         className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/40"
@@ -582,6 +593,12 @@ export default async function ClubDetailPage({
                         <span className="min-w-0 flex-1 truncate text-sm font-medium">
                           {m.full_name ?? t("unnamedMember")}
                         </span>
+                        {m.isPresident && (
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-accent-gold/45 bg-[color-mix(in_oklab,var(--accent-gold)_14%,transparent)] px-2 py-0.5 text-[10px] font-semibold text-accent-gold uppercase">
+                            <Crown className="size-3" />
+                            {roleLabel("PRESIDENT", tRoleLabels)}
+                          </span>
+                        )}
                         <BadgeIconRow codes={badgesByUser[m.id] ?? []} />
                       </li>
                     ))}

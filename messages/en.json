@@ -25,9 +25,7 @@
       "listLabel": "People results",
       "loading": "Searching…",
       "noResults": "No results",
-      "minChars": "Type at least 2 characters",
-      "badgeAdvisor": "Advisor",
-      "badgeAdmin": "Administrator"
+      "minChars": "Type at least 2 characters"
     }
   },
   "theme": {
@@ -41,11 +39,6 @@
     "signOut": "Sign Out",
     "signingOut": "Signing out…",
     "language": "Language"
-  },
-  "roles": {
-    "user": "Member",
-    "advisor": "Advisor",
-    "superAdmin": "Super admin"
   },
   "notifications": {
     "title": "Notifications",
@@ -116,9 +109,7 @@
     "readOnly": "This is a one-way channel from the school administration; you can read messages but cannot reply.",
     "deletedUser": "Deleted user",
     "counterpart": {
-      "SCHOOL_ADMIN": "School Administration",
-      "ADVISOR": "Advisor",
-      "PRESIDENT": "President"
+      "SCHOOL_ADMIN": "School Administration"
     },
     "channelType": {
       "ADMIN_ADVISOR": "School Administration ↔ Advisor",
@@ -180,9 +171,7 @@
       "hide": "Hide password"
     },
     "myClubs": "My Clubs ({count})",
-    "noClubs": "You are not a member of any club yet.",
-    "presidentBadge": "PRESIDENT",
-    "memberBadge": "MEMBER",
+    "noClubs": "You don’t have any club connections yet.",
     "myEvents": "My Upcoming Events ({count})",
     "noEvents": "You have no upcoming attendance.",
     "visibility": {
@@ -232,12 +221,7 @@
     "department": "Department",
     "classYear": "Year",
     "clubsTitle": "Clubs",
-    "noClubs": "Not affiliated with any club yet.",
-    "relation": {
-      "advisor": "Advisor",
-      "president": "President",
-      "member": "Member"
-    }
+    "noClubs": "Not affiliated with any club yet."
   },
   "auth": {
     "tagline": "Discover campus communities, join events, and manage your own club.",
@@ -436,8 +420,6 @@
     "noEvents": "No events yet",
     "membersTitle": "Management & Members",
     "leadershipTitle": "Leadership",
-    "advisorLabel": "Advisor",
-    "presidentLabel": "President",
     "noMembers": "Be the first to join this club!",
     "unnamedMember": "Unnamed Member",
     "attendeeCount": "{count} attending",
@@ -526,9 +508,6 @@
       "tabTickets": "Tickets",
       "tabMembers": "Members",
       "title": "{name} · Management",
-      "roleSuper": "Super admin",
-      "roleAdvisor": "Advisor",
-      "rolePresident": "Club president",
       "access": "{role} access",
       "infoTitle": "Club Information",
       "infoDesc": "Edit the community's general information and contact channels.",
@@ -638,7 +617,6 @@
       "sendChanges": "Send Revision"
     },
     "members": {
-      "adminBadge": "ADMIN",
       "empty": "This club has no members yet.",
       "unnamed": "Unnamed Member",
       "demoteAria": "Revoke presidency",
@@ -984,5 +962,11 @@
     "entrepreneurship": "Entrepreneurship",
     "engineering": "Engineering",
     "media": "Media"
+  },
+  "roleLabels": {
+    "superAdmin": "Super admin",
+    "advisor": "Advisor",
+    "president": "President",
+    "member": "Member"
   }
 }

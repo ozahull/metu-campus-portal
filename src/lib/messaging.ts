@@ -7,6 +7,7 @@
 // değer (kişi adı) olduğu gibi gösterilir.
 
 import { GraduationCap, Landmark, Users, type LucideIcon } from "lucide-react";
+import { roleLabel } from "@/lib/role-label";
 
 // list_my_conversations RPC satırı (src/types/database.ts ile aynı sözleşme).
 export type ConversationRow = {
@@ -24,13 +25,17 @@ export const COUNTERPART_TOKENS = ["SCHOOL_ADMIN", "ADVISOR", "PRESIDENT"];
 
 type Translate = (key: string) => string;
 
-/** Kanal başlığı: token → t(messages.counterpart.*), kişi adı → olduğu gibi. */
+/** Kanal başlığı: rol token'ı → merkezî roleLabel (D24); SCHOOL_ADMIN kurum
+ *  etiketi olarak messages.counterpart'ta kalır; kişi adı (VERİ) olduğu gibi. */
 export function counterpartText(
   label: string | null,
   t: Translate,
+  tRoleLabels: Translate,
 ): string | null {
   if (!label) return null;
-  return COUNTERPART_TOKENS.includes(label) ? t(`counterpart.${label}`) : label;
+  if (label === "SCHOOL_ADMIN") return t("counterpart.SCHOOL_ADMIN");
+  if (COUNTERPART_TOKENS.includes(label)) return roleLabel(label, tRoleLabels);
+  return label;
 }
 
 /** Alt satır: kulüp kanalında kulüp adı, değilse kanal tipinin etiketi. */

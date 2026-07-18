@@ -15,6 +15,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/datetime";
 import { resolveDisplayName } from "@/lib/display-name";
+import { roleLabel } from "@/lib/role-label";
 import { PageShell } from "@/components/shared/page-shell";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import {
@@ -56,7 +57,7 @@ type RsvpRow = {
 export default async function ProfilePage() {
   const t = await getTranslations("profile");
   const tBadges = await getTranslations("badges");
-  const tRoles = await getTranslations("roles");
+  const tRoleLabels = await getTranslations("roleLabels");
   const locale = await getLocale();
   const supabase = await createClient();
 
@@ -71,14 +72,14 @@ export default async function ProfilePage() {
     .eq("id", user.id)
     .maybeSingle();
 
-  // Rol rozeti (yalnız görsel): ADVISOR → "Hoca", SUPER_ADMIN → "Süper yönetici".
-  // Sıradan üyeye (USER) rozet gösterilmez (gürültüyü azalt). Yetki Aşama 2'de.
+  // Rol rozeti (yalnız görsel; etiket merkezî roleLabel'dan — D24). Sıradan
+  // üyeye (USER) rozet gösterilmez (gürültüyü azalt). Yetki Aşama 2'de.
   const roleKey = profile?.role?.toString().trim().toUpperCase();
   const roleBadge =
     roleKey === "SUPER_ADMIN"
-      ? { label: tRoles("superAdmin"), Icon: ShieldCheck }
+      ? { label: roleLabel(roleKey, tRoleLabels), Icon: ShieldCheck }
       : roleKey === "ADVISOR"
-        ? { label: tRoles("advisor"), Icon: GraduationCap }
+        ? { label: roleLabel(roleKey, tRoleLabels), Icon: GraduationCap }
         : null;
 
   // İsim yoksa e-postanın @ öncesi kısmı — ham e-posta başlıkta gösterilmez.
@@ -155,6 +156,39 @@ export default async function ProfilePage() {
       ): m is { id: string; name: string; logoUrl: string | null; role: string } =>
         m !== null,
     );
+
+  // Danışmanı olunan kulüpler (canlı QA): sayaç yalnız club_members üyeliğini
+  // sayıyordu; danışman "Kulüplerim (0)" görüyordu. Liste artık İLİŞKİ listesi:
+  // danışmanlık + üyelik/başkanlık. Aynı kulüpte hem danışman hem üye olma
+  // (teorik) durumunda tek satır — danışmanlık önceliklidir.
+  const { data: advisorClubsRaw } = await supabase
+    .from("clubs")
+    .select("id, name, logo_url")
+    .eq("advisor_id", user.id);
+
+  const clubRelations = new Map<
+    string,
+    { id: string; name: string; logoUrl: string | null; relation: string }
+  >();
+  for (const c of (advisorClubsRaw ?? []) as ClubLite[]) {
+    clubRelations.set(c.id, {
+      id: c.id,
+      name: c.name,
+      logoUrl: c.logo_url,
+      relation: "ADVISOR",
+    });
+  }
+  for (const m of memberships) {
+    if (!clubRelations.has(m.id)) {
+      clubRelations.set(m.id, {
+        id: m.id,
+        name: m.name,
+        logoUrl: m.logoUrl,
+        relation: m.role,
+      });
+    }
+  }
+  const myClubs = Array.from(clubRelations.values());
 
   // RSVP'lenen yaklaşan & onaylı etkinlikler
   const { data: rsvpRaw } = await supabase
@@ -253,15 +287,15 @@ export default async function ProfilePage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg font-semibold">
               <Users className="size-4 text-primary" />
-              {t("myClubs", { count: memberships.length })}
+              {t("myClubs", { count: myClubs.length })}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {memberships.length === 0 ? (
+            {myClubs.length === 0 ? (
               <p className="text-sm text-muted-foreground">{t("noClubs")}</p>
             ) : (
               <ul className="space-y-2">
-                {memberships.map((m) => (
+                {myClubs.map((m) => (
                   <li key={m.id}>
                     <Link
                       href={`/clubs/${m.id}`}
@@ -278,14 +312,19 @@ export default async function ProfilePage() {
                       <span className="min-w-0 flex-1 truncate text-sm font-medium">
                         {m.name}
                       </span>
-                      {m.role.toUpperCase() === "ADMIN" ? (
-                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-accent-gold/45 bg-[color-mix(in_oklab,var(--accent-gold)_14%,transparent)] px-2 py-0.5 text-[10px] font-semibold text-accent-gold">
+                      {m.relation === "ADVISOR" ? (
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary uppercase">
+                          <GraduationCap className="size-3" />
+                          {roleLabel(m.relation, tRoleLabels)}
+                        </span>
+                      ) : m.relation.toUpperCase() === "ADMIN" ? (
+                        <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-accent-gold/45 bg-[color-mix(in_oklab,var(--accent-gold)_14%,transparent)] px-2 py-0.5 text-[10px] font-semibold text-accent-gold uppercase">
                           <Crown className="size-3" />
-                          {t("presidentBadge")}
+                          {roleLabel(m.relation, tRoleLabels)}
                         </span>
                       ) : (
-                        <span className="shrink-0 rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                          {t("memberBadge")}
+                        <span className="shrink-0 rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground uppercase">
+                          {roleLabel(m.relation, tRoleLabels)}
                         </span>
                       )}
                       <ArrowRight className="size-4 shrink-0 text-muted-foreground" />

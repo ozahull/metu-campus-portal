@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { roleLabel } from "@/lib/role-label";
 import { buttonVariants } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
@@ -61,6 +62,7 @@ export default async function ClubManagePage({
 }) {
   const { id } = await params;
   const t = await getTranslations("manage.shell");
+  const tRoleLabels = await getTranslations("roleLabels");
   const supabase = await createClient();
 
   const {
@@ -226,11 +228,14 @@ export default async function ClubManagePage({
             </h1>
             <p className="text-sm text-muted-foreground">
               {t("access", {
-                role: isSuperAdmin
-                  ? t("roleSuper")
-                  : isClubAdvisor
-                    ? t("roleAdvisor")
-                    : t("rolePresident"),
+                role: roleLabel(
+                  isSuperAdmin
+                    ? "SUPER_ADMIN"
+                    : isClubAdvisor
+                      ? "ADVISOR"
+                      : "PRESIDENT",
+                  tRoleLabels,
+                ),
               })}
             </p>
           </div>

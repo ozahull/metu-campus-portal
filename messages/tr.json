@@ -25,9 +25,7 @@
       "listLabel": "Kişi sonuçları",
       "loading": "Aranıyor…",
       "noResults": "Sonuç bulunamadı",
-      "minChars": "En az 2 karakter yazın",
-      "badgeAdvisor": "Hoca",
-      "badgeAdmin": "Yönetici"
+      "minChars": "En az 2 karakter yazın"
     }
   },
   "theme": {
@@ -41,11 +39,6 @@
     "signOut": "Çıkış Yap",
     "signingOut": "Çıkış yapılıyor…",
     "language": "Dil"
-  },
-  "roles": {
-    "user": "Üye",
-    "advisor": "Hoca",
-    "superAdmin": "Süper yönetici"
   },
   "notifications": {
     "title": "Bildirimler",
@@ -116,9 +109,7 @@
     "readOnly": "Bu kanal okul yönetiminin tek yönlü bilgilendirme kanalıdır; mesajları okuyabilirsiniz ancak yanıt yazamazsınız.",
     "deletedUser": "Silinmiş kullanıcı",
     "counterpart": {
-      "SCHOOL_ADMIN": "Okul Yönetimi",
-      "ADVISOR": "Danışman",
-      "PRESIDENT": "Başkan"
+      "SCHOOL_ADMIN": "Okul Yönetimi"
     },
     "channelType": {
       "ADMIN_ADVISOR": "Okul Yönetimi ↔ Danışman",
@@ -180,9 +171,7 @@
       "hide": "Şifreyi gizle"
     },
     "myClubs": "Kulüplerim ({count})",
-    "noClubs": "Henüz bir kulübe üye değilsiniz.",
-    "presidentBadge": "BAŞKAN",
-    "memberBadge": "ÜYE",
+    "noClubs": "Henüz bir kulüple bağlantınız yok.",
     "myEvents": "Katılacağım Etkinlikler ({count})",
     "noEvents": "Yaklaşan katılımınız yok.",
     "visibility": {
@@ -232,12 +221,7 @@
     "department": "Bölüm",
     "classYear": "Sınıf",
     "clubsTitle": "Kulüpleri",
-    "noClubs": "Henüz bir kulübe bağlı değil.",
-    "relation": {
-      "advisor": "Danışman",
-      "president": "Başkan",
-      "member": "Üye"
-    }
+    "noClubs": "Henüz bir kulübe bağlı değil."
   },
   "auth": {
     "tagline": "Kampüsteki toplulukları keşfet, etkinliklere katıl ve kendi kulübünü yönet.",
@@ -436,8 +420,6 @@
     "noEvents": "Henüz etkinlik bulunmuyor",
     "membersTitle": "Yönetim & Üyeler",
     "leadershipTitle": "Yönetim",
-    "advisorLabel": "Danışman",
-    "presidentLabel": "Başkan",
     "noMembers": "Bu kulübe ilk katılan siz olun!",
     "unnamedMember": "İsimsiz Üye",
     "attendeeCount": "{count} Kişi Katılıyor",
@@ -526,9 +508,6 @@
       "tabTickets": "Biletler",
       "tabMembers": "Üyeler",
       "title": "{name} · Yönetim",
-      "roleSuper": "Süper yönetici",
-      "roleAdvisor": "Danışman",
-      "rolePresident": "Kulüp başkanı",
       "access": "{role} erişimi",
       "infoTitle": "Kulüp Bilgileri",
       "infoDesc": "Topluluğun genel bilgilerini ve iletişim kanallarını düzenleyin.",
@@ -638,7 +617,6 @@
       "sendChanges": "Revizyon Gönder"
     },
     "members": {
-      "adminBadge": "YÖNETİCİ",
       "empty": "Bu kulübün henüz üyesi yok.",
       "unnamed": "İsimsiz Üye",
       "demoteAria": "Başkanlığı geri al",
@@ -984,5 +962,11 @@
     "entrepreneurship": "Girişimcilik",
     "engineering": "Mühendislik",
     "media": "Medya"
+  },
+  "roleLabels": {
+    "superAdmin": "Süper yönetici",
+    "advisor": "Danışman",
+    "president": "Başkan",
+    "member": "Üye"
   }
 }

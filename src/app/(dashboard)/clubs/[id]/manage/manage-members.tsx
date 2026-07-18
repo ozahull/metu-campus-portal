@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { ShieldCheck, ShieldMinus, UserRound, UserX } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { roleLabel } from "@/lib/role-label";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 
@@ -28,6 +29,7 @@ export function ManageMembers({
   const router = useRouter();
   const t = useTranslations("manage.members");
   const tc = useTranslations("confirm");
+  const tRoleLabels = useTranslations("roleLabels");
   const [busyId, setBusyId] = useState<string | null>(null);
 
   async function setRole(member: RosterMember, role: "ADMIN" | "MEMBER") {
@@ -93,7 +95,7 @@ export function ManageMembers({
               </span>
               {isAdmin && (
                 <span className="rounded-full border border-border bg-secondary px-2 py-0.5 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
-                  {t("adminBadge")}
+                  {roleLabel("PRESIDENT", tRoleLabels)}
                 </span>
               )}
             </div>

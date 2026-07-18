@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Dialog } from "@base-ui/react/dialog";
 import { GraduationCap, Loader2, Search, ShieldCheck, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { roleLabel } from "@/lib/role-label";
 import { cn } from "@/lib/utils";
 
 /**
@@ -125,17 +126,17 @@ function usePeopleSearch() {
 
 type SearchState = ReturnType<typeof usePeopleSearch>;
 
-/** Rol rozeti: yalnız ADVISOR ("Hoca") ve SUPER_ADMIN ("Yönetici"). USER'a
- *  rozet YOK — USER sonuçları başkanlık üzerinden kamusaldır ama bu hafif
- *  RPC'de başkanlık ilişkisi dönmez; "Öğrenci" yazıp yanıltmayalım. */
+/** Rol rozeti: yalnız ADVISOR ve SUPER_ADMIN (etiketler merkezî roleLabel'dan
+ *  — D24). USER'a rozet YOK — USER sonuçları başkanlık üzerinden kamusaldır
+ *  ama bu hafif RPC'de başkanlık ilişkisi dönmez; yanıltıcı etiket basmayalım. */
 function RoleBadge({ role }: { role: string }) {
-  const t = useTranslations("nav.search");
+  const t = useTranslations("roleLabels");
   const key = role?.toString().trim().toUpperCase();
   if (key === "ADVISOR") {
     return (
       <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
         <GraduationCap className="size-3" />
-        {t("badgeAdvisor")}
+        {roleLabel(key, t)}
       </span>
     );
   }
@@ -143,7 +144,7 @@ function RoleBadge({ role }: { role: string }) {
     return (
       <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
         <ShieldCheck className="size-3" />
-        {t("badgeAdmin")}
+        {roleLabel(key, t)}
       </span>
     );
   }

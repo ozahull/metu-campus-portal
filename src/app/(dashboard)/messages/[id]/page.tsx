@@ -24,6 +24,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const t = await getTranslations("messages");
+  const tRoleLabels = await getTranslations("roleLabels");
   const supabase = await createClient();
   const { data } = await supabase.rpc("list_my_conversations");
   const row = ((data ?? []) as ConversationRow[]).find(
@@ -31,7 +32,7 @@ export async function generateMetadata({
   );
   return {
     title: row
-      ? (counterpartText(row.counterpart_label, t) ?? t("title"))
+      ? (counterpartText(row.counterpart_label, t, tRoleLabels) ?? t("title"))
       : t("title"),
   };
 }
@@ -43,6 +44,7 @@ export default async function MessageThreadPage({
 }) {
   const { id } = await params;
   const t = await getTranslations("messages");
+  const tRoleLabels = await getTranslations("roleLabels");
   const supabase = await createClient();
 
   const {
@@ -88,7 +90,8 @@ export default async function MessageThreadPage({
 
   const Icon = conversationIcon(row.type);
   const title =
-    counterpartText(row.counterpart_label, t) ?? t(`channelType.${row.type}`);
+    counterpartText(row.counterpart_label, t, tRoleLabels) ??
+    t(`channelType.${row.type}`);
 
   return (
     <PageShell>

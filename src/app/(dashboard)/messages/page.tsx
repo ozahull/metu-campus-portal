@@ -24,6 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function MessagesPage() {
   const t = await getTranslations("messages");
+  const tRoleLabels = await getTranslations("roleLabels");
   const locale = await getLocale();
   const supabase = await createClient();
 
@@ -60,7 +61,7 @@ export default async function MessagesPage() {
           {rows.map((row) => {
             const Icon = conversationIcon(row.type);
             const title =
-              counterpartText(row.counterpart_label, t) ??
+              counterpartText(row.counterpart_label, t, tRoleLabels) ??
               t(`channelType.${row.type}`);
             const unread = row.unread_count > 0;
             const badge =

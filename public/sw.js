@@ -41,13 +41,14 @@ self.addEventListener("notificationclick", (event) => {
       .matchAll({ type: "window", includeUncontrolled: true })
       .then((wins) => {
         // Açık pencere varsa oraya git + odaklan; yoksa yeni pencere aç.
-        for (const win of wins) {
-          if ("focus" in win) {
-            win.navigate(url);
-            return win.focus();
-          }
-        }
-        return self.clients.openWindow(url);
+        // navigate() SW'nin kontrol etmediği pencerede reddedilebilir —
+        // o durumda yeni pencereye düş (tıklama sessizce ölmesin).
+        const win = wins.find((w) => "focus" in w && "navigate" in w);
+        if (!win) return self.clients.openWindow(url);
+        return win
+          .navigate(url)
+          .then(() => win.focus())
+          .catch(() => self.clients.openWindow(url));
       }),
   );
 });

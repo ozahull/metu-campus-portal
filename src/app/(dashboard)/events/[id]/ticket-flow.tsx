@@ -33,10 +33,11 @@ const CANCEL_ERRORS = [
 
 type TicketFlowProps = {
   eventId: string;
-  // Bilet alımının kapandığı an (deadline ya da etkinlik saati).
-  closesAtISO: string;
-  // Etkinliğin BAŞLANGIÇ anı — iptal yalnızca etkinlik başlamadan önce mümkün.
-  eventStartsAtISO: string;
+  // Zaman kapıları SUNUCUDA hesaplanır (hydration determinizmi — React #418):
+  // istemci render'ında Date.now() KULLANMA. Kapı geçse bile RPC yeniden doğrular.
+  salesClosed: boolean;
+  // Etkinlik başladıysa iptal butonu gösterilmez (RPC de reddeder).
+  eventStarted: boolean;
   ticket: MyTicket | null;
 };
 
@@ -44,18 +45,14 @@ type TicketFlowProps = {
 // ile bilet DOĞRUDAN APPROVED doğar → QR + token gösterilir → kapıda check-in.
 export function TicketFlow({
   eventId,
-  closesAtISO,
-  eventStartsAtISO,
+  salesClosed,
+  eventStarted,
   ticket,
 }: TicketFlowProps) {
   const router = useRouter();
   const t = useTranslations("events.ticket");
   const [loading, setLoading] = useState(false);
   const [cancelling, setCancelling] = useState(false);
-
-  const closed = new Date(closesAtISO).getTime() <= Date.now();
-  // Etkinlik başladıysa iptal butonu gösterilmez (RPC de reddeder).
-  const eventStarted = new Date(eventStartsAtISO).getTime() <= Date.now();
 
   async function getTicket() {
     setLoading(true);
@@ -103,7 +100,7 @@ export function TicketFlow({
             <p className="text-sm text-muted-foreground">{t("freeLabel")}</p>
             <p className="text-lg font-semibold tracking-tight">{t("free")}</p>
           </div>
-          {closed ? (
+          {salesClosed ? (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1.5 text-sm text-muted-foreground">
               <Ban className="size-4" />
               {t("salesClosed")}

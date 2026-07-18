@@ -10,6 +10,7 @@ import { AddToCalendar } from "./add-to-calendar";
 import { EventPhotoWall, type EventPhoto } from "./event-photo-wall";
 import { TicketFlow, type MyTicket } from "./ticket-flow";
 import { formatDateTime } from "@/lib/datetime";
+import { normalizeMultiline } from "@/lib/text";
 
 export const dynamic = "force-dynamic";
 
@@ -88,6 +89,10 @@ export default async function EventDetailPage({
   const attendees = data.event_attendees ?? [];
   const isAttending = attendees.some((a) => a.user_id === user.id);
 
+  // Hydration (React #418): DB'den CRLF gelirse SSR metni DOM'da normalize
+  // edilir ve uyuşmazlık doğar — çok satırlı kullanıcı metni normalize edilir.
+  const description = normalizeMultiline(data.description);
+
   // Bilet akışı OPT-IN: yalnızca kulüp bu etkinlikte katılım biletini (QR)
   // açtıysa gösterilir (ticket_enabled). Ödeme/fiyat yok — bilet ücretsiz.
   // Opt-in kapalıysa klasik RSVP (event_attendees) korunur.
@@ -117,7 +122,13 @@ export default async function EventDetailPage({
 
   // Etkinlik geçmişse fotoğraf duvarı gösterilir. Yetki (yükle/sil): kulübün
   // başkanı/danışmanı/okul.
-  const isPast = new Date(data.event_date).getTime() < Date.now();
+  // Zaman kapıları SUNUCUDA bir kez hesaplanır ve TicketFlow'a boolean prop
+  // olarak iner (hydration determinizmi — istemci render'ında Date.now() YOK).
+  const now = Date.now();
+  const isPast = new Date(data.event_date).getTime() < now;
+  const salesClosed =
+    new Date(data.ticket_deadline ?? data.event_date).getTime() <= now;
+  const eventStarted = new Date(data.event_date).getTime() <= now;
   const { data: profileRow } = await supabase
     .from("profiles")
     .select("role")
@@ -225,13 +236,13 @@ export default async function EventDetailPage({
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_20rem]">
           {/* Sol: açıklama + geçmiş fotoğraflar + takvim (mobilde CTA'dan sonra) */}
           <div className="order-2 min-w-0 space-y-6 lg:order-1">
-            {data.description?.trim() && (
+            {description?.trim() && (
               <section className="rounded-2xl border border-border bg-card p-5">
                 <h2 className="font-display text-lg font-bold tracking-tight">
                   {t("about")}
                 </h2>
                 <p className="mt-3 leading-relaxed whitespace-pre-line text-muted-foreground">
-                  {data.description}
+                  {description}
                 </p>
               </section>
             )}
@@ -250,7 +261,7 @@ export default async function EventDetailPage({
               </p>
               <AddToCalendar
                 title={data.title}
-                description={data.description}
+                description={description}
                 location={data.location}
                 startISO={data.event_date}
               />
@@ -305,8 +316,8 @@ export default async function EventDetailPage({
             {ticketingOn ? (
               <TicketFlow
                 eventId={data.id}
-                closesAtISO={data.ticket_deadline ?? data.event_date}
-                eventStartsAtISO={data.event_date}
+                salesClosed={salesClosed}
+                eventStarted={eventStarted}
                 ticket={myTicket}
               />
             ) : (

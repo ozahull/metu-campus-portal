@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { statusMeta } from "@/lib/event-status";
+import { normalizeMultiline } from "@/lib/text";
 import {
   formatDateTime,
   fromAppDateTimeInput,
@@ -172,7 +173,8 @@ export function ManageEvents({
     const supabase = createClient();
     const payload = {
       title: title.trim(),
-      description: description.trim() || null,
+      // CRLF normalize: DB'ye \r sızmasın (SSR hydration determinizmi — lib/text.ts).
+      description: normalizeMultiline(description.trim()) || null,
       event_date: fromAppDateTimeInput(eventDate),
       location: location.trim() || null,
       ...(ticketFields ?? {}),

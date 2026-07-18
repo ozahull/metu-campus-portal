@@ -25,6 +25,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { categoryLabel } from "@/lib/category";
 import { roleLabel } from "@/lib/role-label";
+import { normalizeMultiline } from "@/lib/text";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
@@ -407,9 +408,10 @@ export default async function ClubDetailPage({
                   <h2 className="text-lg font-semibold tracking-tight">
                     {t("about")}
                   </h2>
+                  {/* CRLF normalize: hydration determinizmi (bkz. lib/text.ts) */}
                   <p className="mt-3 leading-relaxed whitespace-pre-line text-muted-foreground">
                     {club.description?.trim()
-                      ? club.description
+                      ? normalizeMultiline(club.description)
                       : t("noDescription")}
                   </p>
                 </section>
@@ -511,7 +513,7 @@ export default async function ClubDetailPage({
                       {t("vision")}
                     </h2>
                     <p className="mt-3 leading-relaxed whitespace-pre-line text-muted-foreground">
-                      {club.vision}
+                      {normalizeMultiline(club.vision)}
                     </p>
                   </section>
                 )}

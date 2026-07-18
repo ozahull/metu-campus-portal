@@ -8,6 +8,12 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  appDateTimeFormat,
+  appDayKey,
+  DAY_MS,
+  fromAppDateTimeInput,
+} from "@/lib/datetime";
 
 type ReportRow = {
   club_id: string;
@@ -19,26 +25,23 @@ type ReportRow = {
   checkin_total: number;
 };
 
-function isoDate(d: Date): string {
-  return d.toISOString().slice(0, 10);
-}
-
 export function TermReport() {
   const t = useTranslations("admin.termReport");
   const locale = useLocale();
 
-  const today = new Date();
-  const [start, setStart] = useState(
-    isoDate(new Date(today.getTime() - 120 * 86_400_000)),
+  // Varsayılan aralık kampüs (Istanbul) gününe göre — UTC "bugün" gece
+  // 00:00-03:00 arasında bir gün geride kalıyordu (hydration farkı).
+  const [start, setStart] = useState(() =>
+    appDayKey(Date.now() - 120 * DAY_MS),
   );
-  const [end, setEnd] = useState(isoDate(today));
+  const [end, setEnd] = useState(() => appDayKey(Date.now()));
   const [rows, setRows] = useState<ReportRow[] | null>(null);
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(false);
 
   const nf = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const df = useMemo(
-    () => new Intl.DateTimeFormat(locale, { dateStyle: "long" }),
+    () => appDateTimeFormat(locale, { dateStyle: "long" }),
     [locale],
   );
   const pf = useMemo(
@@ -93,9 +96,12 @@ export function TermReport() {
     }
     setLoading(true);
     const supabase = createClient();
+    // Aralık sınırları kampüs günü başlangıcı/bitişi (Istanbul gece yarısı).
     const { data, error } = await supabase.rpc("analytics_term_report", {
-      p_start: new Date(`${start}T00:00:00`).toISOString(),
-      p_end: new Date(`${end}T23:59:59.999`).toISOString(),
+      p_start: fromAppDateTimeInput(`${start}T00:00`),
+      p_end: new Date(
+        Date.parse(fromAppDateTimeInput(`${end}T00:00`)) + DAY_MS - 1,
+      ).toISOString(),
     });
     setLoading(false);
     if (error) {
@@ -171,8 +177,8 @@ export function TermReport() {
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   {t("range", {
-                    start: df.format(new Date(`${start}T00:00:00`)),
-                    end: df.format(new Date(`${end}T00:00:00`)),
+                    start: df.format(new Date(fromAppDateTimeInput(`${start}T00:00`))),
+                    end: df.format(new Date(fromAppDateTimeInput(`${end}T00:00`))),
                   })}
                 </p>
               </div>

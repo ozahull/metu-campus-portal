@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { formatDateTime } from "@/lib/datetime";
+import { appDayKey, DAY_MS, formatDateTime } from "@/lib/datetime";
 import { cn } from "@/lib/utils";
 
 export type ThreadMessage = {
@@ -19,11 +19,9 @@ export type ThreadMessage = {
   sender: { full_name: string | null } | null;
 };
 
-/** Gün ayracı karşılaştırması YEREL takvim günüyle yapılır (UTC kayması
- *  gece yarısı civarı mesajları yanlış güne atardı). */
-function dayKeyOf(d: Date): string {
-  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-}
+// Gün ayracı karşılaştırması KAMPÜS (Europe/Istanbul) takvim günüyle yapılır
+// (appDayKey) — yerel getter'lar sunucu (UTC) ve tarayıcıda farklı güne
+// düşüp hydration uyuşmazlığı yaratıyordu.
 
 /**
  * Mesaj balonları + composer (Aşama 4B). Realtime/polling YOK — gönderim ve
@@ -104,12 +102,10 @@ export function MessageThread({
   // Gün ayracı etiketi: bugün/dün çevirisi, aksi halde salt-tarih biçimi
   // (formatDateTime "dateOnly" = medium tarih, saat yok).
   function dayLabel(date: Date): string {
-    const now = new Date();
-    const yesterday = new Date(now);
-    yesterday.setDate(now.getDate() - 1);
-    const key = dayKeyOf(date);
-    if (key === dayKeyOf(now)) return t("day.today");
-    if (key === dayKeyOf(yesterday)) return t("day.yesterday");
+    const now = Date.now();
+    const key = appDayKey(date);
+    if (key === appDayKey(now)) return t("day.today");
+    if (key === appDayKey(now - DAY_MS)) return t("day.yesterday");
     return formatDateTime(date, locale, "dateOnly");
   }
 
@@ -124,12 +120,11 @@ export function MessageThread({
           initialMessages.map((m, i) => {
             const mine = m.sender_user_id === currentUserId;
             const date = new Date(m.created_at);
-            // Yerel takvim günü bir önceki mesajdan farklıysa (ilk mesaj
+            // Kampüs takvim günü bir önceki mesajdan farklıysa (ilk mesaj
             // dahil) mesajın üstüne ortalanmış gün çipi (Aşama 4C).
             const showDayChip =
               i === 0 ||
-              dayKeyOf(new Date(initialMessages[i - 1].created_at)) !==
-                dayKeyOf(date);
+              appDayKey(initialMessages[i - 1].created_at) !== appDayKey(date);
             return (
               <Fragment key={m.id}>
                 {showDayChip && (

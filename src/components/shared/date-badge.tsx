@@ -1,3 +1,4 @@
+import { appDateTimeFormat } from "@/lib/datetime";
 import { cn } from "@/lib/utils";
 
 /** Etkinlik kartlarında ay/gün blok tasarımı. */
@@ -10,8 +11,8 @@ export function DateBadge({
   locale: string;
   className?: string;
 }) {
-  const month = new Intl.DateTimeFormat(locale, { month: "short" }).format(date);
-  const day = new Intl.DateTimeFormat(locale, { day: "numeric" }).format(date);
+  const month = appDateTimeFormat(locale, { month: "short" }).format(date);
+  const day = appDateTimeFormat(locale, { day: "numeric" }).format(date);
   return (
     <div
       className={cn(

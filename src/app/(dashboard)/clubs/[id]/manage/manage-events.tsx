@@ -20,7 +20,11 @@ import {
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { statusMeta } from "@/lib/event-status";
-import { formatDateTime } from "@/lib/datetime";
+import {
+  formatDateTime,
+  fromAppDateTimeInput,
+  toAppDateTimeInput,
+} from "@/lib/datetime";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,11 +52,8 @@ export type ManageEvent = {
   ticket_deadline: string | null;
 };
 
-function toLocalInput(iso: string): string {
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
+// datetime-local alanları KAMPÜS saatiyle (Europe/Istanbul) okunur/yazılır —
+// tarayıcı TZ'sine göre değil; formda görülen saat her yerde gösterilenle aynı.
 
 export function ManageEvents({
   clubId,
@@ -110,12 +111,14 @@ export function ManageEvents({
     setEditing(ev);
     setTitle(ev.title);
     setDescription(ev.description ?? "");
-    setEventDate(toLocalInput(ev.event_date));
+    setEventDate(toAppDateTimeInput(ev.event_date));
     setLocation(ev.location ?? "");
     setTicketCapacity(
       ev.ticket_capacity !== null ? String(ev.ticket_capacity) : "",
     );
-    setTicketDeadline(ev.ticket_deadline ? toLocalInput(ev.ticket_deadline) : "");
+    setTicketDeadline(
+      ev.ticket_deadline ? toAppDateTimeInput(ev.ticket_deadline) : "",
+    );
     setOpen(true);
   }
 
@@ -148,7 +151,7 @@ export function ManageEvents({
       ticketFields = {
         ticket_capacity: capacity,
         ticket_deadline: ticketDeadline
-          ? new Date(ticketDeadline).toISOString()
+          ? fromAppDateTimeInput(ticketDeadline)
           : null,
       };
     }
@@ -158,7 +161,7 @@ export function ManageEvents({
     const payload = {
       title: title.trim(),
       description: description.trim() || null,
-      event_date: new Date(eventDate).toISOString(),
+      event_date: fromAppDateTimeInput(eventDate),
       location: location.trim() || null,
       ...(ticketFields ?? {}),
     };

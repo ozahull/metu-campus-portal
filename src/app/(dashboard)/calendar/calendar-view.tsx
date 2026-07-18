@@ -5,6 +5,13 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { AlertTriangle, CalendarX, Clock, MapPin, Users } from "lucide-react";
 import { EmptyState } from "@/components/shared/empty-state";
+import {
+  appDateTimeFormat,
+  appDayKey,
+  appDayOfWeek,
+  DAY_MS,
+  startOfAppDay,
+} from "@/lib/datetime";
 import { cn } from "@/lib/utils";
 
 export type CalendarEvent = {
@@ -44,31 +51,26 @@ export function CalendarView({ events }: { events: CalendarEvent[] }) {
     return s;
   }, [events]);
 
+  // Hafta sınırları KAMPÜS (Europe/Istanbul) gününe göre — yerel TZ
+  // getter'ları sunucu (UTC) ile tarayıcıda farklı haftaya düşebilirdi.
   const { weekStart, weekEnd } = useMemo(() => {
-    const now = new Date();
-    const dow = (now.getDay() + 6) % 7; // Pazartesi = 0
-    const monday = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() - dow,
-    );
-    const ws = new Date(monday);
-    ws.setDate(monday.getDate() + offset * 7);
-    const we = new Date(ws);
-    we.setDate(ws.getDate() + 7);
+    const now = Date.now();
+    const monday = startOfAppDay(now).getTime() - appDayOfWeek(now) * DAY_MS;
+    const ws = new Date(monday + offset * 7 * DAY_MS);
+    const we = new Date(ws.getTime() + 7 * DAY_MS);
     return { weekStart: ws, weekEnd: we };
   }, [offset]);
 
-  const dayFmt = new Intl.DateTimeFormat(locale, {
+  const dayFmt = appDateTimeFormat(locale, {
     weekday: "long",
     day: "numeric",
     month: "long",
   });
-  const timeFmt = new Intl.DateTimeFormat(locale, {
+  const timeFmt = appDateTimeFormat(locale, {
     hour: "2-digit",
     minute: "2-digit",
   });
-  const rangeFmt = new Intl.DateTimeFormat(locale, {
+  const rangeFmt = appDateTimeFormat(locale, {
     day: "numeric",
     month: "short",
   });
@@ -84,7 +86,8 @@ export function CalendarView({ events }: { events: CalendarEvent[] }) {
     const map = new Map<string, { date: Date; items: CalendarEvent[] }>();
     for (const e of weekEvents) {
       const d = new Date(e.event_date);
-      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      const key = appDayKey(d); // kampüs günü — sunucu/istemci aynı grup
+
       let g = map.get(key);
       if (!g) {
         g = { date: d, items: [] };

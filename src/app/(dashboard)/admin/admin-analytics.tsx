@@ -28,6 +28,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { appDateTimeFormat } from "@/lib/datetime";
 
 export type Overview = {
   total_clubs: number;
@@ -72,14 +73,15 @@ const metricDefs: {
 ];
 
 // "YYYY-MM" → locale'e göre kısa ay + yıl (örn. "Oca 2026" / "Jan 2026").
+// UTC öğlen anı seçilir ki kampüs diliminde de aynı aya düşsün.
 function formatMonth(ym: string, locale: string): string {
   const [y, m] = ym.split("-");
   const idx = Number.parseInt(m, 10) - 1;
   if (idx < 0 || idx > 11 || !y) return ym;
-  return new Date(Number(y), idx, 1).toLocaleDateString(locale, {
+  return appDateTimeFormat(locale, {
     month: "short",
     year: "numeric",
-  });
+  }).format(new Date(Date.UTC(Number(y), idx, 1, 12)));
 }
 
 export function AdminAnalytics({

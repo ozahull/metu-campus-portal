@@ -157,6 +157,28 @@ Deno.serve(async (req) => {
     { auth: { persistSession: false } },
   );
 
+  // Savunma katmanı (Y5): satır oluşturulurken user_wants_notification zaten
+  // uygulanıyor, ama işlemsel üreticiler (club_request) bunu geçmişte atlayabildiği
+  // için fanout da BAĞIMSIZ olarak tercihi kontrol eder. "Sessiz (NONE)" ise PUSH
+  // gönderilmez (uygulama içi bildirim satırı yine görünür). Tercih satırı yoksa
+  // varsayılan MEMBER_CLUBS → push serbest. FAIL-CLOSED: tercih OKUNAMAZSA push YOK.
+  const { data: pref, error: prefError } = await admin
+    .from("notification_preferences")
+    .select("scope")
+    .eq("user_id", record.user_id)
+    .maybeSingle();
+  if (prefError) {
+    console.error(
+      "[push-fanout] tercih okunamadı, fail-closed (push yok):",
+      prefError.message,
+    );
+    return new Response("Pref error", { status: 500 });
+  }
+  if (pref?.scope === "NONE") {
+    console.log("[push-fanout] kullanıcı tercihi NONE — push atlanıyor.");
+    return Response.json({ sent: 0, pruned: 0, failed: 0, skipped: "pref_none" });
+  }
+
   const { data: subs, error } = await admin
     .from("push_subscriptions")
     .select("id, endpoint, p256dh, auth")

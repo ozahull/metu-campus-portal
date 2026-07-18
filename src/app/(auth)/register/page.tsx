@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isAllowedEmail } from "@/lib/auth";
+import { knownErrorKey } from "@/lib/known-errors";
 import {
   deriveNameFromEmail,
   isDerivableEmail,
@@ -112,7 +113,15 @@ export default function RegisterPage() {
 
     if (signUpError) {
       setLoading(false);
-      setError(signUpError.message);
+      // Ham Supabase hata metni gösterilmez (D8); bilinen "zaten kayıtlı"
+      // durumu ayırt edilir, kalanı genel mesaja düşer.
+      console.error("[register] signUp hatası:", signUpError);
+      const known = knownErrorKey(signUpError.message, [
+        ["already registered", "alreadyRegistered"],
+      ]);
+      setError(
+        known ? t("register.alreadyRegistered") : t("register.genericError"),
+      );
       return;
     }
 
@@ -133,7 +142,8 @@ export default function RegisterPage() {
 
       if (profileError) {
         setLoading(false);
-        setError(t("register.profileError", { message: profileError.message }));
+        console.error("[register] profil güncelleme hatası:", profileError);
+        setError(t("register.profileError"));
         return;
       }
 

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { knownErrorKey } from "@/lib/known-errors";
 import { normalizeSearchText, searchIncludes } from "@/lib/search-text";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,18 @@ type CheckinResult = {
 };
 
 const READER_ID = "qr-reader";
+
+// ticket_checkin RPC'sinin bilinen RAISE metinleri → checkin.errors.* (D8).
+// Kapı görevlisi neden reddedildiğini görmeli; eşleşmeyen hata generic'e düşer.
+const CHECKIN_ERRORS = [
+  ["zaten kullanıldı", "alreadyUsed"],
+  ["onaylı değil", "notApproved"],
+  ["Geçersiz bilet", "invalid"],
+  ["Bilet bulunamadı", "invalid"],
+  ["henüz açılmadı", "tooEarly"],
+  ["süresi doldu", "tooLate"],
+  ["Yetkisiz", "unauthorized"],
+] as const;
 
 export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
   const router = useRouter();
@@ -73,9 +86,13 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
     processingRef.current = false;
 
     if (error) {
-      // "Bu bilet zaten kullanıldı" / "Bilet geçerli değil" / "Geçersiz bilet"
-      setResult({ ok: false, message: error.message });
-      toast.error(error.message);
+      // Ham RPC metni gösterilmez (D8): bilinen hata → yerelleştirilmiş ayırt
+      // edici mesaj; bilinmeyen → generic. Ham metin yalnız konsola.
+      console.error("[checkin] ticket_checkin hatası:", error);
+      const known = knownErrorKey(error.message, CHECKIN_ERRORS);
+      const message = t(`errors.${known ?? "generic"}`);
+      setResult({ ok: false, message });
+      toast.error(message);
       return;
     }
 

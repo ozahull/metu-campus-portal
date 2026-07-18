@@ -52,7 +52,8 @@ export function AdminRoles({
       p_role: role,
     });
     if (error) {
-      toast.error(t("toasts.error", { message: error.message }));
+      console.error("[admin-roles] rol atama hatası:", error);
+      toast.error(t("toasts.error"));
       return false;
     }
     if (data !== role) {

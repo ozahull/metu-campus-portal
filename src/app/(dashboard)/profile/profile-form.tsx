@@ -65,7 +65,8 @@ export function ProfileForm({
       .eq("id", userId);
     setNameBusy(false);
     if (error) {
-      toast.error(t("toasts.nameError", { message: error.message }));
+      console.error("[profile-form] isim güncelleme hatası:", error);
+      toast.error(t("toasts.nameError"));
       return;
     }
     toast.success(t("toasts.nameUpdated"));
@@ -83,7 +84,8 @@ export function ProfileForm({
     const { error } = await supabase.auth.updateUser({ password });
     setPwBusy(false);
     if (error) {
-      toast.error(t("toasts.passwordError", { message: error.message }));
+      console.error("[profile-form] şifre güncelleme hatası:", error);
+      toast.error(t("toasts.passwordError"));
       return;
     }
     setPassword("");

@@ -32,7 +32,8 @@ export function AdminSettings({ clubs }: { clubs: ClubSetting[] }) {
       .eq("id", club.id);
     setBusyId(null);
     if (error) {
-      toast.error(t("toasts.settingError", { message: error.message }));
+      console.error("[admin-settings] ayar güncelleme hatası:", error);
+      toast.error(t("toasts.settingError"));
       return;
     }
     toast.success(t("toasts.settingUpdated"));

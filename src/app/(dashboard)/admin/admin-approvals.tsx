@@ -97,7 +97,8 @@ function PendingRow({ ev, userId }: { ev: PendingEvent; userId: string }) {
     });
     setBusy(false);
     if (error) {
-      toast.error(t("toasts.decideError", { message: error.message }));
+      console.error("[admin-approvals] karar hatası:", error);
+      toast.error(t("toasts.decideError"));
       return;
     }
     toast.success(

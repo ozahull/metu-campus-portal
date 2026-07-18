@@ -45,7 +45,8 @@ export function ProfileVisibilityToggle({
     setBusy(false);
     if (error) {
       setHidden(prev); // geri al
-      toast.error(t("toastError", { message: error.message }));
+      console.error("[profile-visibility] güncelleme hatası:", error);
+      toast.error(t("toastError"));
       return;
     }
     toast.success(next ? t("toastHidden") : t("toastVisible"));

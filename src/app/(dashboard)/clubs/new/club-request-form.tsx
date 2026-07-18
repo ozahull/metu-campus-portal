@@ -119,7 +119,8 @@ export function ClubRequestForm({
       });
       setLoading(false);
       if (error) {
-        toast.error(t("toasts.resubmitError", { message: error.message }));
+        console.error("[club-request] yeniden gönderim hatası:", error);
+        toast.error(t("toasts.resubmitError"));
         return;
       }
       toast.success(t("toasts.resubmitted"));
@@ -136,7 +137,8 @@ export function ClubRequestForm({
     });
     setLoading(false);
     if (error) {
-      toast.error(t("toasts.submitError", { message: error.message }));
+      console.error("[club-request] başvuru hatası:", error);
+      toast.error(t("toasts.submitError"));
       return;
     }
     toast.success(t("toasts.submitted"));

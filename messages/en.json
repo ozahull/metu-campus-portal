@@ -79,7 +79,7 @@
       "NONE_desc": "Don't receive any notifications.",
       "toasts": {
         "saved": "Notification preference updated",
-        "error": "Could not update: {message}"
+        "error": "Could not update. Please try again."
       }
     },
     "push": {
@@ -181,16 +181,16 @@
       "note": "When on, your bio, department, and year are visible only to you and school administration, and you won't appear in people search. Your name and role remain visible in club and member lists.",
       "toastHidden": "Your profile is now hidden.",
       "toastVisible": "Your profile is now visible.",
-      "toastError": "Could not update: {message}"
+      "toastError": "Could not update. Please try again."
     },
     "toasts": {
       "nameTooShort": "Please enter your full name.",
       "nameMismatch": "Your name must match your email address.",
       "nameUpdated": "Name updated",
-      "nameError": "Could not update: {message}",
+      "nameError": "Could not update. Please try again.",
       "passwordShort": "Password must be at least 6 characters.",
       "passwordUpdated": "Password updated",
-      "passwordError": "Could not update password: {message}"
+      "passwordError": "Could not update password. Please try again."
     },
     "detailsCard": {
       "title": "Your profile info",
@@ -248,7 +248,7 @@
       "domainError": "Only @metu.edu.tr or @ncc.metu.edu.tr email addresses are allowed.",
       "passwordShort": "Password must be at least 6 characters.",
       "nameMismatch": "Your name must match your email address.",
-      "profileError": "Could not save profile: {message}",
+      "profileError": "Could not save profile. Please try again.",
       "confirmTitle": "Confirmation email sent",
       "confirmBody": "Activate your account by clicking the confirmation link sent to your email. (Also check your spam folder.)",
       "firstNameLabel": "First Name",
@@ -261,7 +261,9 @@
       "submit": "Create Account",
       "submitting": "Creating account…",
       "haveAccount": "Already have an account?",
-      "loginLink": "Sign in"
+      "loginLink": "Sign in",
+      "alreadyRegistered": "An account with this email already exists. Try signing in.",
+      "genericError": "Could not register. Please try again."
     },
     "forgot": {
       "title": "Forgot your password?",
@@ -292,7 +294,8 @@
       "confirmLabel": "New Password (again)",
       "confirmPlaceholder": "Re-enter password",
       "submit": "Update Password",
-      "submitting": "Updating…"
+      "submitting": "Updating…",
+      "requestNew": "Request a new reset link"
     }
   },
   "home": {
@@ -307,7 +310,10 @@
     "statEvents": "Upcoming RSVPs",
     "activeClubs": "Active Clubs",
     "activeClubsEmptyTitle": "No active clubs yet",
-    "activeClubsEmptyBody": "They'll appear here as new communities are added."
+    "activeClubsEmptyBody": "They'll appear here as new communities are added.",
+    "clubsError": "Clubs could not be loaded",
+    "clubsErrorBody": "Something went wrong. Please try again.",
+    "clubsRetry": "Try again"
   },
   "events": {
     "title": "Events",
@@ -346,11 +352,21 @@
         "confirmBody": "Are you sure you want to give up your spot for this event? It will open up for others, and you may need capacity to get a ticket again.",
         "confirmLabel": "Yes, cancel",
         "toastSuccess": "Your ticket was cancelled.",
-        "toastError": "Could not cancel ticket: {message}"
+        "toastError": "Could not cancel ticket. Please try again.",
+        "errors": {
+          "started": "The event has started; the pass can no longer be cancelled.",
+          "checkedIn": "A checked-in pass cannot be cancelled."
+        }
       },
       "toasts": {
-        "buyError": "Could not get ticket: {message}",
+        "buyError": "Could not get ticket. Please try again.",
         "buyCreated": "Your ticket is ready. Your QR code is available."
+      },
+      "errors": {
+        "full": "The event is at capacity.",
+        "closed": "Registration has closed.",
+        "disabled": "Attendance passes are not enabled for this event.",
+        "notPublished": "The event is not published."
       }
     }
   },
@@ -375,18 +391,18 @@
     "attending": "Attending",
     "attend": "Attend",
     "processing": "Processing…",
-    "attendError": "Could not attend: {message}",
+    "attendError": "Could not attend. Please try again.",
     "attendSuccess": "You're attending the event!",
-    "cancelError": "Operation failed: {message}",
+    "cancelError": "Operation failed. Please try again.",
     "cancelSuccess": "Your attendance has been withdrawn."
   },
   "membership": {
     "join": "Join Club",
     "leave": "Leave Club",
     "processing": "Processing…",
-    "joinError": "Could not join: {message}",
+    "joinError": "Could not join. Please try again.",
     "joinSuccess": "You joined the club!",
-    "leaveError": "Could not leave: {message}",
+    "leaveError": "Could not leave. Please try again.",
     "leaveInfo": "You left the club."
   },
   "clubs": {
@@ -496,8 +512,8 @@
       "rationaleRequired": "Rationale is required.",
       "submitted": "Your application has been submitted.",
       "resubmitted": "Your application has been resubmitted.",
-      "submitError": "Could not submit application: {message}",
-      "resubmitError": "Could not resubmit application: {message}"
+      "submitError": "Could not submit application. Please try again.",
+      "resubmitError": "Could not resubmit application. Please try again."
     }
   },
   "manage": {
@@ -548,10 +564,10 @@
         "nameRequired": "Club name cannot be empty.",
         "whatsappInvalid": "WhatsApp link must start with https://.",
         "instagramInvalid": "Instagram link must start with https://.",
-        "saveError": "Could not save: {message}",
+        "saveError": "Could not save. Please try again.",
         "saveSuccess": "Club information updated",
-        "imageUploadError": "Could not upload image: {message}",
-        "imageSaveError": "Could not save: {message}",
+        "imageUploadError": "Could not upload image. Please try again.",
+        "imageSaveError": "Could not save. Please try again.",
         "imageUpdated": "{label} updated"
       }
     },
@@ -594,18 +610,18 @@
         "dateRequired": "Please select a date/time.",
         "pastDate": "Event date must be in the future.",
         "capacityInvalid": "Capacity must be a positive integer.",
-        "updateError": "Operation failed: {message}",
+        "updateError": "Operation failed. Please try again.",
         "updated": "Event updated",
-        "createError": "Could not add: {message}",
-        "submitError": "Could not submit for approval: {message}",
+        "createError": "Could not add. Please try again.",
+        "submitError": "Could not submit for approval. Please try again.",
         "created": "Event created and submitted for approval",
         "deleteConfirm": "Are you sure you want to delete the event \"{title}\"?",
-        "deleteError": "Could not delete: {message}",
+        "deleteError": "Could not delete. Please try again.",
         "deleted": "Event deleted",
-        "resubmitError": "Could not submit: {message}",
+        "resubmitError": "Could not submit. Please try again.",
         "resubmitted": "Event resubmitted for approval",
         "changesNoteRequired": "Enter a note for the revision.",
-        "decideError": "Operation failed: {message}",
+        "decideError": "Operation failed. Please try again.",
         "approved": "Approved, submitted for school approval",
         "rejected": "Event rejected",
         "changes": "Changes requested"
@@ -625,10 +641,10 @@
       "removeConfirm": "Remove {name} from the club?",
       "removeConfirmFallback": "this member",
       "toasts": {
-        "roleError": "Operation failed: {message}",
+        "roleError": "Operation failed. Please try again.",
         "promoted": "Member made admin",
         "demoted": "Admin role revoked",
-        "removeError": "Could not remove: {message}",
+        "removeError": "Could not remove. Please try again.",
         "removed": "Member removed"
       }
     },
@@ -670,7 +686,8 @@
       "toasts": {
         "titleRequired": "Title and message are required.",
         "sent": "Announcement sent to {count, plural, one {# member} other {# members}}",
-        "error": "Could not send: {message}"
+        "error": "Could not send. Please try again.",
+        "rateLimit": "You can send at most 3 announcements per hour."
       }
     }
   },
@@ -733,7 +750,7 @@
       "toasts": {
         "on": "Club Fair mode enabled",
         "off": "Club Fair mode disabled",
-        "error": "Could not update: {message}"
+        "error": "Could not update. Please try again."
       }
     },
     "newClub": {
@@ -747,7 +764,7 @@
       "submitting": "Adding…",
       "toasts": {
         "nameRequired": "Club name cannot be empty.",
-        "error": "Could not add club: {message}",
+        "error": "Could not add club. Please try again.",
         "success": "Club added successfully"
       }
     },
@@ -764,7 +781,7 @@
       "submit": "Save Advisor",
       "toasts": {
         "clubRequired": "Select a club.",
-        "error": "Assignment failed: {message}",
+        "error": "Assignment failed. Please try again.",
         "notSaved": "Assignment could not be saved (permission denied). Please try again.",
         "assigned": "Advisor assigned",
         "removed": "Advisor removed"
@@ -782,7 +799,7 @@
       "noneAssigned": "No advisors yet.",
       "toasts": {
         "userRequired": "Select a user.",
-        "error": "Operation failed: {message}",
+        "error": "Operation failed. Please try again.",
         "notSaved": "Role could not be saved (permission denied). Please try again.",
         "promoted": "User made an advisor",
         "demoted": "Advisor role removed"
@@ -809,11 +826,11 @@
       "off": "Off",
       "toasts": {
         "changesNoteRequired": "Enter a note for the revision.",
-        "decideError": "Operation failed: {message}",
+        "decideError": "Operation failed. Please try again.",
         "approved": "Event approved and live",
         "rejected": "Event rejected",
         "changes": "Changes requested",
-        "settingError": "Could not update: {message}",
+        "settingError": "Could not update. Please try again.",
         "settingUpdated": "Approval setting updated"
       }
     },
@@ -838,7 +855,7 @@
         "approved": "Application approved and club created",
         "rejected": "Application rejected",
         "changes": "Changes requested",
-        "decideError": "Action failed: {message}",
+        "decideError": "Action failed. Please try again.",
         "changesNoteRequired": "Enter a note for the revision.",
         "rejectNoteRequired": "Enter a reason for rejection."
       }
@@ -886,7 +903,7 @@
       "eventsCount": "{count, plural, one {# event} other {# events}}",
       "toasts": {
         "badRange": "Start date cannot be after end date.",
-        "error": "Could not generate report: {message}"
+        "error": "Could not generate report. Please try again."
       }
     }
   },
@@ -920,7 +937,16 @@
     "cameraDeniedBody": "Grant camera permission, or check in by code or name.",
     "retry": "Try Again",
     "dismiss": "Dismiss",
-    "scanNext": "Scan Next"
+    "scanNext": "Scan Next",
+    "errors": {
+      "invalid": "Invalid or unknown ticket.",
+      "alreadyUsed": "This ticket has already been used.",
+      "notApproved": "Ticket is not valid (not approved).",
+      "tooEarly": "Check-in has not opened yet (opens 2 hours before the event).",
+      "tooLate": "Check-in window has closed (the event has ended).",
+      "unauthorized": "You are not authorized to do this.",
+      "generic": "Check-in failed. Please try again."
+    }
   },
   "photos": {
     "title": "Event Snapshots",
@@ -936,10 +962,10 @@
     "toasts": {
       "tooMany": "You can upload at most {max} photos.",
       "tooBig": "Each photo must be at most ~5MB.",
-      "uploadError": "Could not upload: {message}",
-      "saveError": "Could not save: {message}",
+      "uploadError": "Could not upload. Please try again.",
+      "saveError": "Could not save. Please try again.",
       "uploaded": "{count, plural, one {# photo uploaded} other {# photos uploaded}}",
-      "deleteError": "Could not delete: {message}",
+      "deleteError": "Could not delete. Please try again.",
       "deleted": "Photo deleted"
     }
   },

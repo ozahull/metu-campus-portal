@@ -188,7 +188,8 @@ export function ManageEvents({
         .eq("id", editing.id);
       setLoading(false);
       if (error) {
-        toast.error(t("toasts.updateError", { message: error.message }));
+        console.error("[manage-events] güncelleme hatası:", error);
+        toast.error(t("toasts.updateError"));
         return;
       }
       toast.success(t("toasts.updated"));
@@ -207,11 +208,8 @@ export function ManageEvents({
 
     if (insertError || !created) {
       setLoading(false);
-      toast.error(
-        t("toasts.createError", {
-          message: insertError?.message ?? "unknown error",
-        }),
-      );
+      console.error("[manage-events] oluşturma hatası:", insertError);
+      toast.error(t("toasts.createError"));
       return;
     }
 
@@ -220,7 +218,8 @@ export function ManageEvents({
     });
     setLoading(false);
     if (submitError) {
-      toast.error(t("toasts.submitError", { message: submitError.message }));
+      console.error("[manage-events] gönderim hatası:", submitError);
+      toast.error(t("toasts.submitError"));
       return;
     }
     toast.success(t("toasts.created"));
@@ -232,7 +231,8 @@ export function ManageEvents({
     const supabase = createClient();
     const { error } = await supabase.from("events").delete().eq("id", ev.id);
     if (error) {
-      toast.error(t("toasts.deleteError", { message: error.message }));
+      console.error("[manage-events] silme hatası:", error);
+      toast.error(t("toasts.deleteError"));
       return;
     }
     toast.success(t("toasts.deleted"));
@@ -245,7 +245,8 @@ export function ManageEvents({
     const { error } = await supabase.rpc("event_submit", { p_event_id: ev.id });
     setBusyId(null);
     if (error) {
-      toast.error(t("toasts.resubmitError", { message: error.message }));
+      console.error("[manage-events] yeniden gönderim hatası:", error);
+      toast.error(t("toasts.resubmitError"));
       return;
     }
     toast.success(t("toasts.resubmitted"));
@@ -266,7 +267,8 @@ export function ManageEvents({
     });
     setBusyId(null);
     if (error) {
-      toast.error(t("toasts.decideError", { message: error.message }));
+      console.error("[manage-events] karar hatası:", error);
+      toast.error(t("toasts.decideError"));
       return;
     }
     toast.success(

@@ -28,7 +28,8 @@ export function FairModeToggle({ initialEnabled }: { initialEnabled: boolean }) 
     setBusy(false);
     if (error) {
       setEnabled(!next);
-      toast.error(t("toasts.error", { message: error.message }));
+      console.error("[fair-mode] güncelleme hatası:", error);
+      toast.error(t("toasts.error"));
       return;
     }
     toast.success(next ? t("toasts.on") : t("toasts.off"));

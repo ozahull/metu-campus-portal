@@ -83,7 +83,8 @@ export function EventPhotoWall({
         .from(IMAGE_BUCKET)
         .upload(path, file, { contentType: file.type || undefined });
       if (upErr) {
-        toast.error(t("toasts.uploadError", { message: upErr.message }));
+        console.error("[photo-wall] yükleme hatası:", upErr);
+        toast.error(t("toasts.uploadError"));
         continue;
       }
       const { error: insErr } = await supabase.from("event_photos").insert({
@@ -92,7 +93,8 @@ export function EventPhotoWall({
         storage_path: path,
       });
       if (insErr) {
-        toast.error(t("toasts.saveError", { message: insErr.message }));
+        console.error("[photo-wall] kayıt hatası:", insErr);
+        toast.error(t("toasts.saveError"));
         continue;
       }
       ok += 1;
@@ -116,7 +118,8 @@ export function EventPhotoWall({
       .eq("id", photo.id);
     if (error) {
       setDeletingId(null);
-      toast.error(t("toasts.deleteError", { message: error.message }));
+      console.error("[photo-wall] silme hatası:", error);
+      toast.error(t("toasts.deleteError"));
       return;
     }
     // Storage'dan da temizle (hata yutulur — RLS/erişim sorununda satır zaten gitti).

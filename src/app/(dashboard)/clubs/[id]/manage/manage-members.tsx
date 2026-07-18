@@ -43,7 +43,8 @@ export function ManageMembers({
 
     setBusyId(null);
     if (error) {
-      toast.error(t("toasts.roleError", { message: error.message }));
+      console.error("[manage-members] rol değiştirme hatası:", error);
+      toast.error(t("toasts.roleError"));
       return;
     }
     toast.success(role === "ADMIN" ? t("toasts.promoted") : t("toasts.demoted"));
@@ -61,7 +62,8 @@ export function ManageMembers({
 
     setBusyId(null);
     if (error) {
-      toast.error(t("toasts.removeError", { message: error.message }));
+      console.error("[manage-members] üye çıkarma hatası:", error);
+      toast.error(t("toasts.removeError"));
       return;
     }
     toast.success(t("toasts.removed"));

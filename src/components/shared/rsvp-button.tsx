@@ -53,9 +53,8 @@ export function RSVPButton({
 
     if (error) {
       setAttending(!next); // geri al
-      toast.error(
-        t(next ? "attendError" : "cancelError", { message: error.message }),
-      );
+      console.error("[rsvp] işlem hatası:", error);
+      toast.error(t(next ? "attendError" : "cancelError"));
       return;
     }
 

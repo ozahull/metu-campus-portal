@@ -101,7 +101,8 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
 
     setLoading(false);
     if (error) {
-      toast.error(t("toasts.saveError", { message: error.message }));
+      console.error("[club-info] kaydetme hatası:", error);
+      toast.error(t("toasts.saveError"));
       return;
     }
     toast.success(t("toasts.saveSuccess"));
@@ -257,7 +258,8 @@ function ImageUploadField({
     if (uploadError) {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
-      toast.error(t("toasts.imageUploadError", { message: uploadError.message }));
+      console.error("[club-info] görsel yükleme hatası:", uploadError);
+      toast.error(t("toasts.imageUploadError"));
       return;
     }
 
@@ -276,7 +278,8 @@ function ImageUploadField({
     if (updateError) {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
-      toast.error(t("toasts.imageSaveError", { message: updateError.message }));
+      console.error("[club-info] görsel kaydetme hatası:", updateError);
+      toast.error(t("toasts.imageSaveError"));
       return;
     }
 

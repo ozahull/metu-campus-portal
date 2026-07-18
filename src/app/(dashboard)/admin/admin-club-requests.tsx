@@ -112,7 +112,8 @@ function RequestRow({
     });
     setBusy(false);
     if (error) {
-      toast.error(t("toasts.decideError", { message: error.message }));
+      console.error("[admin-club-requests] karar hatası:", error);
+      toast.error(t("toasts.decideError"));
       return;
     }
     toast.success(

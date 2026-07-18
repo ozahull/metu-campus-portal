@@ -7,6 +7,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { BadgeCheck, Ban, Loader2, Ticket as TicketIcon, X } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { knownErrorKey } from "@/lib/known-errors";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ticketStatusMeta } from "@/lib/ticket-status";
@@ -16,6 +17,19 @@ export type MyTicket = {
   token: string;
   status: string;
 };
+
+// ticket_issue / ticket_cancel RPC'lerinin bilinen RAISE metinleri (D8):
+// ayırt edici mesaj gereken durumlar (kapasite/kapanış vb.); kalanı generic.
+const BUY_ERRORS = [
+  ["Kapasite dolu", "full"],
+  ["Bilet alımı kapandı", "closed"],
+  ["katılım bileti kapalı", "disabled"],
+  ["Etkinlik yayında değil", "notPublished"],
+] as const;
+const CANCEL_ERRORS = [
+  ["Giriş yapılmış bilet", "checkedIn"],
+  ["Etkinlik başladı", "started"],
+] as const;
 
 type TicketFlowProps = {
   eventId: string;
@@ -50,7 +64,9 @@ export function TicketFlow({
     const { error } = await supabase.rpc("ticket_issue", { p_event: eventId });
     setLoading(false);
     if (error) {
-      toast.error(t("toasts.buyError", { message: error.message }));
+      console.error("[ticket-flow] ticket_issue hatası:", error);
+      const known = knownErrorKey(error.message, BUY_ERRORS);
+      toast.error(known ? t(`errors.${known}`) : t("toasts.buyError"));
       return;
     }
     toast.success(t("toasts.buyCreated"));
@@ -67,7 +83,9 @@ export function TicketFlow({
     });
     setCancelling(false);
     if (error) {
-      toast.error(t("cancel.toastError", { message: error.message }));
+      console.error("[ticket-flow] ticket_cancel hatası:", error);
+      const known = knownErrorKey(error.message, CANCEL_ERRORS);
+      toast.error(known ? t(`cancel.errors.${known}`) : t("cancel.toastError"));
       return;
     }
     toast.success(t("cancel.toastSuccess"));

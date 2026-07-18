@@ -50,7 +50,8 @@ export function NotificationPreferences({
     setBusy(null);
     if (error) {
       setScope(prev);
-      toast.error(t("toasts.error", { message: error.message }));
+      console.error("[notification-preferences] tercih güncelleme hatası:", error);
+      toast.error(t("toasts.error"));
       return;
     }
     toast.success(t("toasts.saved"));

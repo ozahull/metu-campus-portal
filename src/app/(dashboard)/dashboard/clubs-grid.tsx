@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Inbox } from "lucide-react";
+import { AlertTriangle, Inbox, RotateCw } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ClubsCollection } from "@/components/shared/clubs-collection";
 import type { Club } from "@/components/shared/club-card";
@@ -27,8 +30,29 @@ export async function ClubsGrid() {
     )
     .order("name", { ascending: true });
 
+  // D22: hata boş-durumla KARIŞMAZ — "aktif kulüp yok" yerine "yüklenemedi +
+  // tekrar dene" gösterilir (sayfa force-dynamic; link yeniden çeker).
   if (error) {
     console.error("[Dashboard] Kulüpler çekme hatası:", error);
+    return (
+      <EmptyState
+        icon={AlertTriangle}
+        title={t("clubsError")}
+        description={t("clubsErrorBody")}
+        action={
+          <Link
+            href="/dashboard"
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "gap-1.5",
+            )}
+          >
+            <RotateCw className="size-4" />
+            {t("clubsRetry")}
+          </Link>
+        }
+      />
+    );
   }
 
   const clubs: Club[] = ((data ?? []) as unknown as ClubQueryRow[]).map((c) => ({

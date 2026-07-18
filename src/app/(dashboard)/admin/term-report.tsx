@@ -105,7 +105,8 @@ export function TermReport() {
     });
     setLoading(false);
     if (error) {
-      toast.error(t("toasts.error", { message: error.message }));
+      console.error("[term-report] rapor hatası:", error);
+      toast.error(t("toasts.error"));
       return;
     }
     setRows((data as ReportRow[]) ?? []);

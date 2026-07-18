@@ -45,7 +45,8 @@ export function NewClubForm() {
     setLoading(false);
 
     if (error) {
-      toast.error(t("toasts.error", { message: error.message }));
+      console.error("[new-club] kulüp ekleme hatası:", error);
+      toast.error(t("toasts.error"));
       return;
     }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
@@ -11,8 +12,9 @@ import {
   Loader2,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 import { AuthShell } from "@/components/shared/auth-shell";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -40,12 +42,20 @@ export default function ResetPasswordPage() {
 
   // Reset linki callback üzerinden oturum açtığı için kullanıcı burada
   // kimlik doğrulanmış olmalı. Oturum yoksa link geçersiz/süresi dolmuştur.
+  // D21: getUser() reddederse (ağ hatası vb.) sayfa sonsuza dek spinner'da
+  // kalıyordu — catch ile geçersiz-oturum ekranına düşer (çıkış yolu linkli).
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      setValidSession(!!data.user);
-      setChecking(false);
-    });
+    supabase.auth
+      .getUser()
+      .then(({ data }) => {
+        setValidSession(!!data.user);
+      })
+      .catch((err) => {
+        console.error("[reset-password] oturum kontrolü hatası:", err);
+        setValidSession(false);
+      })
+      .finally(() => setChecking(false));
   }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -97,13 +107,24 @@ export default function ResetPasswordPage() {
               <Loader2 className="size-5 animate-spin" />
             </div>
           ) : !validSession ? (
-            <Alert variant="destructive">
-              <AlertCircle className="size-4" />
-              <AlertTitle>{t("reset.invalidTitle")}</AlertTitle>
-              <AlertDescription>
-                {t("reset.invalidBody")}
-              </AlertDescription>
-            </Alert>
+            <div className="space-y-4">
+              <Alert variant="destructive">
+                <AlertCircle className="size-4" />
+                <AlertTitle>{t("reset.invalidTitle")}</AlertTitle>
+                <AlertDescription>
+                  {t("reset.invalidBody")}
+                </AlertDescription>
+              </Alert>
+              <Link
+                href="/forgot-password"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "h-11 w-full rounded-full",
+                )}
+              >
+                {t("reset.requestNew")}
+              </Link>
+            </div>
           ) : done ? (
             <Alert className="border-success/40 bg-success/10 text-success [&>svg]:text-success">
               <CheckCircle2 className="size-4" />

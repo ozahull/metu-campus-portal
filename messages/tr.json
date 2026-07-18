@@ -79,7 +79,7 @@
       "NONE_desc": "Hiç bildirim almayın.",
       "toasts": {
         "saved": "Bildirim tercihi güncellendi",
-        "error": "Güncellenemedi: {message}"
+        "error": "Güncellenemedi. Lütfen tekrar deneyin."
       }
     },
     "push": {
@@ -181,16 +181,16 @@
       "note": "Açık olduğunda hakkında, bölüm ve sınıf bilgin yalnızca sana ve okul yönetimine görünür; kişi aramasında çıkmazsın. Adın ve rolün kulüp ve üye listelerinde görünmeye devam eder.",
       "toastHidden": "Profilin artık gizli.",
       "toastVisible": "Profilin artık görünür.",
-      "toastError": "Güncellenemedi: {message}"
+      "toastError": "Güncellenemedi. Lütfen tekrar deneyin."
     },
     "toasts": {
       "nameTooShort": "Lütfen ad ve soyadınızı eksiksiz girin.",
       "nameMismatch": "Adınız e-posta adresinizle eşleşmeli.",
       "nameUpdated": "İsim güncellendi",
-      "nameError": "Güncellenemedi: {message}",
+      "nameError": "Güncellenemedi. Lütfen tekrar deneyin.",
       "passwordShort": "Şifre en az 6 karakter olmalıdır.",
       "passwordUpdated": "Şifre güncellendi",
-      "passwordError": "Şifre güncellenemedi: {message}"
+      "passwordError": "Şifre güncellenemedi. Lütfen tekrar deneyin."
     },
     "detailsCard": {
       "title": "Profil bilgilerin",
@@ -248,7 +248,7 @@
       "domainError": "Sadece @metu.edu.tr veya @ncc.metu.edu.tr uzantılı mail kullanılabilir.",
       "passwordShort": "Şifre en az 6 karakter olmalıdır.",
       "nameMismatch": "Adınız e-posta adresinizle eşleşmeli.",
-      "profileError": "Profil kaydedilemedi: {message}",
+      "profileError": "Profil kaydedilemedi. Lütfen tekrar deneyin.",
       "confirmTitle": "Onay maili gönderildi",
       "confirmBody": "E-postanıza gelen onay linkine tıklayarak hesabınızı etkinleştirin. (Spam klasörünü de kontrol edin.)",
       "firstNameLabel": "Adınız",
@@ -261,7 +261,9 @@
       "submit": "Hesap Oluştur",
       "submitting": "Hesap oluşturuluyor…",
       "haveAccount": "Zaten hesabınız var mı?",
-      "loginLink": "Giriş yapın"
+      "loginLink": "Giriş yapın",
+      "alreadyRegistered": "Bu e-posta ile zaten bir hesap var. Giriş yapmayı deneyin.",
+      "genericError": "Kayıt yapılamadı. Lütfen tekrar deneyin."
     },
     "forgot": {
       "title": "Şifrenizi mi unuttunuz?",
@@ -292,7 +294,8 @@
       "confirmLabel": "Yeni Şifre (Tekrar)",
       "confirmPlaceholder": "Şifreyi tekrar girin",
       "submit": "Şifreyi Güncelle",
-      "submitting": "Güncelleniyor…"
+      "submitting": "Güncelleniyor…",
+      "requestNew": "Yeni sıfırlama linki iste"
     }
   },
   "home": {
@@ -307,7 +310,10 @@
     "statEvents": "Yaklaşan katılımın",
     "activeClubs": "Aktif Kulüpler",
     "activeClubsEmptyTitle": "Henüz aktif kulüp bulunmuyor",
-    "activeClubsEmptyBody": "Yeni topluluklar eklendiğinde burada görünecek."
+    "activeClubsEmptyBody": "Yeni topluluklar eklendiğinde burada görünecek.",
+    "clubsError": "Kulüpler yüklenemedi",
+    "clubsErrorBody": "Bir sorun oluştu. Lütfen tekrar deneyin.",
+    "clubsRetry": "Tekrar dene"
   },
   "events": {
     "title": "Etkinlikler",
@@ -346,11 +352,21 @@
         "confirmBody": "Bu etkinlikteki yerini bırakmak istediğine emin misin? Yerin başkalarına açılır ve tekrar bilet almak için kontenjan gerekebilir.",
         "confirmLabel": "Evet, iptal et",
         "toastSuccess": "Biletin iptal edildi.",
-        "toastError": "Bilet iptal edilemedi: {message}"
+        "toastError": "Bilet iptal edilemedi. Lütfen tekrar deneyin.",
+        "errors": {
+          "started": "Etkinlik başladı; bilet artık iptal edilemez.",
+          "checkedIn": "Giriş yapılmış bilet iptal edilemez."
+        }
       },
       "toasts": {
-        "buyError": "Bilet oluşturulamadı: {message}",
+        "buyError": "Bilet oluşturulamadı. Lütfen tekrar deneyin.",
         "buyCreated": "Biletiniz oluşturuldu. QR kodunuz hazır."
+      },
+      "errors": {
+        "full": "Kontenjan dolu.",
+        "closed": "Katılım kaydı kapandı.",
+        "disabled": "Bu etkinlikte katılım bileti kapalı.",
+        "notPublished": "Etkinlik yayında değil."
       }
     }
   },
@@ -375,18 +391,18 @@
     "attending": "Katılıyorsunuz",
     "attend": "Katılacağım",
     "processing": "İşleniyor…",
-    "attendError": "Katılma başarısız: {message}",
+    "attendError": "Katılma başarısız. Lütfen tekrar deneyin.",
     "attendSuccess": "Etkinliğe katılıyorsunuz!",
-    "cancelError": "İşlem başarısız: {message}",
+    "cancelError": "İşlem başarısız. Lütfen tekrar deneyin.",
     "cancelSuccess": "Katılımınız geri alındı."
   },
   "membership": {
     "join": "Kulübe Katıl",
     "leave": "Kulüpten Ayrıl",
     "processing": "İşleniyor…",
-    "joinError": "Katılma başarısız: {message}",
+    "joinError": "Katılma başarısız. Lütfen tekrar deneyin.",
     "joinSuccess": "Kulübe katıldınız!",
-    "leaveError": "Ayrılma başarısız: {message}",
+    "leaveError": "Ayrılma başarısız. Lütfen tekrar deneyin.",
     "leaveInfo": "Kulüpten ayrıldınız."
   },
   "clubs": {
@@ -496,8 +512,8 @@
       "rationaleRequired": "Gerekçe gerekli.",
       "submitted": "Başvurun gönderildi.",
       "resubmitted": "Başvurun yeniden gönderildi.",
-      "submitError": "Başvuru gönderilemedi: {message}",
-      "resubmitError": "Başvuru yeniden gönderilemedi: {message}"
+      "submitError": "Başvuru gönderilemedi. Lütfen tekrar deneyin.",
+      "resubmitError": "Başvuru yeniden gönderilemedi. Lütfen tekrar deneyin."
     }
   },
   "manage": {
@@ -548,10 +564,10 @@
         "nameRequired": "Kulüp adı boş olamaz.",
         "whatsappInvalid": "WhatsApp linki https:// ile başlamalı.",
         "instagramInvalid": "Instagram linki https:// ile başlamalı.",
-        "saveError": "Kaydedilemedi: {message}",
+        "saveError": "Kaydedilemedi. Lütfen tekrar deneyin.",
         "saveSuccess": "Kulüp bilgileri güncellendi",
-        "imageUploadError": "Görsel yüklenemedi: {message}",
-        "imageSaveError": "Kaydedilemedi: {message}",
+        "imageUploadError": "Görsel yüklenemedi. Lütfen tekrar deneyin.",
+        "imageSaveError": "Kaydedilemedi. Lütfen tekrar deneyin.",
         "imageUpdated": "{label} güncellendi"
       }
     },
@@ -594,18 +610,18 @@
         "dateRequired": "Lütfen tarih/saat seçin.",
         "pastDate": "Etkinlik tarihi gelecekte olmalı.",
         "capacityInvalid": "Kapasite pozitif bir tam sayı olmalı.",
-        "updateError": "İşlem başarısız: {message}",
+        "updateError": "İşlem başarısız. Lütfen tekrar deneyin.",
         "updated": "Etkinlik güncellendi",
-        "createError": "Eklenemedi: {message}",
-        "submitError": "Onaya gönderilemedi: {message}",
+        "createError": "Eklenemedi. Lütfen tekrar deneyin.",
+        "submitError": "Onaya gönderilemedi. Lütfen tekrar deneyin.",
         "created": "Etkinlik oluşturuldu ve onaya gönderildi",
         "deleteConfirm": "\"{title}\" etkinliğini silmek istediğinize emin misiniz?",
-        "deleteError": "Silinemedi: {message}",
+        "deleteError": "Silinemedi. Lütfen tekrar deneyin.",
         "deleted": "Etkinlik silindi",
-        "resubmitError": "Gönderilemedi: {message}",
+        "resubmitError": "Gönderilemedi. Lütfen tekrar deneyin.",
         "resubmitted": "Etkinlik tekrar onaya gönderildi",
         "changesNoteRequired": "Revizyon için bir not girin.",
-        "decideError": "İşlem başarısız: {message}",
+        "decideError": "İşlem başarısız. Lütfen tekrar deneyin.",
         "approved": "Onaylandı, okul onayına gönderildi",
         "rejected": "Etkinlik reddedildi",
         "changes": "Revizyon istendi"
@@ -625,10 +641,10 @@
       "removeConfirm": "{name} kulüpten çıkarılsın mı?",
       "removeConfirmFallback": "Bu üye",
       "toasts": {
-        "roleError": "İşlem başarısız: {message}",
+        "roleError": "İşlem başarısız. Lütfen tekrar deneyin.",
         "promoted": "Üye yönetici yapıldı",
         "demoted": "Yöneticilik geri alındı",
-        "removeError": "Çıkarılamadı: {message}",
+        "removeError": "Çıkarılamadı. Lütfen tekrar deneyin.",
         "removed": "Üye çıkarıldı"
       }
     },
@@ -670,7 +686,8 @@
       "toasts": {
         "titleRequired": "Başlık ve mesaj gerekli.",
         "sent": "Duyuru {count} üyeye gönderildi",
-        "error": "Gönderilemedi: {message}"
+        "error": "Gönderilemedi. Lütfen tekrar deneyin.",
+        "rateLimit": "Son bir saatte en fazla 3 duyuru gönderebilirsiniz."
       }
     }
   },
@@ -733,7 +750,7 @@
       "toasts": {
         "on": "Kulüp Fuarı modu açıldı",
         "off": "Kulüp Fuarı modu kapatıldı",
-        "error": "Güncellenemedi: {message}"
+        "error": "Güncellenemedi. Lütfen tekrar deneyin."
       }
     },
     "newClub": {
@@ -747,7 +764,7 @@
       "submitting": "Ekleniyor…",
       "toasts": {
         "nameRequired": "Kulüp adı boş olamaz.",
-        "error": "Kulüp eklenemedi: {message}",
+        "error": "Kulüp eklenemedi. Lütfen tekrar deneyin.",
         "success": "Kulüp başarıyla eklendi"
       }
     },
@@ -764,7 +781,7 @@
       "submit": "Danışmanı Kaydet",
       "toasts": {
         "clubRequired": "Kulüp seçin.",
-        "error": "Atama başarısız: {message}",
+        "error": "Atama başarısız. Lütfen tekrar deneyin.",
         "notSaved": "Atama kaydedilemedi (yetki reddedildi). Lütfen tekrar deneyin.",
         "assigned": "Danışman atandı",
         "removed": "Danışman kaldırıldı"
@@ -782,7 +799,7 @@
       "noneAssigned": "Henüz hoca yok.",
       "toasts": {
         "userRequired": "Kullanıcı seçin.",
-        "error": "İşlem başarısız: {message}",
+        "error": "İşlem başarısız. Lütfen tekrar deneyin.",
         "notSaved": "Rol kaydedilemedi (yetki reddedildi). Lütfen tekrar deneyin.",
         "promoted": "Kullanıcı hoca yapıldı",
         "demoted": "Hoca rolü kaldırıldı"
@@ -809,11 +826,11 @@
       "off": "Kapalı",
       "toasts": {
         "changesNoteRequired": "Revizyon için bir not girin.",
-        "decideError": "İşlem başarısız: {message}",
+        "decideError": "İşlem başarısız. Lütfen tekrar deneyin.",
         "approved": "Etkinlik onaylandı ve yayında",
         "rejected": "Etkinlik reddedildi",
         "changes": "Revizyon istendi",
-        "settingError": "Güncellenemedi: {message}",
+        "settingError": "Güncellenemedi. Lütfen tekrar deneyin.",
         "settingUpdated": "Onay ayarı güncellendi"
       }
     },
@@ -838,7 +855,7 @@
         "approved": "Başvuru onaylandı ve kulüp oluşturuldu",
         "rejected": "Başvuru reddedildi",
         "changes": "Revizyon istendi",
-        "decideError": "İşlem başarısız: {message}",
+        "decideError": "İşlem başarısız. Lütfen tekrar deneyin.",
         "changesNoteRequired": "Revizyon için bir not girin.",
         "rejectNoteRequired": "Reddetme gerekçesi girin."
       }
@@ -886,7 +903,7 @@
       "eventsCount": "{count} etkinlik",
       "toasts": {
         "badRange": "Başlangıç tarihi bitişten sonra olamaz.",
-        "error": "Rapor oluşturulamadı: {message}"
+        "error": "Rapor oluşturulamadı. Lütfen tekrar deneyin."
       }
     }
   },
@@ -920,7 +937,16 @@
     "cameraDeniedBody": "Kamera izni verin ya da kod/isimle giriş yapın.",
     "retry": "Tekrar Dene",
     "dismiss": "Kapat",
-    "scanNext": "Sonrakini Tara"
+    "scanNext": "Sonrakini Tara",
+    "errors": {
+      "invalid": "Geçersiz ya da bulunamayan bilet.",
+      "alreadyUsed": "Bu bilet zaten kullanılmış.",
+      "notApproved": "Bilet geçerli değil (onaylı değil).",
+      "tooEarly": "Giriş henüz açılmadı (etkinlik başlangıcından en erken 2 saat önce).",
+      "tooLate": "Giriş süresi doldu (etkinlik bitiminden sonra).",
+      "unauthorized": "Bu işlem için yetkiniz yok.",
+      "generic": "Giriş yapılamadı. Lütfen tekrar deneyin."
+    }
   },
   "photos": {
     "title": "Etkinlikten Kareler",
@@ -936,10 +962,10 @@
     "toasts": {
       "tooMany": "En fazla {max} fotoğraf yükleyebilirsiniz.",
       "tooBig": "Her fotoğraf en fazla ~5MB olmalı.",
-      "uploadError": "Yüklenemedi: {message}",
-      "saveError": "Kaydedilemedi: {message}",
+      "uploadError": "Yüklenemedi. Lütfen tekrar deneyin.",
+      "saveError": "Kaydedilemedi. Lütfen tekrar deneyin.",
       "uploaded": "{count} fotoğraf yüklendi",
-      "deleteError": "Silinemedi: {message}",
+      "deleteError": "Silinemedi. Lütfen tekrar deneyin.",
       "deleted": "Fotoğraf silindi"
     }
   },

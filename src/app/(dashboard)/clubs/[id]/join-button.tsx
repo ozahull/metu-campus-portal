@@ -34,7 +34,8 @@ export function JoinButton({ clubId, userId, isMember }: JoinButtonProps) {
       setLoading(false);
 
       if (error) {
-        toast.error(t("leaveError", { message: error.message }));
+        console.error("[join-button] ayrılma hatası:", error);
+        toast.error(t("leaveError"));
         return;
       }
 
@@ -51,7 +52,8 @@ export function JoinButton({ clubId, userId, isMember }: JoinButtonProps) {
     setLoading(false);
 
     if (error) {
-      toast.error(t("joinError", { message: error.message }));
+      console.error("[join-button] katılma hatası:", error);
+      toast.error(t("joinError"));
       return;
     }
 

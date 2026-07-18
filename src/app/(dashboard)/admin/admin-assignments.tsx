@@ -85,7 +85,8 @@ export function AdminAssignments({
       .select("id, advisor_id");
     setAdvBusy(false);
     if (error) {
-      toast.error(t("toasts.error", { message: error.message }));
+      console.error("[admin-assignments] atama hatası:", error);
+      toast.error(t("toasts.error"));
       return;
     }
     if (!data || data.length === 0 || data[0].advisor_id !== wanted) {

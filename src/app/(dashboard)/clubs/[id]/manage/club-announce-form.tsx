@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Loader2, Megaphone, Send } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { knownErrorKey } from "@/lib/known-errors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,7 +38,12 @@ export function ClubAnnounceForm({ clubId }: { clubId: string }) {
     setLoading(false);
 
     if (error) {
-      toast.error(t("toasts.error", { message: error.message }));
+      // Ham RPC metni gösterilmez (D8); bilinen spam sınırı ayırt edilir.
+      console.error("[club-announce] duyuru gönderme hatası:", error);
+      const known = knownErrorKey(error.message, [
+        ["en fazla 3 duyuru", "rateLimit"],
+      ]);
+      toast.error(known ? t(`toasts.${known}`) : t("toasts.error"));
       return;
     }
 

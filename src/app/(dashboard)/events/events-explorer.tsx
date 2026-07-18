@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/shared/empty-state";
 import { EventCard, type EventCardData } from "@/components/shared/event-card";
 import { categoryLabel } from "@/lib/category";
+import { normalizeSearchText, searchIncludes } from "@/lib/search-text";
 import { cn } from "@/lib/utils";
 
 export type EventRow = {
@@ -63,9 +64,10 @@ export function EventsExplorer({
   }, [events]);
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    // Türkçe-güvenli arama (O18) — bkz. src/lib/search-text.ts.
+    const q = normalizeSearchText(query.trim());
     return events.filter((e) => {
-      if (q && !e.title.toLowerCase().includes(q)) return false;
+      if (q && !searchIncludes(e.title, q)) return false;
       if (club && e.club_id !== club) return false;
       if (category && e.category !== category) return false;
       return true;

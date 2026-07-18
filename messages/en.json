@@ -116,7 +116,7 @@
       "ADVISOR_PRESIDENT": "Advisor ↔ President",
       "ADMIN_PRESIDENT": "School Administration → President (one-way)"
     },
-    "unreadBadgeAria": "{count} unread messages",
+    "unreadBadgeAria": "{count, plural, one {# unread message} other {# unread messages}}",
     "compose": {
       "toPresident": "Message president",
       "toAdvisor": "Message advisor",
@@ -398,7 +398,7 @@
     "noDescription": "No description has been added for this club yet.",
     "cardExplore": "View Club",
     "allCategories": "All",
-    "memberCount": "{count} members",
+    "memberCount": "{count, plural, one {# member} other {# members}}",
     "tabEvents": "Events",
     "tabMembers": "Members",
     "back": "Back",
@@ -634,7 +634,7 @@
     },
     "tickets": {
       "empty": "No attendance passes issued for this club yet.",
-      "issued": "{count} passes",
+      "issued": "{count, plural, one {# pass} other {# passes}}",
       "capacity": " / {count} capacity",
       "checkedIn": "{count} checked in"
     },
@@ -669,7 +669,7 @@
       "submitting": "Sending…",
       "toasts": {
         "titleRequired": "Title and message are required.",
-        "sent": "Announcement sent to {count} members",
+        "sent": "Announcement sent to {count, plural, one {# member} other {# members}}",
         "error": "Could not send: {message}"
       }
     }
@@ -883,7 +883,7 @@
       "checkin": "Attended",
       "attendanceRate": "Attendance Rate",
       "colClub": "Club",
-      "eventsCount": "{count} events",
+      "eventsCount": "{count, plural, one {# event} other {# events}}",
       "toasts": {
         "badRange": "Start date cannot be after end date.",
         "error": "Could not generate report: {message}"
@@ -938,7 +938,7 @@
       "tooBig": "Each photo must be at most ~5MB.",
       "uploadError": "Could not upload: {message}",
       "saveError": "Could not save: {message}",
-      "uploaded": "{count} photos uploaded",
+      "uploaded": "{count, plural, one {# photo uploaded} other {# photos uploaded}}",
       "deleteError": "Could not delete: {message}",
       "deleted": "Photo deleted"
     }

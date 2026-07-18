@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { normalizeSearchText, searchIncludes } from "@/lib/search-text";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -51,11 +52,11 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
   const processingRef = useRef(false);
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLocaleLowerCase("tr");
+    // Türkçe-güvenli arama (O18): ortak normalizasyon — ASCII klavye girişi
+    // ("isik") Türkçe adı ("IŞIK") da bulur. bkz. src/lib/search-text.ts.
+    const q = normalizeSearchText(query.trim());
     if (!q) return approved.slice(0, 20);
-    return approved.filter((t) =>
-      (t.full_name ?? "").toLocaleLowerCase("tr").includes(q),
-    );
+    return approved.filter((t) => searchIncludes(t.full_name, q));
   }, [approved, query]);
 
   async function doCheckin(token: string) {

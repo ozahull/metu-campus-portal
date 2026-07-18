@@ -4,19 +4,13 @@
 // sahte adları eler). SUNUCU tarafı AYNI mantığı SQL'de tekrarlar
 // (20260719200000_verified_real_name.sql) — istemci doğrulaması güvenlik değildir.
 
-// Türkçe/aksanlı harfleri toLowerCase'den ÖNCE ASCII'ye map'ler. Bu, Türkçe I/ı
-// tuzağını ("İ".toLowerCase()="i̇", "IŞIK".toLowerCase()="işik") KÖKÜNDEN önler:
-// İ ve ı ikisi de 'i' olur. (Talebin "iki lower varyantını dene" önerisinden daha
-// deterministik — çift-yol karşılaştırma yerine tek kanonik biçim.)
-const TR_MAP: Record<string, string> = {
-  ğ: "g", Ğ: "g", ü: "u", Ü: "u", ş: "s", Ş: "s", ı: "i", İ: "i",
-  ö: "o", Ö: "o", ç: "c", Ç: "c", â: "a", Â: "a", î: "i", Î: "i", û: "u", Û: "u",
-};
+import { normalizeSearchText } from "@/lib/search-text";
 
 // Kanonik karşılaştırma anahtarı: Türkçe→ASCII + küçük harf + yalnız a-z.
+// (Türkçe I/ı tuzağını önleyen dönüşüm artık ortak src/lib/search-text.ts'te —
+// arama filtreleri de aynı normalizasyonu kullanır.)
 export function normalizeNameToken(s: string): string {
-  const mapped = (s ?? "").replace(/[ğĞüÜşŞıİöÖçÇâÂîÎûÛ]/g, (c) => TR_MAP[c] ?? c);
-  return mapped.toLowerCase().replace(/[^a-z]/g, "");
+  return normalizeSearchText(s).replace(/[^a-z]/g, "");
 }
 
 // E-posta yerelini (sondaki rakamlar atılmış) token'a indirger.

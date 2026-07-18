@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ClubCard, type Club } from "@/components/shared/club-card";
 import { categoryLabel } from "@/lib/category";
+import { normalizeSearchText, searchIncludes } from "@/lib/search-text";
 import { cn } from "@/lib/utils";
 
 /**
@@ -33,13 +34,14 @@ export function ClubsCollection({
   }, [clubs]);
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    // Türkçe-güvenli arama (O18): "İnovasyon"/"IŞIK" gibi adlar Türkçe veya
+    // ASCII klavye girişiyle de bulunur — bkz. src/lib/search-text.ts.
+    const q = normalizeSearchText(query.trim());
     return clubs.filter((club) => {
       if (category && club.category !== category) return false;
       if (!q) return true;
       return (
-        club.name.toLowerCase().includes(q) ||
-        (club.description?.toLowerCase().includes(q) ?? false)
+        searchIncludes(club.name, q) || searchIncludes(club.description, q)
       );
     });
   }, [clubs, query, category]);

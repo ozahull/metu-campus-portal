@@ -342,6 +342,14 @@
         "APPROVED": "Approved",
         "CHECKED_IN": "Checked in"
       },
+      "cancel": {
+        "button": "Give up spot",
+        "confirmTitle": "Cancel ticket",
+        "confirmBody": "Are you sure you want to give up your spot for this event? It will open up for others, and you may need capacity to get a ticket again.",
+        "confirmLabel": "Yes, cancel",
+        "toastSuccess": "Your ticket was cancelled.",
+        "toastError": "Could not cancel ticket: {message}"
+      },
       "toasts": {
         "buyError": "Could not get ticket: {message}",
         "buyCreated": "Your ticket is ready. Your QR code is available."

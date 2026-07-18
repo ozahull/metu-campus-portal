@@ -294,6 +294,7 @@ export default async function EventDetailPage({
               <TicketFlow
                 eventId={data.id}
                 closesAtISO={data.ticket_deadline ?? data.event_date}
+                eventStartsAtISO={data.event_date}
                 ticket={myTicket}
               />
             ) : (

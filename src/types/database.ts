@@ -953,6 +953,10 @@ export type Database = {
         Args: { p_role: string; p_user_id: string }
         Returns: string
       }
+      ticket_cancel: {
+        Args: { p_ticket_id: string }
+        Returns: undefined
+      }
       ticket_checkin: {
         Args: { p_token: string }
         Returns: {

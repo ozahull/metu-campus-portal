@@ -4,10 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
-import { BadgeCheck, Ban, Loader2, Ticket as TicketIcon } from "lucide-react";
+import { BadgeCheck, Ban, Loader2, Ticket as TicketIcon, X } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ticketStatusMeta } from "@/lib/ticket-status";
 
 export type MyTicket = {
@@ -20,17 +21,27 @@ type TicketFlowProps = {
   eventId: string;
   // Bilet alımının kapandığı an (deadline ya da etkinlik saati).
   closesAtISO: string;
+  // Etkinliğin BAŞLANGIÇ anı — iptal yalnızca etkinlik başlamadan önce mümkün.
+  eventStartsAtISO: string;
   ticket: MyTicket | null;
 };
 
 // Ücretsiz katılım bileti akışı (ödeme yok): "Yerini Ayırt" → ticket_issue RPC
 // ile bilet DOĞRUDAN APPROVED doğar → QR + token gösterilir → kapıda check-in.
-export function TicketFlow({ eventId, closesAtISO, ticket }: TicketFlowProps) {
+export function TicketFlow({
+  eventId,
+  closesAtISO,
+  eventStartsAtISO,
+  ticket,
+}: TicketFlowProps) {
   const router = useRouter();
   const t = useTranslations("events.ticket");
   const [loading, setLoading] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   const closed = new Date(closesAtISO).getTime() <= Date.now();
+  // Etkinlik başladıysa iptal butonu gösterilmez (RPC de reddeder).
+  const eventStarted = new Date(eventStartsAtISO).getTime() <= Date.now();
 
   async function getTicket() {
     setLoading(true);
@@ -43,6 +54,23 @@ export function TicketFlow({ eventId, closesAtISO, ticket }: TicketFlowProps) {
       return;
     }
     toast.success(t("toasts.buyCreated"));
+    router.refresh();
+  }
+
+  async function cancelTicket() {
+    if (!ticket) return;
+    setCancelling(true);
+    const supabase = createClient();
+    // İptal yetkisi + kapasite iadesi RPC içinde (SECURITY DEFINER).
+    const { error } = await supabase.rpc("ticket_cancel", {
+      p_ticket_id: ticket.id,
+    });
+    setCancelling(false);
+    if (error) {
+      toast.error(t("cancel.toastError", { message: error.message }));
+      return;
+    }
+    toast.success(t("cancel.toastSuccess"));
     router.refresh();
   }
 
@@ -112,6 +140,32 @@ export function TicketFlow({ eventId, closesAtISO, ticket }: TicketFlowProps) {
             <BadgeCheck className="size-4" />
             {t("qrHint")}
           </p>
+
+          {/* İptal (vazgeç) — yalnızca etkinlik başlamadan önce. CHECKED_IN
+              bilette bu blok hiç render edilmez (ayrı durum). Yıkıcı → ConfirmDialog. */}
+          {!eventStarted && (
+            <ConfirmDialog
+              trigger={
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={cancelling}
+                  className="gap-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                >
+                  {cancelling ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <X className="size-4" />
+                  )}
+                  {t("cancel.button")}
+                </Button>
+              }
+              title={t("cancel.confirmTitle")}
+              description={t("cancel.confirmBody")}
+              confirmLabel={t("cancel.confirmLabel")}
+              onConfirm={cancelTicket}
+            />
+          )}
         </div>
       )}
 

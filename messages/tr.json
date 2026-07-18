@@ -342,6 +342,14 @@
         "APPROVED": "Onaylandı",
         "CHECKED_IN": "Giriş yapıldı"
       },
+      "cancel": {
+        "button": "Vazgeç",
+        "confirmTitle": "Bileti iptal et",
+        "confirmBody": "Bu etkinlikteki yerini bırakmak istediğine emin misin? Yerin başkalarına açılır ve tekrar bilet almak için kontenjan gerekebilir.",
+        "confirmLabel": "Evet, iptal et",
+        "toastSuccess": "Biletin iptal edildi.",
+        "toastError": "Bilet iptal edilemedi: {message}"
+      },
       "toasts": {
         "buyError": "Bilet oluşturulamadı: {message}",
         "buyCreated": "Biletiniz oluşturuldu. QR kodunuz hazır."

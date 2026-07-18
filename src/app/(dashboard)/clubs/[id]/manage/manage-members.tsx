@@ -112,19 +112,25 @@ export function ManageMembers({
                     <ShieldCheck className="size-4" />
                   </Button>
                 ))}
-              <ConfirmDialog
-                trigger={
-                  <Button disabled={busy} size="icon-sm" variant="ghost" className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label={t("removeAria")}>
-                    <UserX className="size-4" />
-                  </Button>
-                }
-                title={tc("removeMemberTitle")}
-                description={tc("removeMemberBody", {
-                  name: m.full_name ?? t("unnamed"),
-                })}
-                confirmLabel={tc("removeMemberConfirm")}
-                onConfirm={() => removeMember(m)}
-              />
+              {/* O16: ADMIN satırını silmeyi prevent_unauthorized_club_admin
+                  trigger'ı zaten reddeder — başkan diğer başkana/kendine karşı
+                  kesin hata alacağı butonu hiç görmesin (UI ↔ sunucu hizası).
+                  Danışman/okul (canAssignAdmin) başkanı çıkarabilir. */}
+              {(!isAdmin || canAssignAdmin) && (
+                <ConfirmDialog
+                  trigger={
+                    <Button disabled={busy} size="icon-sm" variant="ghost" className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive" aria-label={t("removeAria")}>
+                      <UserX className="size-4" />
+                    </Button>
+                  }
+                  title={tc("removeMemberTitle")}
+                  description={tc("removeMemberBody", {
+                    name: m.full_name ?? t("unnamed"),
+                  })}
+                  confirmLabel={tc("removeMemberConfirm")}
+                  onConfirm={() => removeMember(m)}
+                />
+              )}
             </div>
           </li>
         );

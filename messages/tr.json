@@ -3,7 +3,6 @@
     "save": "Kaydet",
     "cancel": "İptal",
     "delete": "Sil",
-    "edit": "Düzenle",
     "upload": "Yükle",
     "back": "Geri",
     "loading": "Yükleniyor…"
@@ -128,7 +127,8 @@
     "day": {
       "today": "Bugün",
       "yesterday": "Dün"
-    }
+    },
+    "historyTruncated": "Yalnızca son {count} mesaj gösteriliyor; daha eski mesajlar bu görünümde yüklenmiyor."
   },
   "badges": {
     "title": "Rozetler",
@@ -224,7 +224,6 @@
     "noClubs": "Henüz bir kulübe bağlı değil."
   },
   "auth": {
-    "tagline": "Kampüsteki toplulukları keşfet, etkinliklere katıl ve kendi kulübünü yönet.",
     "showPassword": "Şifreyi göster",
     "hidePassword": "Şifreyi gizle",
     "login": {
@@ -303,7 +302,6 @@
     "subtitle": "Kampüsteki aktif kulüpleri keşfedin ve topluluklara katılın.",
     "upcomingTitle": "Yaklaşan Kampüs Etkinlikleri",
     "noUpcoming": "Şu an planlanan bir etkinlik yok.",
-    "organizer": "düzenleyen: {name}",
     "attendeeCount": "{count} Kişi Katılıyor",
     "seeAll": "Tümünü gör",
     "statClubs": "Üye olduğun kulüp",
@@ -322,9 +320,7 @@
     "allClubs": "Tüm kulüpler",
     "allCategories": "Tüm kategoriler",
     "clubFilter": "Kulüp filtresi",
-    "categoryFilter": "Kategori filtresi",
     "attendees": "{count} katılıyor",
-    "viewDetail": "Detayı gör",
     "emptyTitle": "Uygun etkinlik bulunamadı",
     "emptyBody": "Filtreleri değiştirip tekrar deneyin.",
     "backToList": "Etkinlikler",
@@ -412,7 +408,6 @@
     "emptyTitle": "Aradığınız kriterlere uygun kulüp bulunamadı",
     "emptyBody": "Farklı bir anahtar kelimeyle tekrar deneyin.",
     "noDescription": "Bu kulüp için henüz bir açıklama eklenmemiş.",
-    "cardExplore": "Kulübü İncele",
     "allCategories": "Tümü",
     "memberCount": "{count} üye",
     "tabEvents": "Etkinlikler",
@@ -432,7 +427,6 @@
     "whatsappJoin": "Gruba katıl",
     "galleryTitle": "Galeri",
     "galleryAlt": "Etkinlik karesi",
-    "upcomingEvents": "Yaklaşan Etkinlikler",
     "noEvents": "Henüz etkinlik bulunmuyor",
     "membersTitle": "Yönetim & Üyeler",
     "leadershipTitle": "Yönetim",
@@ -530,7 +524,7 @@
       "eventsTitle": "Etkinlikler",
       "eventsDesc": "Kulübünüzün etkinliklerini oluşturun, düzenleyin veya silin.",
       "ticketsTitle": "Biletler",
-      "ticketsDesc": "Dekontları inceleyip onaylayın veya reddedin.",
+      "ticketsDesc": "Etkinlik bazında verilen katılım biletlerini ve kapı girişlerini izleyin.",
       "checkin": "Kapı Kontrol",
       "membersTitle": "Üyeler ({count})",
       "membersDesc": "Üyeleri yönetin; yönetici atayın veya kulüpten çıkarın.",
@@ -603,8 +597,6 @@
         "REJECTED": "Reddedildi",
         "CHANGES_REQUESTED": "Revizyon istendi"
       },
-      "rejectPrompt": "Reddetme notu (opsiyonel):",
-      "changesPrompt": "Revizyon notu:",
       "toasts": {
         "titleRequired": "Etkinlik adı boş olamaz.",
         "dateRequired": "Lütfen tarih/saat seçin.",
@@ -615,7 +607,6 @@
         "createError": "Eklenemedi. Lütfen tekrar deneyin.",
         "submitError": "Onaya gönderilemedi. Lütfen tekrar deneyin.",
         "created": "Etkinlik oluşturuldu ve onaya gönderildi",
-        "deleteConfirm": "\"{title}\" etkinliğini silmek istediğinize emin misiniz?",
         "deleteError": "Silinemedi. Lütfen tekrar deneyin.",
         "deleted": "Etkinlik silindi",
         "resubmitError": "Gönderilemedi. Lütfen tekrar deneyin.",
@@ -638,8 +629,6 @@
       "demoteAria": "Başkanlığı geri al",
       "promoteAria": "Başkan yap",
       "removeAria": "Üyeyi çıkar",
-      "removeConfirm": "{name} kulüpten çıkarılsın mı?",
-      "removeConfirmFallback": "Bu üye",
       "toasts": {
         "roleError": "İşlem başarısız. Lütfen tekrar deneyin.",
         "promoted": "Üye yönetici yapıldı",
@@ -667,7 +656,6 @@
         "uploadError": "Belge yüklenemedi. Lütfen tekrar deneyin.",
         "saveError": "Belge kaydedilemedi. Lütfen tekrar deneyin.",
         "uploaded": "Belge yüklendi.",
-        "deleteConfirm": "\"{name}\" belgesini silmek istiyor musunuz?",
         "deleteError": "Belge silinemedi. Lütfen tekrar deneyin.",
         "deleted": "Belge silindi."
       }
@@ -812,8 +800,6 @@
       "approve": "Onayla",
       "requestChanges": "Revizyon",
       "reject": "Reddet",
-      "rejectPrompt": "Reddetme notu (opsiyonel):",
-      "changesPrompt": "Revizyon notu:",
       "rejectConfirmTitle": "Etkinliği reddet",
       "rejectConfirmBody": "\"{title}\" etkinliği reddedilecek. Başkan revizyonla tekrar gönderebilir. Emin misiniz?",
       "changesPlaceholder": "Neyin düzeltilmesi gerektiğini yazın…",
@@ -915,13 +901,11 @@
     "stop": "Durdur",
     "openCamera": "Kamerayı Aç",
     "cameraHint": "Kamerayı açıp katılımcının QR kodunu okutun.",
-    "cameraError": "Kamera başlatılamadı. İzin verin veya isimle arama kullanın.",
     "findTitle": "İsimle Bul",
     "searchPlaceholder": "Katılımcı adı…",
     "noApproved": "Onaylı (giriş yapmamış) bilet bulunamadı.",
     "unnamedUser": "İsimsiz kullanıcı",
     "checkinButton": "Giriş",
-    "checkedInResult": "{name} · giriş yaptı",
     "resultUser": "Kullanıcı",
     "checkedInMessage": "Giriş yapıldı",
     "successToast": "Giriş: {name}",

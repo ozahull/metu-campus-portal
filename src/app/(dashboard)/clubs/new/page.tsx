@@ -52,6 +52,7 @@ export default async function NewClubRequestPage() {
     )
     .eq("requested_by", user.id)
     .order("created_at", { ascending: false })
+    .order("id", { ascending: true })
     .limit(1)
     .maybeSingle();
 
@@ -65,7 +66,8 @@ export default async function NewClubRequestPage() {
       .from("club_request_documents")
       .select("id, uploaded_by, file_url, file_name, note")
       .eq("request_id", existing.id)
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true });
 
     documents = await Promise.all(
       ((docRaw ?? []) as DocRow[]).map(async (d) => {

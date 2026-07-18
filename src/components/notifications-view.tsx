@@ -10,17 +10,16 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { NotificationItem } from "@/components/notification-item";
 import { isExternalLink, type AppNotification } from "@/lib/notification-meta";
+import { DAY_MS, startOfAppDay } from "@/lib/datetime";
 
 type Group = { key: "today" | "week" | "older"; items: AppNotification[] };
 
+// D27: gün sınırı KAMPÜS gününe göre (Europe/Istanbul) — tarayıcı-yerel
+// new Date(y,m,d) İstanbul dışındaki tarayıcıda sınırı kaydırıyordu.
+// startOfAppDay 4dafb0c datetime katmanından.
 function groupByDate(items: AppNotification[]): Group[] {
-  const now = new Date();
-  const startToday = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-  ).getTime();
-  const weekStart = startToday - 6 * 86_400_000; // son 7 gün
+  const startToday = startOfAppDay(Date.now()).getTime();
+  const weekStart = startToday - 6 * DAY_MS; // son 7 gün
 
   const today: AppNotification[] = [];
   const week: AppNotification[] = [];

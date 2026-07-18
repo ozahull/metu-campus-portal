@@ -28,7 +28,8 @@ export async function ClubsGrid() {
     .select(
       "id, name, description, category, logo_url, cover_url, club_members(count)",
     )
-    .order("name", { ascending: true });
+    .order("name", { ascending: true })
+    .order("id", { ascending: true });
 
   // D22: hata boş-durumla KARIŞMAZ — "aktif kulüp yok" yerine "yüklenemedi +
   // tekrar dene" gösterilir (sayfa force-dynamic; link yeniden çeker).

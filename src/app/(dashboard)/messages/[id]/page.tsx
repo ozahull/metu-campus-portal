@@ -17,6 +17,11 @@ import { MessageThread, type ThreadMessage } from "./message-thread";
 
 export const dynamic = "force-dynamic";
 
+// D25: 200+ mesajlı kanalda en eskiler sessizce gizlenmesin — limit+1 çekilir,
+// taşma varsa kullanıcıya "yalnızca son N gösteriliyor" bildirilir. (Tam
+// sayfalama bilinçli olarak kapsam dışı; sessiz kayıp kabul edilmez.)
+const MESSAGE_LIMIT = 200;
+
 export async function generateMetadata({
   params,
 }: {
@@ -77,16 +82,20 @@ export default async function MessageThreadPage({
 
   // Son 200 mesaj. Embed FK (messages.sender_user_id → profiles) 4A'da mevcut;
   // DESC + limit ile en YENİ 200 alınır, kodda reverse ile kronolojiye döner.
+  // limit+1: 201. satır geldiyse geçmiş kesilmiş demektir → gösterge çıkar.
   const { data: msgRaw, error: msgError } = await supabase
     .from("messages")
     .select("id, sender_user_id, body, created_at, sender:sender_user_id(full_name)")
     .eq("conversation_id", id)
     .order("created_at", { ascending: false })
-    .limit(200);
+    .order("id", { ascending: true })
+    .limit(MESSAGE_LIMIT + 1);
   if (msgError) {
     console.error("[messages] mesaj listesi hatası:", msgError);
   }
-  const messages = ((msgRaw ?? []) as ThreadMessage[]).reverse();
+  const msgRows = (msgRaw ?? []) as ThreadMessage[];
+  const historyTruncated = msgRows.length > MESSAGE_LIMIT;
+  const messages = msgRows.slice(0, MESSAGE_LIMIT).reverse();
 
   const Icon = conversationIcon(row.type);
   const title =
@@ -121,6 +130,12 @@ export default async function MessageThreadPage({
           </div>
         </div>
       </div>
+
+      {historyTruncated && (
+        <p className="mb-3 rounded-lg border border-dashed border-border bg-muted/40 px-3 py-2 text-center text-xs text-muted-foreground">
+          {t("historyTruncated", { count: MESSAGE_LIMIT })}
+        </p>
+      )}
 
       <MessageThread
         conversationId={id}

@@ -3,7 +3,6 @@
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
-    "edit": "Edit",
     "upload": "Upload",
     "back": "Back",
     "loading": "Loading…"
@@ -128,7 +127,8 @@
     "day": {
       "today": "Today",
       "yesterday": "Yesterday"
-    }
+    },
+    "historyTruncated": "Only the last {count} messages are shown; older messages are not loaded in this view."
   },
   "badges": {
     "title": "Badges",
@@ -224,7 +224,6 @@
     "noClubs": "Not affiliated with any club yet."
   },
   "auth": {
-    "tagline": "Discover campus communities, join events, and manage your own club.",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "login": {
@@ -303,7 +302,6 @@
     "subtitle": "Discover active campus clubs and join communities.",
     "upcomingTitle": "Upcoming Campus Events",
     "noUpcoming": "No events are currently scheduled.",
-    "organizer": "organized by: {name}",
     "attendeeCount": "{count} attending",
     "seeAll": "See all",
     "statClubs": "Clubs joined",
@@ -322,9 +320,7 @@
     "allClubs": "All clubs",
     "allCategories": "All categories",
     "clubFilter": "Club filter",
-    "categoryFilter": "Category filter",
     "attendees": "{count} attending",
-    "viewDetail": "View details",
     "emptyTitle": "No matching events found",
     "emptyBody": "Try changing the filters.",
     "backToList": "Events",
@@ -412,7 +408,6 @@
     "emptyTitle": "No clubs match your search",
     "emptyBody": "Try a different keyword.",
     "noDescription": "No description has been added for this club yet.",
-    "cardExplore": "View Club",
     "allCategories": "All",
     "memberCount": "{count, plural, one {# member} other {# members}}",
     "tabEvents": "Events",
@@ -432,7 +427,6 @@
     "whatsappJoin": "Join group",
     "galleryTitle": "Gallery",
     "galleryAlt": "Event snapshot",
-    "upcomingEvents": "Upcoming Events",
     "noEvents": "No events yet",
     "membersTitle": "Management & Members",
     "leadershipTitle": "Leadership",
@@ -530,7 +524,7 @@
       "eventsTitle": "Events",
       "eventsDesc": "Create, edit, or delete your club's events.",
       "ticketsTitle": "Tickets",
-      "ticketsDesc": "Review receipts and approve or reject them.",
+      "ticketsDesc": "Track issued attendance passes and door check-ins per event.",
       "checkin": "Door Check-in",
       "membersTitle": "Members ({count})",
       "membersDesc": "Manage members; assign admins or remove them from the club.",
@@ -603,8 +597,6 @@
         "REJECTED": "Rejected",
         "CHANGES_REQUESTED": "Changes requested"
       },
-      "rejectPrompt": "Rejection note (optional):",
-      "changesPrompt": "Changes note:",
       "toasts": {
         "titleRequired": "Event name cannot be empty.",
         "dateRequired": "Please select a date/time.",
@@ -615,7 +607,6 @@
         "createError": "Could not add. Please try again.",
         "submitError": "Could not submit for approval. Please try again.",
         "created": "Event created and submitted for approval",
-        "deleteConfirm": "Are you sure you want to delete the event \"{title}\"?",
         "deleteError": "Could not delete. Please try again.",
         "deleted": "Event deleted",
         "resubmitError": "Could not submit. Please try again.",
@@ -638,8 +629,6 @@
       "demoteAria": "Revoke presidency",
       "promoteAria": "Make president",
       "removeAria": "Remove member",
-      "removeConfirm": "Remove {name} from the club?",
-      "removeConfirmFallback": "this member",
       "toasts": {
         "roleError": "Operation failed. Please try again.",
         "promoted": "Member made admin",
@@ -667,7 +656,6 @@
         "uploadError": "Could not upload the document. Please try again.",
         "saveError": "Could not save the document. Please try again.",
         "uploaded": "Document uploaded.",
-        "deleteConfirm": "Do you want to delete the document \"{name}\"?",
         "deleteError": "Could not delete the document. Please try again.",
         "deleted": "Document deleted."
       }
@@ -812,8 +800,6 @@
       "approve": "Approve",
       "requestChanges": "Request Changes",
       "reject": "Reject",
-      "rejectPrompt": "Rejection note (optional):",
-      "changesPrompt": "Changes note:",
       "rejectConfirmTitle": "Reject event",
       "rejectConfirmBody": "\"{title}\" will be rejected. The president can resubmit after revising. Are you sure?",
       "changesPlaceholder": "Describe what needs to be fixed…",
@@ -915,13 +901,11 @@
     "stop": "Stop",
     "openCamera": "Open Camera",
     "cameraHint": "Open the camera and scan the attendee's QR code.",
-    "cameraError": "Could not start the camera. Grant permission or use name search.",
     "findTitle": "Find by Name",
     "searchPlaceholder": "Attendee name…",
     "noApproved": "No approved (not-yet-checked-in) tickets found.",
     "unnamedUser": "Unnamed user",
     "checkinButton": "Check in",
-    "checkedInResult": "{name} · checked in",
     "resultUser": "User",
     "checkedInMessage": "Checked in",
     "successToast": "Checked in: {name}",

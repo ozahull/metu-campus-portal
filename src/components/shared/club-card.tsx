@@ -76,7 +76,9 @@ export function ClubCard({
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-4 pt-2.5">
-        <h3 className="font-semibold tracking-tight text-foreground transition-colors group-hover:text-primary">
+        {/* D30: uzun/tek-token adlar kartı taşırmasın (event-card deseni) —
+            iki satıra kadar sarar, kırılamayan token'ı keser. */}
+        <h3 className="line-clamp-2 font-semibold tracking-tight break-words text-foreground transition-colors group-hover:text-primary">
           {club.name}
         </h3>
 

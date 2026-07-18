@@ -40,6 +40,7 @@ export async function UpcomingEvents() {
     .eq("status", "APPROVED")
     .gte("event_date", new Date().toISOString())
     .order("event_date", { ascending: true })
+    .order("id", { ascending: true })
     .limit(8);
 
   if (error) {

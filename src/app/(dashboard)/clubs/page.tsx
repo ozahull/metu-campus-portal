@@ -57,7 +57,8 @@ export default async function ClubsPage() {
     .select(
       "id, name, description, category, logo_url, cover_url, club_members(count)",
     )
-    .order("name", { ascending: true });
+    .order("name", { ascending: true })
+    .order("id", { ascending: true });
 
   if (error) {
     console.error("[Clubs] Kulüpler çekme hatası:", error);

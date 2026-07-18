@@ -213,7 +213,8 @@ export default async function ClubDetailPage({
     )
     .eq("club_id", id)
     .eq("status", "APPROVED")
-    .order("event_date", { ascending: true });
+    .order("event_date", { ascending: true })
+    .order("id", { ascending: true });
 
   if (eventsError) {
     console.error("[ClubDetail] Etkinlikler çekme hatası:", eventsError);
@@ -228,6 +229,7 @@ export default async function ClubDetailPage({
     .select("id, storage_path, event_id, events!inner(club_id)")
     .eq("events.club_id", id)
     .order("created_at", { ascending: false })
+    .order("id", { ascending: true })
     .limit(8);
   const gallery = ((galleryRaw ?? []) as unknown as {
     id: string;

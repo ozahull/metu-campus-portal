@@ -65,11 +65,13 @@ export default async function AdminPage() {
   const { data: clubsRaw } = await supabase
     .from("clubs")
     .select("id, name, requires_advisor_approval, advisor_id")
-    .order("name", { ascending: true });
+    .order("name", { ascending: true })
+    .order("id", { ascending: true });
   const { data: usersRaw } = await supabase
     .from("profiles")
     .select("id, full_name, role")
-    .order("full_name", { ascending: true });
+    .order("full_name", { ascending: true })
+    .order("id", { ascending: true });
 
   const clubOptions: Option[] = (clubsRaw ?? []).map((c) => ({
     id: c.id,
@@ -106,7 +108,8 @@ export default async function AdminPage() {
     .from("events")
     .select("id, title, event_date, location, review_note, clubs(name)")
     .eq("status", "PENDING_SCHOOL")
-    .order("event_date", { ascending: true });
+    .order("event_date", { ascending: true })
+    .order("id", { ascending: true });
 
   const pendingBase = (
     (pendingRaw ?? []) as unknown as {
@@ -137,7 +140,8 @@ export default async function AdminPage() {
       .from("event_documents")
       .select("id, event_id, file_url, file_name, note")
       .in("event_id", pendingIds)
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true });
 
     for (const d of (docRaw ?? []) as {
       id: string;
@@ -181,7 +185,8 @@ export default async function AdminPage() {
       "id, name, description, category, rationale, created_at, requested_by",
     )
     .eq("status", "PENDING")
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
 
   const reqBase = (reqRaw ?? []) as {
     id: string;
@@ -202,7 +207,8 @@ export default async function AdminPage() {
       .from("club_request_documents")
       .select("id, request_id, file_url, file_name, note")
       .in("request_id", reqIds)
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true });
 
     for (const d of (reqDocRaw ?? []) as {
       id: string;

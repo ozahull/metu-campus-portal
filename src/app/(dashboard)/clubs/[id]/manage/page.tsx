@@ -113,7 +113,8 @@ export default async function ClubManagePage({
       "id, title, description, event_date, location, status, review_note, ticket_capacity, ticket_deadline",
     )
     .eq("club_id", id)
-    .order("event_date", { ascending: true });
+    .order("event_date", { ascending: true })
+    .order("id", { ascending: true });
   const events = (eventsRaw ?? []) as ManageEvent[];
 
   // Belge ekleri: bu kulübün etkinliklerine ait event_documents. Görüntüleme
@@ -126,7 +127,8 @@ export default async function ClubManagePage({
       .from("event_documents")
       .select("id, event_id, uploaded_by, file_url, file_name, note")
       .in("event_id", eventIds)
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true });
 
     for (const d of (docRaw ?? []) as EventDocumentRow[]) {
       let signedUrl: string | null = null;
@@ -151,7 +153,8 @@ export default async function ClubManagePage({
     .from("club_members")
     .select("user_id, role, profile:user_id(full_name)")
     .eq("club_id", id)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
 
   const members: RosterMember[] = ((rosterRaw ?? []) as unknown as RosterRow[]).map(
     (r) => {
@@ -170,7 +173,8 @@ export default async function ClubManagePage({
     .from("tickets")
     .select("status, event_id, events!inner(title, club_id, ticket_capacity)")
     .eq("events.club_id", id)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
 
   const ticketRows = (ticketRaw ?? []) as unknown as TicketRow[];
 

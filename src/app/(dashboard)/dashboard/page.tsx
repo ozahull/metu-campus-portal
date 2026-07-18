@@ -60,7 +60,8 @@ export default async function DashboardPage({
     const { data: cRaw } = await supabase
       .from("clubs")
       .select("id, name, description, category, logo_url")
-      .order("name", { ascending: true });
+      .order("name", { ascending: true })
+      .order("id", { ascending: true });
     fairClubs = (cRaw ?? []) as FairClub[];
     const { data: mRaw } = await supabase
       .from("club_members")

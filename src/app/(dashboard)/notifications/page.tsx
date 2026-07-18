@@ -28,6 +28,7 @@ export default async function NotificationsPage() {
     .from("notifications")
     .select("id, type, title, body, link, read_at, created_at")
     .order("created_at", { ascending: false })
+    .order("id", { ascending: true })
     .limit(100);
 
   return (

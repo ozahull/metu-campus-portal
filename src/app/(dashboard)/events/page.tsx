@@ -42,7 +42,8 @@ export default async function EventsPage() {
     )
     .eq("status", "APPROVED")
     .gte("event_date", new Date().toISOString())
-    .order("event_date", { ascending: true });
+    .order("event_date", { ascending: true })
+    .order("id", { ascending: true });
 
   if (error) {
     console.error("[Events] Etkinlikler çekme hatası:", error);

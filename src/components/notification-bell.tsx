@@ -47,6 +47,7 @@ export function NotificationBell({
       .from("notifications")
       .select(SELECT_COLS)
       .order("created_at", { ascending: false })
+      .order("id", { ascending: true })
       .limit(10);
     if (data) setItems(data as AppNotification[]);
     const { count } = await supabase

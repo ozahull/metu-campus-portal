@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { isValidExternalUrl } from "@/lib/url";
 
 const IMAGE_BUCKET = "club-images";
 
@@ -67,6 +68,15 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
     e.preventDefault();
     if (form.name.trim().length === 0) {
       toast.error(t("toasts.nameRequired"));
+      return;
+    }
+    // Harici linkler yalnız http(s) olabilir (XSS koruması — DB CHECK ile aynı kural).
+    if (!isValidExternalUrl(form.whatsapp_url)) {
+      toast.error(t("toasts.whatsappInvalid"));
+      return;
+    }
+    if (!isValidExternalUrl(form.instagram_url)) {
+      toast.error(t("toasts.instagramInvalid"));
       return;
     }
 
@@ -152,11 +162,11 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
         </div>
         <div className="space-y-2">
           <Label htmlFor="whatsapp_url">{t("whatsapp")}</Label>
-          <Input id="whatsapp_url" value={form.whatsapp_url} onChange={(e) => set("whatsapp_url", e.target.value)} disabled={loading} />
+          <Input id="whatsapp_url" type="url" inputMode="url" placeholder={t("whatsappPlaceholder")} value={form.whatsapp_url} onChange={(e) => set("whatsapp_url", e.target.value)} disabled={loading} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="instagram_url">{t("instagram")}</Label>
-          <Input id="instagram_url" value={form.instagram_url} onChange={(e) => set("instagram_url", e.target.value)} disabled={loading} />
+          <Input id="instagram_url" type="url" inputMode="url" placeholder={t("instagramPlaceholder")} value={form.instagram_url} onChange={(e) => set("instagram_url", e.target.value)} disabled={loading} />
         </div>
       </div>
 

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { safeExternalHref } from "@/lib/url";
 import {
   ArrowLeft,
   AtSign,
@@ -231,8 +232,12 @@ export default async function ClubDetailPage({
   const initials = club?.name.slice(0, 2).toUpperCase() ?? "";
   // NOT: whatsapp_url genel iletişim listesinde GÖSTERİLMEZ — WhatsApp grup
   // daveti yalnızca onaylı üyeye özel bir buton olarak sunulur (spam koruması).
+  // Kullanıcı-girdisi harici linkler XSS'e karşı yalnız http(s) şemasıyla render
+  // edilir; geçersiz (ör. javascript:) değer null döner ve link gösterilmez (Y4).
+  const whatsappHref = safeExternalHref(club?.whatsapp_url);
+  const instagramHref = safeExternalHref(club?.instagram_url);
   const hasContact = Boolean(
-    club?.contact_email || club?.contact_phone || club?.instagram_url,
+    club?.contact_email || club?.contact_phone || instagramHref,
   );
 
   return (
@@ -356,9 +361,9 @@ export default async function ClubDetailPage({
               <TabsPanel value="about" className="space-y-6">
                 {/* WhatsApp grup daveti — YALNIZCA onaylı üyeye görünür
                     (spam koruması). Üye olmayan bu bloğu göremez. */}
-                {isMember && club.whatsapp_url && (
+                {isMember && whatsappHref && (
                   <a
-                    href={club.whatsapp_url}
+                    href={whatsappHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between gap-3 rounded-xl border border-success/30 bg-success/10 p-4 transition-colors hover:border-success/50"
@@ -514,9 +519,9 @@ export default async function ClubDetailPage({
                         label={club.contact_phone}
                       />
                     )}
-                    {club.instagram_url && (
+                    {instagramHref && (
                       <ContactChip
-                        href={club.instagram_url}
+                        href={instagramHref}
                         external
                         icon={<AtSign className="size-4 text-primary" />}
                         label={t("instagram")}

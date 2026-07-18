@@ -541,6 +541,8 @@
       "contactPhone": "Contact Phone",
       "whatsapp": "WhatsApp Link",
       "instagram": "Instagram Link",
+      "whatsappPlaceholder": "https://chat.whatsapp.com/...",
+      "instagramPlaceholder": "https://instagram.com/...",
       "ticketSystem": "QR Attendance Pass",
       "ticketSystemDesc": "When enabled, this club's events use a free QR attendance pass (check-in tracking).",
       "ticketSystemAria": "QR attendance pass active",
@@ -551,6 +553,8 @@
       "imageChange": "Change",
       "toasts": {
         "nameRequired": "Club name cannot be empty.",
+        "whatsappInvalid": "WhatsApp link must start with https://.",
+        "instagramInvalid": "Instagram link must start with https://.",
         "saveError": "Could not save: {message}",
         "saveSuccess": "Club information updated",
         "imageUploadError": "Could not upload image: {message}",

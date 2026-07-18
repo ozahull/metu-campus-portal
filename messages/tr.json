@@ -541,6 +541,8 @@
       "contactPhone": "İletişim Telefon",
       "whatsapp": "WhatsApp Linki",
       "instagram": "Instagram Linki",
+      "whatsappPlaceholder": "https://chat.whatsapp.com/...",
+      "instagramPlaceholder": "https://instagram.com/...",
       "ticketSystem": "QR Katılım Bileti",
       "ticketSystemDesc": "Açıldığında bu kulübün etkinliklerinde ücretsiz QR katılım bileti (giriş takibi) kullanılır.",
       "ticketSystemAria": "QR katılım bileti aktif",
@@ -551,6 +553,8 @@
       "imageChange": "Değiştir",
       "toasts": {
         "nameRequired": "Kulüp adı boş olamaz.",
+        "whatsappInvalid": "WhatsApp linki https:// ile başlamalı.",
+        "instagramInvalid": "Instagram linki https:// ile başlamalı.",
         "saveError": "Kaydedilemedi: {message}",
         "saveSuccess": "Kulüp bilgileri güncellendi",
         "imageUploadError": "Görsel yüklenemedi: {message}",

@@ -86,6 +86,20 @@
         "saved": "Notification preference updated",
         "error": "Could not update: {message}"
       }
+    },
+    "push": {
+      "title": "Push notifications",
+      "desc": "Get notified on this device even when the portal is closed.",
+      "enable": "Enable push notifications",
+      "disable": "Disable push notifications",
+      "enabled": "Enabled on this device.",
+      "unsupported": "This browser does not support push notifications. On iPhone/iPad, install the app first via Share → \"Add to Home Screen\".",
+      "permissionDenied": "Notification permission is blocked in the browser. Allow notifications in site settings and reload the page.",
+      "toasts": {
+        "enabled": "Push notifications enabled",
+        "disabled": "Push notifications disabled",
+        "error": "The operation could not be completed. Please try again."
+      }
     }
   },
   "messages": {

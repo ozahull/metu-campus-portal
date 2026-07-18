@@ -86,6 +86,20 @@
         "saved": "Bildirim tercihi güncellendi",
         "error": "Güncellenemedi: {message}"
       }
+    },
+    "push": {
+      "title": "Anlık bildirimler (push)",
+      "desc": "Portal kapalıyken bile bu cihaza bildirim gönderilir.",
+      "enable": "Push bildirimlerini aç",
+      "disable": "Push bildirimlerini kapat",
+      "enabled": "Bu cihazda açık.",
+      "unsupported": "Bu tarayıcı push bildirimlerini desteklemiyor. iPhone/iPad'de önce Paylaş menüsünden \"Ana Ekrana Ekle\" ile kurun.",
+      "permissionDenied": "Bildirim izni tarayıcıda engellenmiş. Site ayarlarından bildirim iznini verip sayfayı yenileyin.",
+      "toasts": {
+        "enabled": "Push bildirimleri açıldı",
+        "disabled": "Push bildirimleri kapatıldı",
+        "error": "İşlem tamamlanamadı. Lütfen tekrar deneyin."
+      }
     }
   },
   "messages": {

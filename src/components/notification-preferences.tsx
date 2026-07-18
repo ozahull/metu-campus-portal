@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { PushToggle } from "@/components/push-toggle";
 import { cn } from "@/lib/utils";
 
 type Scope = "MEMBER_CLUBS" | "ALL" | "NONE";
@@ -130,6 +131,10 @@ export function NotificationPreferences({
             );
           })}
         </div>
+
+        {/* Aşama 5B: Web Push aç/kapat — kapsam tercihi üstteki radyolarda,
+            cihaz bazlı push aboneliği bu anahtarda yönetilir. */}
+        <PushToggle />
       </CardContent>
     </Card>
   );

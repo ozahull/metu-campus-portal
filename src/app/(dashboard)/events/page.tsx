@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { CalendarDays } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { fetchAttendanceCounts } from "@/lib/attendance";
 import { PageShell } from "@/components/shared/page-shell";
 import { EventsExplorer, type EventRow } from "./events-explorer";
 
@@ -49,24 +50,31 @@ export default async function EventsPage() {
     console.error("[Events] Etkinlikler çekme hatası:", error);
   }
 
-  const events: EventRow[] = ((data ?? []) as unknown as EventQueryRow[]).map(
-    (e) => {
-      const club = Array.isArray(e.clubs) ? e.clubs[0] : e.clubs;
-      const att = e.event_attendees ?? [];
-      return {
-        id: e.id,
-        title: e.title,
-        event_date: e.event_date,
-        location: e.location,
-        club_id: e.club_id,
-        club_name: club?.name ?? null,
-        category: club?.category ?? null,
-        cover_url: club?.cover_url ?? null,
-        attendees: att.length,
-        attending: att.some((a) => a.user_id === user.id),
-      };
-    },
+  const rows = (data ?? []) as unknown as EventQueryRow[];
+
+  // Detayla BİREBİR aynı sayı: biletli etkinlikte bilet, RSVP'de attendees
+  // (tek batch RPC). Hata/eksikte event_attendees sayısına düşülür.
+  const counts = await fetchAttendanceCounts(
+    supabase,
+    rows.map((e) => e.id),
   );
+
+  const events: EventRow[] = rows.map((e) => {
+    const club = Array.isArray(e.clubs) ? e.clubs[0] : e.clubs;
+    const att = e.event_attendees ?? [];
+    return {
+      id: e.id,
+      title: e.title,
+      event_date: e.event_date,
+      location: e.location,
+      club_id: e.club_id,
+      club_name: club?.name ?? null,
+      category: club?.category ?? null,
+      cover_url: club?.cover_url ?? null,
+      attendees: counts[e.id] ?? att.length,
+      attending: att.some((a) => a.user_id === user.id),
+    };
+  });
 
   return (
     <PageShell>

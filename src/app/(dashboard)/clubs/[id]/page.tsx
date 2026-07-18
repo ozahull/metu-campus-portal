@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { categoryLabel } from "@/lib/category";
+import { fetchAttendanceCounts } from "@/lib/attendance";
 import { roleLabel } from "@/lib/role-label";
 import { normalizeMultiline } from "@/lib/text";
 import { buttonVariants } from "@/components/ui/button";
@@ -222,6 +223,13 @@ export default async function ClubDetailPage({
   }
 
   const events = (eventsRaw ?? []) as ClubEvent[];
+
+  // Detayla BİREBİR aynı sayı: biletli etkinlikte bilet, RSVP'de attendees
+  // (tek batch RPC). Hata/eksikte event_attendees sayısına düşülür.
+  const attendanceCounts = await fetchAttendanceCounts(
+    supabase,
+    events.map((e) => e.id),
+  );
 
   // Galeri şeridi: kulübün etkinliklerinden son kareler (RLS: yalnız APPROVED
   // etkinliklerin fotoğrafları herkese görünür).
@@ -561,7 +569,8 @@ export default async function ClubDetailPage({
                         clubName: null,
                         category: club.category,
                         coverUrl: club.cover_url,
-                        attendeeCount: attendees.length,
+                        attendeeCount:
+                          attendanceCounts[ev.id] ?? attendees.length,
                       };
                       return (
                         <EventCard

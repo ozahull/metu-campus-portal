@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ArrowRight, CalendarDays, CalendarX } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { fetchAttendanceCounts } from "@/lib/attendance";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { EmptyState } from "@/components/shared/empty-state";
 import { EventCard, type EventCardData } from "@/components/shared/event-card";
@@ -49,6 +50,13 @@ export async function UpcomingEvents() {
 
   const events = (data ?? []) as UpcomingEvent[];
 
+  // Detayla BİREBİR aynı sayı: biletli etkinlikte bilet, RSVP'de attendees
+  // (tek batch RPC). Hata/eksikte event_attendees sayısına düşülür.
+  const counts = await fetchAttendanceCounts(
+    supabase,
+    events.map((e) => e.id),
+  );
+
   return (
     <section className="mb-12">
       <SectionHeading
@@ -83,7 +91,7 @@ export async function UpcomingEvents() {
                 location: ev.location,
                 clubName: club?.name ?? null,
                 coverUrl: club?.cover_url ?? null,
-                attendeeCount: attendees.length,
+                attendeeCount: counts[ev.id] ?? attendees.length,
               };
               return (
                 <div

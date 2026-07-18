@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import { BadgeCheck, Ban, Loader2, Ticket as TicketIcon, X } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { knownErrorKey } from "@/lib/known-errors";
+import { refreshRoute } from "@/lib/refresh-action";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ticketStatusMeta } from "@/lib/ticket-status";
@@ -49,7 +49,6 @@ export function TicketFlow({
   eventStarted,
   ticket,
 }: TicketFlowProps) {
-  const router = useRouter();
   const t = useTranslations("events.ticket");
   const [loading, setLoading] = useState(false);
   const [cancelling, setCancelling] = useState(false);
@@ -67,7 +66,9 @@ export function TicketFlow({
       return;
     }
     toast.success(t("toasts.buyCreated"));
-    router.refresh();
+    // Next 16: router.refresh() açık sayfayı güncellemiyor — QR/kapasite barı
+    // Server Action refresh ile yerinde tazelenir (lib/refresh-action.ts).
+    await refreshRoute();
   }
 
   async function cancelTicket() {
@@ -86,7 +87,7 @@ export function TicketFlow({
       return;
     }
     toast.success(t("cancel.toastSuccess"));
-    router.refresh();
+    await refreshRoute();
   }
 
   const meta = ticket ? ticketStatusMeta(ticket.status) : null;

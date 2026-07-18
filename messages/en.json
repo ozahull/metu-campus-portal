@@ -390,7 +390,10 @@
     "attendError": "Could not attend. Please try again.",
     "attendSuccess": "You're attending the event!",
     "cancelError": "Operation failed. Please try again.",
-    "cancelSuccess": "Your attendance has been withdrawn."
+    "cancelSuccess": "Your attendance has been withdrawn.",
+    "cancelConfirmTitle": "Cancel attendance",
+    "cancelConfirmBody": "Are you sure you want to withdraw your attendance for this event? You can rejoin at any time.",
+    "cancelConfirmLabel": "Yes, withdraw"
   },
   "membership": {
     "join": "Join Club",
@@ -621,7 +624,11 @@
       "rejectConfirmBody": "\"{title}\" will be rejected. The president can resubmit after revising. Are you sure?",
       "changesPlaceholder": "Describe what needs to be fixed…",
       "cancelChanges": "Cancel",
-      "sendChanges": "Send Revision"
+      "sendChanges": "Send Revision",
+      "errors": {
+        "deadlineAfterEvent": "The pass deadline cannot be later than the event date.",
+        "capacityInvalid": "Capacity must be greater than zero."
+      }
     },
     "members": {
       "empty": "This club has no members yet.",

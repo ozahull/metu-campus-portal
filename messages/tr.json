@@ -390,7 +390,10 @@
     "attendError": "Katılma başarısız. Lütfen tekrar deneyin.",
     "attendSuccess": "Etkinliğe katılıyorsunuz!",
     "cancelError": "İşlem başarısız. Lütfen tekrar deneyin.",
-    "cancelSuccess": "Katılımınız geri alındı."
+    "cancelSuccess": "Katılımınız geri alındı.",
+    "cancelConfirmTitle": "Katılımdan vazgeç",
+    "cancelConfirmBody": "Bu etkinlikteki katılımını geri almak istediğine emin misin? İstediğin zaman yeniden katılabilirsin.",
+    "cancelConfirmLabel": "Evet, vazgeç"
   },
   "membership": {
     "join": "Kulübe Katıl",
@@ -621,7 +624,11 @@
       "rejectConfirmBody": "\"{title}\" etkinliği reddedilecek. Başkan revizyonla tekrar gönderebilir. Emin misiniz?",
       "changesPlaceholder": "Neyin düzeltilmesi gerektiğini yazın…",
       "cancelChanges": "Vazgeç",
-      "sendChanges": "Revizyon Gönder"
+      "sendChanges": "Revizyon Gönder",
+      "errors": {
+        "deadlineAfterEvent": "Bilet son tarihi, etkinlik tarihinden sonra olamaz.",
+        "capacityInvalid": "Kontenjan 0'dan büyük olmalı."
+      }
     },
     "members": {
       "empty": "Bu kulübün henüz üyesi yok.",

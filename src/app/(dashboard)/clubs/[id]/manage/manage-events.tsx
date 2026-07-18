@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { statusMeta } from "@/lib/event-status";
+import { knownErrorKey } from "@/lib/known-errors";
 import { normalizeMultiline } from "@/lib/text";
 import {
   formatDateTime,
@@ -40,6 +41,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { EventDocuments, type EventDocument } from "./event-documents";
+
+// Etkinlik kaydında DB CHECK kısıtlarının (20260719170000) bilinen ihlalleri —
+// ham "violates check constraint ..." metni yerine anlaşılır mesaj (D8).
+const EVENT_SAVE_ERRORS = [
+  ["events_ticket_deadline_check", "deadlineAfterEvent"],
+  ["events_ticket_capacity_check", "capacityInvalid"],
+] as const;
 
 export type ManageEvent = {
   id: string;
@@ -191,7 +199,8 @@ export function ManageEvents({
       setLoading(false);
       if (error) {
         console.error("[manage-events] güncelleme hatası:", error);
-        toast.error(t("toasts.updateError"));
+        const known = knownErrorKey(error.message, EVENT_SAVE_ERRORS);
+        toast.error(known ? t(`errors.${known}`) : t("toasts.updateError"));
         return;
       }
       toast.success(t("toasts.updated"));
@@ -211,7 +220,8 @@ export function ManageEvents({
     if (insertError || !created) {
       setLoading(false);
       console.error("[manage-events] oluşturma hatası:", insertError);
-      toast.error(t("toasts.createError"));
+      const known = knownErrorKey(insertError?.message, EVENT_SAVE_ERRORS);
+      toast.error(known ? t(`errors.${known}`) : t("toasts.createError"));
       return;
     }
 

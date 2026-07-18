@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Check, CalendarCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshRoute } from "@/lib/refresh-action";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { cn } from "@/lib/utils";
 
 type RSVPButtonProps = {
@@ -22,9 +23,8 @@ export function RSVPButton({
   isAttending,
   className,
 }: RSVPButtonProps) {
-  const router = useRouter();
   const t = useTranslations("rsvp");
-  // Optimistic durum: tıklamada anında değişir; sunucu tazelemesi (router.refresh)
+  // Optimistic durum: tıklamada anında değişir; sunucu tazelemesi (refreshRoute)
   // sonrası prop güncellenince senkronlanır. Hata olursa geri alınır.
   const [attending, setAttending] = useState(isAttending);
   const [loading, setLoading] = useState(false);
@@ -33,8 +33,7 @@ export function RSVPButton({
     setAttending(isAttending);
   }, [isAttending]);
 
-  async function handleClick() {
-    const next = !attending;
+  async function mutate(next: boolean) {
     setAttending(next); // optimistic
     setLoading(true);
     const supabase = createClient();
@@ -59,34 +58,46 @@ export function RSVPButton({
     }
 
     toast.success(t(next ? "attendSuccess" : "cancelSuccess"));
-    router.refresh();
+    // Next 16: istemci router.refresh() açık sayfayı güncellemiyor — sayaç ve
+    // kartlar Server Action refresh ile YERİNDE tazelenir (lib/refresh-action.ts).
+    await refreshRoute();
   }
 
   if (attending) {
+    // Katılımdan vazgeçiş açık bir karardır — bilet iptali desenindeki gibi
+    // ConfirmDialog ile sorulur (yanlışlıkla tek tıkla düşme olmasın);
+    // onaylanınca RSVP silinir ve sayaç yerinde tazelenir.
     return (
-      <Button
-        onClick={handleClick}
-        disabled={loading}
-        size="sm"
-        variant="outline"
-        className={cn(
-          "gap-1.5 border-success/40 bg-success/15 text-success hover:bg-success/25 hover:text-success",
-          className,
-        )}
-      >
-        {loading ? (
-          <Loader2 className="size-4 animate-spin" />
-        ) : (
-          <Check className="size-4" />
-        )}
-        {loading ? t("processing") : t("attending")}
-      </Button>
+      <ConfirmDialog
+        trigger={
+          <Button
+            disabled={loading}
+            size="sm"
+            variant="outline"
+            className={cn(
+              "gap-1.5 border-success/40 bg-success/15 text-success hover:bg-success/25 hover:text-success",
+              className,
+            )}
+          >
+            {loading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Check className="size-4" />
+            )}
+            {loading ? t("processing") : t("attending")}
+          </Button>
+        }
+        title={t("cancelConfirmTitle")}
+        description={t("cancelConfirmBody")}
+        confirmLabel={t("cancelConfirmLabel")}
+        onConfirm={() => mutate(false)}
+      />
     );
   }
 
   return (
     <Button
-      onClick={handleClick}
+      onClick={() => mutate(true)}
       disabled={loading}
       size="sm"
       variant="outline"

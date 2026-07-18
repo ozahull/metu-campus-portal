@@ -113,7 +113,7 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="name">{t("clubName")}</Label>
-          <Input id="name" value={form.name} onChange={(e) => set("name", e.target.value)} disabled={loading} required />
+          <Input id="name" maxLength={200} value={form.name} onChange={(e) => set("name", e.target.value)} disabled={loading} required />
         </div>
         <div className="space-y-2">
           <Label htmlFor="category">{t("category")}</Label>

@@ -82,6 +82,7 @@ export function NewClubForm() {
             <Input
               id="name"
               placeholder={t("namePlaceholder")}
+              maxLength={200}
               value={name}
               onChange={(e) => setName(e.target.value)}
               disabled={loading}

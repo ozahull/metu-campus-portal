@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -95,6 +95,12 @@ export function ManageEvents({
   const [location, setLocation] = useState("");
   const [ticketCapacity, setTicketCapacity] = useState("");
   const [ticketDeadline, setTicketDeadline] = useState("");
+  // datetime-local min (yalnız YENİ etkinlikte): geçmiş tarih seçimini kısıtlar.
+  // useEffect ile client-only set → hydration uyuşmazlığı yok (SSR'da undefined).
+  const [minStart, setMinStart] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    setMinStart(toAppDateTimeInput(new Date().toISOString()));
+  }, []);
 
   function openCreate() {
     setEditing(null);
@@ -130,6 +136,12 @@ export function ManageEvents({
     }
     if (!eventDate) {
       toast.error(t("toasts.dateRequired"));
+      return;
+    }
+    // O20: yeni etkinlik geçmiş tarihli olamaz (düzenlemede serbest — geçmiş
+    // etkinliğin başka alanları düzeltilebilmeli; DB trigger'ı da INSERT'i korur).
+    if (!editing && new Date(fromAppDateTimeInput(eventDate)).getTime() <= Date.now()) {
+      toast.error(t("toasts.pastDate"));
       return;
     }
 
@@ -449,7 +461,7 @@ export function ManageEvents({
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="ev-title">{t("fieldTitle")}</Label>
-              <Input id="ev-title" value={title} onChange={(e) => setTitle(e.target.value)} disabled={loading} required />
+              <Input id="ev-title" maxLength={200} value={title} onChange={(e) => setTitle(e.target.value)} disabled={loading} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="ev-desc">{t("fieldDesc")}</Label>
@@ -457,7 +469,7 @@ export function ManageEvents({
             </div>
             <div className="space-y-2">
               <Label htmlFor="ev-date">{t("fieldDate")}</Label>
-              <Input id="ev-date" type="datetime-local" className="[color-scheme:light] dark:[color-scheme:dark]" value={eventDate} onChange={(e) => setEventDate(e.target.value)} disabled={loading} required />
+              <Input id="ev-date" type="datetime-local" min={editing ? undefined : minStart} className="[color-scheme:light] dark:[color-scheme:dark]" value={eventDate} onChange={(e) => setEventDate(e.target.value)} disabled={loading} required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="ev-loc">{t("fieldLocation")}</Label>

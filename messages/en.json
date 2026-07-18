@@ -609,6 +609,7 @@
       "toasts": {
         "titleRequired": "Event name cannot be empty.",
         "dateRequired": "Please select a date/time.",
+        "pastDate": "Event date must be in the future.",
         "capacityInvalid": "Capacity must be a positive integer.",
         "updateError": "Operation failed: {message}",
         "updated": "Event updated",

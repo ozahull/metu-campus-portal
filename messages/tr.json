@@ -609,6 +609,7 @@
       "toasts": {
         "titleRequired": "Etkinlik adı boş olamaz.",
         "dateRequired": "Lütfen tarih/saat seçin.",
+        "pastDate": "Etkinlik tarihi gelecekte olmalı.",
         "capacityInvalid": "Kapasite pozitif bir tam sayı olmalı.",
         "updateError": "İşlem başarısız: {message}",
         "updated": "Etkinlik güncellendi",

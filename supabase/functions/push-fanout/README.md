@@ -72,8 +72,15 @@ values ('<auth.users.id>', 'CLUB_ANNOUNCEMENT', 'Push testi', 'Merhaba!', '/noti
 
 ## Davranış notları
 
-- Tek abonelik hata verirse diğerleri etkilenmez (`Promise.allSettled`).
+- Tek abonelik hata verirse diğerleri etkilenmez (hatalar outcome'a çevrilir).
 - `404/410 Gone` dönen (süresi dolmuş) abonelik satırı otomatik SİLİNİR.
+- Yanıt özetinde `details` dizisi vardır: cihaz başına `endpoint_tail`,
+  `outcome` (sent/pruned/failed), push servisinin KESİN HTTP `status`'u ve
+  hata gövdesi. Webhook yanıtı `net._http_response.content`'e yazıldığı için
+  SQL ile görülebilir: `select content from net._http_response order by id desc limit 1;`
+- ÖNEMLİ: FCM'in `201`'i yalnızca "kuyruğa kabul" demektir — teslim garantisi
+  DEĞİLDİR. Yakın zamanda geçersizleşmiş (SW unregister / site verisi temizleme)
+  bir abonelik kısa süre 201 alıp sonraki denemede 404/410'a düşebilir.
 - Payload `{ title, body, link }` — `public/sw.js` bu şemayı bekler.
 - Kütüphane: `jsr:@negrel/webpush` (saf WebCrypto; npm:web-push Node
   crypto'ya dayandığı için edge runtime'da bilinçli olarak KULLANILMADI).

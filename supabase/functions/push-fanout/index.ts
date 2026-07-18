@@ -68,6 +68,26 @@ function vapidBase64ToJwk(
   };
 }
 
+// FCM'in KESİN HTTP durum kodunu görebilmek için fetch sarmalanır: kütüphane
+// başarıda Response'u dışarı vermez (yalnız response.ok kontrolü yapar; 2xx
+// dışını zaten fırlatır). Yalnız web-push istekleri (Content-Encoding:
+// aes128gcm) kaydedilir; durum, endpoint URL'siyle eşlenir (endpoint unique).
+const pushStatusByEndpoint = new Map<string, number>();
+const originalFetch = globalThis.fetch;
+globalThis.fetch = (async (
+  input: Request | URL | string,
+  init?: RequestInit,
+) => {
+  const resp = await originalFetch(input as Request, init);
+  const isWebPush =
+    new Headers(init?.headers).get("Content-Encoding") === "aes128gcm";
+  if (isWebPush) {
+    const url = input instanceof Request ? input.url : String(input);
+    pushStatusByEndpoint.set(url, resp.status);
+  }
+  return resp;
+}) as typeof fetch;
+
 // ApplicationServer bir kez kurulur, istekler arasında yeniden kullanılır
 // (VAPID key import maliyeti her push'ta ödenmesin).
 let appServerPromise: Promise<webpush.ApplicationServer> | null = null;
@@ -157,42 +177,68 @@ Deno.serve(async (req) => {
     link: record.link ?? "/",
   });
 
-  // Tek abonelik patlarsa diğerleri devam etsin (Promise.allSettled).
-  const results = await Promise.allSettled(
-    subs.map(async (sub) => {
+  // Tek abonelik patlarsa diğerleri devam etsin (hatalar outcome'a çevrilir,
+  // asla fırlatılmaz). details, webhook yanıtı olarak net._http_response'a da
+  // düşer — FCM'in kesin durum kodu dashboard'a girmeden görülebilir.
+  type SendOutcome = {
+    endpoint_tail: string;
+    outcome: "sent" | "pruned" | "failed";
+    status: number; // push servisinin HTTP durumu (0 = ağ/istisna, yanıt yok)
+    body?: string; // hata gövdesi (yalnız başarısızlıkta, kırpılmış)
+  };
+  const results = await Promise.all(
+    subs.map(async (sub): Promise<SendOutcome> => {
+      const tail = sub.endpoint.slice(-10);
       const subscriber = appServer.subscribe({
         endpoint: sub.endpoint,
         keys: { p256dh: sub.p256dh, auth: sub.auth },
       });
       try {
         await subscriber.pushTextMessage(message, { ttl: 24 * 60 * 60 });
-        return "sent" as const;
+        const status = pushStatusByEndpoint.get(sub.endpoint) ?? 0;
+        pushStatusByEndpoint.delete(sub.endpoint);
+        console.log(
+          `[push-fanout] gönderildi (status=${status}, endpoint=...${tail})`,
+        );
+        return { endpoint_tail: tail, outcome: "sent", status };
       } catch (err) {
-        // 404/410 (Gone) = abonelik ölmüş → satırı TEMİZLE.
+        pushStatusByEndpoint.delete(sub.endpoint);
         // (PushMessageError instanceof yerine duck-typing: export yüzeyi
         // değişse de response.status okuması kırılmaz.)
-        const status = (err as { response?: Response }).response?.status ?? 0;
+        const resp = (err as { response?: Response }).response;
+        const status = resp?.status ?? 0;
+        const body = resp
+          ? await resp.text().catch(() => "")
+          : String(err instanceof Error ? err.message : err);
+        // 404/410 (Gone) = abonelik ölmüş → satırı TEMİZLE.
         if (status === 404 || status === 410) {
           await admin.from("push_subscriptions").delete().eq("id", sub.id);
-          return "pruned" as const;
+          console.log(
+            `[push-fanout] abonelik ölü, budandı (status=${status}, endpoint=...${tail})`,
+          );
+          return {
+            endpoint_tail: tail,
+            outcome: "pruned",
+            status,
+            body: body.slice(0, 200),
+          };
         }
         console.error(
-          `[push-fanout] gönderim hatası (status=${status}):`,
-          err instanceof Error ? err.message : err,
+          `[push-fanout] gönderim hatası (status=${status}, endpoint=...${tail}):`,
+          body.slice(0, 500),
         );
-        throw err;
+        return {
+          endpoint_tail: tail,
+          outcome: "failed",
+          status,
+          body: body.slice(0, 200),
+        };
       }
     }),
   );
 
   const summary = { sent: 0, pruned: 0, failed: 0 };
-  for (const r of results) {
-    if (r.status === "fulfilled") {
-      summary[r.value === "sent" ? "sent" : "pruned"]++;
-    } else {
-      summary.failed++;
-    }
-  }
-  console.log("[push-fanout]", JSON.stringify(summary));
-  return Response.json(summary);
+  for (const r of results) summary[r.outcome]++;
+  console.log("[push-fanout]", JSON.stringify({ ...summary, details: results }));
+  return Response.json({ ...summary, details: results });
 });

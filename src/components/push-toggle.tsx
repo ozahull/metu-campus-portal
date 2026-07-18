@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Loader2, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { createClient } from "@/lib/supabase/client";
 import {
   getPushSubscription,
   isPushSupported,
@@ -14,8 +15,11 @@ import {
 import { cn } from "@/lib/utils";
 
 // Aşama 5B — Web Push aç/kapat anahtarı (NotificationPreferences kartının alt
-// bölümü). Durum sunucudan değil tarayıcıdan türetilir: pushManager'da aktif
-// abonelik var mı? (DB satırı zaten aboneyle birlikte yazılıp siliniyor.)
+// bölümü). Durum HEM tarayıcı aboneliğinden HEM de DB'den doğrulanır: yalnız
+// pushManager'da abonelik olması yetmez — o aboneliğin DB satırının GERÇEKTEN
+// mevcut kullanıcıya ait olması gerekir (RLS: kişi yalnız kendi satırını görür).
+// Aksi halde ortak cihazda önceki kullanıcıdan kalan tarayıcı aboneliği "açık"
+// gösterirdi; uyuşmazlıkta toggle KAPALI görünür (K2 düzeltmesi).
 export function PushToggle() {
   const t = useTranslations("notifications.push");
   const [ready, setReady] = useState(false);
@@ -35,9 +39,23 @@ export function PushToggle() {
         return;
       }
       const sub = await getPushSubscription();
+      // Tarayıcı aboneliği var → DB'de bu endpoint'in MEVCUT kullanıcıya ait bir
+      // satırı var mı? RLS SELECT yalnız user_id=auth.uid() satırlarını döndürdüğü
+      // için, satır dönerse bu cihaz gerçekten bu kullanıcıya kayıtlıdır. Başka
+      // kullanıcıdan kalan bayat abonelik burada null döner → toggle KAPALI.
+      let mine = false;
+      if (sub) {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("push_subscriptions")
+          .select("id")
+          .eq("endpoint", sub.endpoint)
+          .maybeSingle();
+        mine = data !== null;
+      }
       if (!cancelled) {
         setDenied(Notification.permission === "denied");
-        setEnabled(sub !== null);
+        setEnabled(mine);
         setReady(true);
       }
     })();

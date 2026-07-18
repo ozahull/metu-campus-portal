@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { LogOut, ShieldCheck, UserRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { unsubscribeFromPush } from "@/lib/push";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -51,6 +52,15 @@ export function UserMenu({
 
   async function handleSignOut() {
     setLoading(true);
+    // Çıkıştan ÖNCE bu cihazın push aboneliğini iptal et + DB satırını sil
+    // (silme RLS'i user_id=auth.uid() ister → oturum HÂLÂ açıkken yapılmalı).
+    // Aksi halde ortak cihazda bir sonraki kullanıcıya eski kullanıcının push'ları
+    // düşerdi (bildirim içeriği sızıntısı). Hata çıkışı ENGELLEMEZ: logla, devam et.
+    try {
+      await unsubscribeFromPush();
+    } catch (err) {
+      console.error("[signout] push aboneliği iptal edilemedi:", err);
+    }
     const supabase = createClient();
     await supabase.auth.signOut();
     router.replace("/login");

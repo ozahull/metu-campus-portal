@@ -371,6 +371,12 @@ authorization_url_path = "/oauth/consent"
 # Allow dynamic client registration
 allow_dynamic_registration = false
 
+# Aşama 5C: push-fanout webhook'la çağrılır (JWT taşımaz). Platform JWT kapısı
+# KAPALI; yetkiyi fonksiyon içindeki x-webhook-secret kontrolü sağlar
+# (PUSH_WEBHOOK_SECRET secret'ı — bkz. functions/push-fanout/README.md).
+[functions.push-fanout]
+verify_jwt = false
+
 [edge_runtime]
 enabled = true
 # Supported request policies: `oneshot`, `per_worker`.

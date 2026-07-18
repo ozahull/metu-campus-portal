@@ -59,6 +59,7 @@
     "type": {
       "EVENT_APPROVED": "Your event was approved",
       "EVENT_NEW": "New event",
+      "EVENT_UPDATED": "Event updated",
       "EVENT_REMINDER": "Event reminder",
       "CLUB_ANNOUNCEMENT": "Announcement",
       "MEMBERSHIP": "Welcome to the club",

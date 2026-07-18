@@ -59,6 +59,7 @@
     "type": {
       "EVENT_APPROVED": "Etkinliğiniz onaylandı",
       "EVENT_NEW": "Yeni etkinlik",
+      "EVENT_UPDATED": "Etkinlik güncellendi",
       "EVENT_REMINDER": "Etkinlik hatırlatıcısı",
       "CLUB_ANNOUNCEMENT": "Duyuru",
       "MEMBERSHIP": "Kulübe hoş geldiniz",

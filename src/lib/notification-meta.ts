@@ -7,6 +7,7 @@ import {
   Award,
   Bell,
   CalendarCheck,
+  CalendarClock,
   CalendarPlus,
   ClipboardPlus,
   Clock,
@@ -30,6 +31,7 @@ export type AppNotification = {
 const ICONS: Record<string, LucideIcon> = {
   EVENT_APPROVED: CalendarCheck,
   EVENT_NEW: CalendarPlus,
+  EVENT_UPDATED: CalendarClock,
   EVENT_REMINDER: Clock,
   CLUB_ANNOUNCEMENT: Megaphone,
   MEMBERSHIP: UserRoundCheck,

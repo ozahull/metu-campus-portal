@@ -179,6 +179,9 @@ export function ManageEvents({
     };
 
     if (editing) {
+      // APPROVED etkinlikte tarih/konum değişimi yeniden ONAY gerektirmez (O11 kararı),
+      // ama on_event_updated trigger'ı katılımcı + bilet sahiplerine EVENT_UPDATED
+      // bildirimi üretir — kimse habersiz kalmasın.
       const { error } = await supabase
         .from("events")
         .update(payload)

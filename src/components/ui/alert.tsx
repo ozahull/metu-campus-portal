@@ -9,8 +9,10 @@ const alertVariants = cva(
     variants: {
       variant: {
         default: "bg-card text-card-foreground",
+        // Açıklama %90 ton — bileşik varyant ayrı sınıf derlendiğinden
+        // --destructive-text üzerinden (koyu temada okunur, globals.css deseni).
         destructive:
-          "bg-card text-destructive *:data-[slot=alert-description]:text-destructive/90 *:[svg]:text-current",
+          "bg-card text-destructive *:data-[slot=alert-description]:text-[color-mix(in_oklab,var(--destructive-text)_90%,transparent)] *:[svg]:text-current",
       },
     },
     defaultVariants: {

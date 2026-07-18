@@ -130,6 +130,8 @@
 
   --destructive: oklch(0.505 0.19 27);
   --destructive-foreground: oklch(0.985 0.01 27);
+  /* destructive METİN/İKON olarak — primary-text ile aynı desen (WCAG AA). */
+  --destructive-text: var(--destructive);
 
   --info: oklch(0.5 0.119 243);
   --info-foreground: oklch(0.985 0.015 240);
@@ -194,8 +196,12 @@
   --warning: oklch(0.78 0.14 65);
   --warning-foreground: oklch(0.25 0.04 68);
 
+  /* destructive buton/kart ZEMİNİ olarak kalır; METİN olarak destructive/10-30
+     tint'leri üstünde 3.2-3.8 verdiğinden text-destructive --destructive-text
+     ile açılmış tona bağlanır (en koyu kombinasyonda ≥4.8). */
   --destructive: oklch(0.62 0.2 27);
   --destructive-foreground: oklch(0.985 0.01 27);
+  --destructive-text: color-mix(in oklab, var(--destructive) 65%, white);
 
   --info: oklch(0.68 0.13 240);
   --info-foreground: oklch(0.18 0.04 240);
@@ -261,18 +267,28 @@
 }
 
 /*
-  PRIMARY METİN VARYANTI (WCAG AA — kontrast süpürmesi).
-  text-primary utility'si --primary-text'e bağlanır: açık temada var(--primary)
-  (aynı görünüm), koyu temada color-mix ile açılmış ton. bg-primary /
-  border-primary DEĞİŞMEZ — buton zeminleri ve beyaz-üstü-kırmızı korunur.
-  Koddaki tüm kullanım biçimleri kapsanır: çıplak sınıf + hover: +
-  group-hover:. Yeni bir varyantla text-primary kullanırsan buraya da ekle.
+  PRIMARY/DESTRUCTIVE METİN VARYANTI (WCAG AA — kontrast süpürmesi).
+  text-primary → --primary-text, text-destructive → --destructive-text:
+  açık temada ana token'ın kendisi (aynı görünüm), koyu temada color-mix ile
+  açılmış ton. bg- ve border- utility'leri DEĞİŞMEZ — buton zeminleri ve
+  beyaz-üstü-kırmızı korunur. Kapsanan: çıplak + hover: + focus: + group-hover:.
+  Yeni bir varyantla kullanırsan buraya da ekle; bileşik varyantlar
+  (data-[...]:) ayrı sınıf derlendiğinden bileşende text-(--*-text) kullan
+  (bkz. ui/dropdown-menu, ui/alert). İSTİSNA: açık zemin üstünde duran
+  destructive metin (checkin FAIL butonu) text-(--destructive) ile düz
+  token'a sabitlidir — açılmış ton beyaz üstünde okunmaz.
 */
 @layer utilities {
   .text-primary,
   .hover\:text-primary:hover,
   .group:hover .group-hover\:text-primary {
     color: var(--primary-text);
+  }
+  .text-destructive,
+  .hover\:text-destructive:hover,
+  .focus\:text-destructive:focus,
+  .group:hover .group-hover\:text-destructive {
+    color: var(--destructive-text);
   }
 }
 
@@ -375,8 +391,10 @@
     --primary: #841515;
     --primary-foreground: #ffffff;
     /* Koyu temadayken yazdırmada da kağıt üstünde marka kırmızısı kalsın
-       (.dark'ın açılmış --primary-text'i beyaz kağıtta okunmaz olurdu). */
+       (.dark'ın açılmış --primary-text/--destructive-text'i beyaz kağıtta
+       okunmaz olurdu). */
     --primary-text: var(--primary);
+    --destructive-text: var(--destructive);
   }
   .print-hide {
     display: none !important;

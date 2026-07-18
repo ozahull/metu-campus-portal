@@ -168,7 +168,9 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
       }
     : {
         card: "bg-destructive text-destructive-foreground",
-        btn: "bg-destructive-foreground text-destructive hover:bg-destructive-foreground/90",
+        // Buton zemini iki temada da açık (destructive-foreground) → metin düz
+        // token'a sabit; --destructive-text açılmış tonu beyaz üstünde okunmaz.
+        btn: "bg-destructive-foreground text-(--destructive) hover:bg-destructive-foreground/90",
         title: t("resultRejectedTitle"),
       };
 

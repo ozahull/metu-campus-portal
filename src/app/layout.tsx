@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SwRegister } from "@/components/pwa/sw-register";
 import { Toaster } from "@/components/ui/sonner";
 
 // Tipografi (R0): gövde yüzü Figtree (--font-sans), display yüzü Gabarito
@@ -36,6 +37,17 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s · ${brand}`,
     },
     description: t("description"),
+    // PWA (Aşama 5A): manifest linkini app/manifest.ts otomatik enjekte eder.
+    // Burada yalnızca iOS "Ana Ekrana Ekle" metaları verilir — iOS 16.4+ web
+    // push, standalone kurulu PWA'yı şart koşar (apple-mobile-web-app-capable).
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: "Kampüs",
+    },
+    icons: {
+      apple: "/icons/icon-192.png",
+    },
   };
 }
 
@@ -62,6 +74,7 @@ export default async function RootLayout({
         >
           <NextIntlClientProvider locale={locale} messages={messages}>
             {children}
+            <SwRegister />
             <Toaster richColors position="top-center" />
           </NextIntlClientProvider>
         </ThemeProvider>

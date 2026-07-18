@@ -108,7 +108,19 @@
       "ADVISOR_PRESIDENT": "Advisor ↔ President",
       "ADMIN_PRESIDENT": "School Administration → President (one-way)"
     },
-    "unreadBadgeAria": "{count} unread messages"
+    "unreadBadgeAria": "{count} unread messages",
+    "compose": {
+      "toPresident": "Message president",
+      "toAdvisor": "Message advisor",
+      "adminDirective": "Send directive to president",
+      "toAdvisorPerson": "Send message",
+      "toAdministration": "Message administration",
+      "error": "Could not open channel. Please try again."
+    },
+    "day": {
+      "today": "Today",
+      "yesterday": "Yesterday"
+    }
   },
   "badges": {
     "title": "Badges",

@@ -28,6 +28,7 @@ import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { EventCard, type EventCardData } from "@/components/shared/event-card";
+import { ComposeButton } from "@/components/messaging/compose-button";
 import { cn } from "@/lib/utils";
 import { BadgeIconRow } from "@/components/badges";
 import { JoinButton } from "./join-button";
@@ -87,6 +88,7 @@ export default async function ClubDetailPage({
 }) {
   const { id } = await params;
   const t = await getTranslations("clubs");
+  const tMessages = await getTranslations("messages");
   const supabase = await createClient();
 
   const {
@@ -389,32 +391,65 @@ export default async function ClubDetailPage({
                 </section>
 
                 {/* Yönetim: danışman + başkan(lar), /u/[id] profiline linkli
-                    (Aşama 3C). Alan boşsa kart hiç görünmez. */}
-                {(advisor || presidents.length > 0) && (
+                    (Aşama 3C). Alan boşsa kart hiç görünmez — bakan yönetici
+                    (danışman/başkan/okul) ise compose butonları için görünür. */}
+                {(advisor || presidents.length > 0 || canManage) && (
                   <section className="rounded-xl border border-border bg-card p-5">
                     <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
                       <Users className="size-4 text-primary" />
                       {t("leadershipTitle")}
                     </h2>
-                    <ul className="mt-3 space-y-3">
-                      {advisor && (
-                        <LeaderRow
-                          icon={GraduationCap}
-                          label={t("advisorLabel")}
-                          person={advisor}
-                          fallbackName={t("unnamedMember")}
-                        />
-                      )}
-                      {presidents.map((p) => (
-                        <LeaderRow
-                          key={p.id}
-                          icon={Crown}
-                          label={t("presidentLabel")}
-                          person={p}
-                          fallbackName={t("unnamedMember")}
-                        />
-                      ))}
-                    </ul>
+                    {(advisor || presidents.length > 0) && (
+                      <ul className="mt-3 space-y-3">
+                        {advisor && (
+                          <LeaderRow
+                            icon={GraduationCap}
+                            label={t("advisorLabel")}
+                            person={advisor}
+                            fallbackName={t("unnamedMember")}
+                          />
+                        )}
+                        {presidents.map((p) => (
+                          <LeaderRow
+                            key={p.id}
+                            icon={Crown}
+                            label={t("presidentLabel")}
+                            person={p}
+                            fallbackName={t("unnamedMember")}
+                          />
+                        ))}
+                      </ul>
+                    )}
+
+                    {/* Compose giriş noktaları (Aşama 4C) — görünürlük bakan
+                        rolünden; karşı taraf atanmamış olsa da buton gösterilir
+                        (kanal club_id ile açılır, atanınca karşı taraf görür).
+                        Gerçek yetki open_conversation RPC + RLS'te. */}
+                    {canManage && (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {isClubAdvisor && (
+                          <ComposeButton
+                            type="ADVISOR_PRESIDENT"
+                            clubId={club.id}
+                            label={tMessages("compose.toPresident")}
+                          />
+                        )}
+                        {isClubAdmin && (
+                          <ComposeButton
+                            type="ADVISOR_PRESIDENT"
+                            clubId={club.id}
+                            label={tMessages("compose.toAdvisor")}
+                          />
+                        )}
+                        {isSuperAdmin && (
+                          <ComposeButton
+                            type="ADMIN_PRESIDENT"
+                            clubId={club.id}
+                            label={tMessages("compose.adminDirective")}
+                          />
+                        )}
+                      </div>
+                    )}
                   </section>
                 )}
 

@@ -108,7 +108,19 @@
       "ADVISOR_PRESIDENT": "Danışman ↔ Başkan",
       "ADMIN_PRESIDENT": "Okul Yönetimi → Başkan (tek yön)"
     },
-    "unreadBadgeAria": "{count} okunmamış mesaj"
+    "unreadBadgeAria": "{count} okunmamış mesaj",
+    "compose": {
+      "toPresident": "Başkana yaz",
+      "toAdvisor": "Danışmana yaz",
+      "adminDirective": "Başkana direktif gönder",
+      "toAdvisorPerson": "Mesaj gönder",
+      "toAdministration": "Okul yönetimine yaz",
+      "error": "Kanal açılamadı. Lütfen tekrar deneyin."
+    },
+    "day": {
+      "today": "Bugün",
+      "yesterday": "Dün"
+    }
   },
   "badges": {
     "title": "Rozetler",

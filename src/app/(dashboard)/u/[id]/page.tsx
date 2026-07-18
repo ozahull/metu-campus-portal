@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PageShell } from "@/components/shared/page-shell";
+import { ComposeButton } from "@/components/messaging/compose-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
@@ -87,6 +88,7 @@ export default async function PersonProfilePage({
   const { id } = await params;
   const t = await getTranslations("personProfile");
   const tRoles = await getTranslations("roles");
+  const tMessages = await getTranslations("messages");
   const supabase = await createClient();
 
   const {
@@ -124,6 +126,22 @@ export default async function PersonProfilePage({
 
   const hasAbout = !!profile.bio || !!profile.department || !!profile.class_year;
 
+  // Compose görünürlüğü (Aşama 4C): "kişi bir kulübün danışmanı" şartı
+  // open_conversation'ın kendi şartıyla birebir — hatalı buton göstermez.
+  // Bakanın süper yönetici rolü yalnız başkasının profilinde gerekir; o
+  // durumda bir kez okunur. Gerçek yetki RPC + RLS'te.
+  const personIsAdvisor = profile.clubs.some((c) => c.relation === "advisor");
+  let viewerIsSuperAdmin = false;
+  if (personIsAdvisor && !profile.can_edit) {
+    const { data: viewerProfile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    viewerIsSuperAdmin =
+      viewerProfile?.role?.toString().trim().toUpperCase() === "SUPER_ADMIN";
+  }
+
   return (
     <PageShell>
       <header className="mb-8 flex flex-wrap items-start gap-4">
@@ -146,17 +164,37 @@ export default async function PersonProfilePage({
           )}
         </div>
 
-        {profile.can_edit && (
-          <Link
-            href="/profile"
-            className={cn(
-              buttonVariants({ variant: "outline", size: "sm" }),
-              "gap-1.5",
+        {(profile.can_edit || (personIsAdvisor && viewerIsSuperAdmin)) && (
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            {profile.can_edit && (
+              <Link
+                href="/profile"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "sm" }),
+                  "gap-1.5",
+                )}
+              >
+                <Pencil className="size-4" />
+                {t("editProfile")}
+              </Link>
             )}
-          >
-            <Pencil className="size-4" />
-            {t("editProfile")}
-          </Link>
+            {/* Danışmanın yönetime proaktif yolu (self) — Aşama 4C. */}
+            {profile.can_edit && personIsAdvisor && (
+              <ComposeButton
+                type="ADMIN_ADVISOR"
+                advisorUserId={profile.id}
+                label={tMessages("compose.toAdministration")}
+              />
+            )}
+            {/* Okul yönetimi → danışman kişi profili — Aşama 4C. */}
+            {!profile.can_edit && viewerIsSuperAdmin && personIsAdvisor && (
+              <ComposeButton
+                type="ADMIN_ADVISOR"
+                advisorUserId={profile.id}
+                label={tMessages("compose.toAdvisorPerson")}
+              />
+            )}
+          </div>
         )}
       </header>
 

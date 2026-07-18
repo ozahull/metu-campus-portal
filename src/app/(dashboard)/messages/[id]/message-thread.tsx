@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Info, Loader2, Send } from "lucide-react";
@@ -18,6 +18,12 @@ export type ThreadMessage = {
   created_at: string;
   sender: { full_name: string | null } | null;
 };
+
+/** Gün ayracı karşılaştırması YEREL takvim günüyle yapılır (UTC kayması
+ *  gece yarısı civarı mesajları yanlış güne atardı). */
+function dayKeyOf(d: Date): string {
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
 
 /**
  * Mesaj balonları + composer (Aşama 4B). Realtime/polling YOK — gönderim ve
@@ -95,6 +101,18 @@ export function MessageThread({
     router.refresh();
   }
 
+  // Gün ayracı etiketi: bugün/dün çevirisi, aksi halde salt-tarih biçimi
+  // (formatDateTime "dateOnly" = medium tarih, saat yok).
+  function dayLabel(date: Date): string {
+    const now = new Date();
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    const key = dayKeyOf(date);
+    if (key === dayKeyOf(now)) return t("day.today");
+    if (key === dayKeyOf(yesterday)) return t("day.yesterday");
+    return formatDateTime(date, locale, "dateOnly");
+  }
+
   return (
     <div>
       <div className="flex max-h-[60svh] min-h-72 flex-col gap-3 overflow-y-auto rounded-xl border border-border bg-card/40 p-4">
@@ -103,41 +121,54 @@ export function MessageThread({
             {t("threadEmpty")}
           </p>
         ) : (
-          initialMessages.map((m) => {
+          initialMessages.map((m, i) => {
             const mine = m.sender_user_id === currentUserId;
+            const date = new Date(m.created_at);
+            // Yerel takvim günü bir önceki mesajdan farklıysa (ilk mesaj
+            // dahil) mesajın üstüne ortalanmış gün çipi (Aşama 4C).
+            const showDayChip =
+              i === 0 ||
+              dayKeyOf(new Date(initialMessages[i - 1].created_at)) !==
+                dayKeyOf(date);
             return (
-              <div
-                key={m.id}
-                className={cn("flex", mine ? "justify-end" : "justify-start")}
-              >
+              <Fragment key={m.id}>
+                {showDayChip && (
+                  <div className="mx-auto rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
+                    {dayLabel(date)}
+                  </div>
+                )}
                 <div
-                  className={cn(
-                    "max-w-[85%] rounded-xl px-3.5 py-2.5 sm:max-w-[70%]",
-                    mine
-                      ? "bg-primary text-primary-foreground"
-                      : "border border-border bg-card",
-                  )}
+                  className={cn("flex", mine ? "justify-end" : "justify-start")}
                 >
-                  {!mine && m.sender?.full_name && (
-                    <p className="mb-0.5 text-xs font-semibold text-primary">
-                      {m.sender.full_name}
-                    </p>
-                  )}
-                  <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
-                    {m.body}
-                  </p>
-                  <p
+                  <div
                     className={cn(
-                      "mt-1 text-[11px]",
+                      "max-w-[85%] rounded-xl px-3.5 py-2.5 sm:max-w-[70%]",
                       mine
-                        ? "text-primary-foreground/70"
-                        : "text-muted-foreground",
+                        ? "bg-primary text-primary-foreground"
+                        : "border border-border bg-card",
                     )}
                   >
-                    {formatDateTime(m.created_at, locale, "short")}
-                  </p>
+                    {!mine && m.sender?.full_name && (
+                      <p className="mb-0.5 text-xs font-semibold text-primary">
+                        {m.sender.full_name}
+                      </p>
+                    )}
+                    <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
+                      {m.body}
+                    </p>
+                    <p
+                      className={cn(
+                        "mt-1 text-[11px]",
+                        mine
+                          ? "text-primary-foreground/70"
+                          : "text-muted-foreground",
+                      )}
+                    >
+                      {formatDateTime(m.created_at, locale, "short")}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              </Fragment>
             );
           })
         )}

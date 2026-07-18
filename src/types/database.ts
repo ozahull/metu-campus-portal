@@ -900,6 +900,10 @@ export type Database = {
         Args: { p_decision: string; p_event_id: string; p_note?: string }
         Returns: string
       }
+      event_approved_ticket_count: {
+        Args: { p_event: string }
+        Returns: number
+      }
       event_school_decision: {
         Args: { p_decision: string; p_event_id: string; p_note?: string }
         Returns: string

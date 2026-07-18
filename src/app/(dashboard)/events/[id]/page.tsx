@@ -100,8 +100,19 @@ export default async function EventDetailPage({
     data.ticket_capacity && Number(data.ticket_capacity) > 0
       ? Number(data.ticket_capacity)
       : null;
+
+  // Doluluk (O19): biletli etkinlikte RSVP yerine geçerli bilet sayısı (tickets
+  // RLS öğrenciye yalnız kendi biletini gösterir → SECURITY DEFINER count RPC'si).
+  // Biletsiz (RSVP) etkinlikte event_attendees sayısı.
+  let filledCount = attendees.length;
+  if (ticketingOn) {
+    const { data: tc } = await supabase.rpc("event_approved_ticket_count", {
+      p_event: data.id,
+    });
+    filledCount = typeof tc === "number" ? tc : 0;
+  }
   const filledPct = capacity
-    ? Math.min(100, Math.round((attendees.length / capacity) * 100))
+    ? Math.min(100, Math.round((filledCount / capacity) * 100))
     : null;
 
   // Etkinlik geçmişse fotoğraf duvarı gösterilir. Yetki (yükle/sil): kulübün
@@ -268,10 +279,10 @@ export default async function EventDetailPage({
                   <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
                     <span className="inline-flex items-center gap-1.5">
                       <Users className="size-3.5" />
-                      {t("attendingCount", { count: attendees.length })}
+                      {t("attendingCount", { count: filledCount })}
                     </span>
                     <span className="tabular-nums">
-                      {attendees.length}/{capacity}
+                      {filledCount}/{capacity}
                     </span>
                   </div>
                   <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-muted">
@@ -284,7 +295,7 @@ export default async function EventDetailPage({
               ) : (
                 <div className="flex items-center gap-2.5 text-sm">
                   <Users className="size-4 shrink-0 text-primary" />
-                  {t("attendingCount", { count: attendees.length })}
+                  {t("attendingCount", { count: filledCount })}
                 </div>
               )}
             </div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Bell, CheckCheck } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { NotificationItem } from "@/components/notification-item";
 import { isExternalLink, type AppNotification } from "@/lib/notification-meta";
@@ -113,10 +114,19 @@ export function NotificationBell({
       );
       setUnread((u) => Math.max(0, u - 1));
       const supabase = createClient();
-      await supabase
+      const { error } = await supabase
         .from("notifications")
         .update({ read_at: nowIso })
         .eq("id", n.id);
+      // Hata: optimistic işareti geri al + sabit yerelleştirilmiş uyarı (ham
+      // error.message gösterme). Gezinme okundu işaretinden bağımsız devam eder.
+      if (error) {
+        setItems((prev) =>
+          prev.map((x) => (x.id === n.id ? { ...x, read_at: null } : x)),
+        );
+        setUnread((u) => u + 1);
+        toast.error(t("markError"));
+      }
     }
     if (n.link) {
       if (isExternalLink(n.link)) {
@@ -129,16 +139,23 @@ export function NotificationBell({
 
   async function markAllRead() {
     const nowIso = new Date().toISOString();
+    const prevItems = items;
+    const prevUnread = unread;
     setItems((prev) =>
       prev.map((x) => (x.read_at ? x : { ...x, read_at: nowIso })),
     );
     setUnread(0);
     const supabase = createClient();
     // RLS: yalnızca kendi okunmamış satırları güncellenir.
-    await supabase
+    const { error } = await supabase
       .from("notifications")
       .update({ read_at: nowIso })
       .is("read_at", null);
+    if (error) {
+      setItems(prevItems);
+      setUnread(prevUnread);
+      toast.error(t("markError"));
+    }
   }
 
   const badge = unread > 99 ? "99+" : String(unread);

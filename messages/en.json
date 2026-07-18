@@ -52,6 +52,7 @@
     "bellAria": "Notifications ({count} unread)",
     "empty": "You have no notifications yet.",
     "markAllRead": "Mark all as read",
+    "markError": "Could not mark as read, please try again.",
     "seeAll": "See all",
     "groupToday": "Today",
     "groupWeek": "This week",

@@ -52,6 +52,7 @@
     "bellAria": "Bildirimler ({count} okunmamış)",
     "empty": "Henüz bildiriminiz yok.",
     "markAllRead": "Tümünü okundu işaretle",
+    "markError": "İşaretlenemedi, lütfen tekrar deneyin.",
     "seeAll": "Tümünü gör",
     "groupToday": "Bugün",
     "groupWeek": "Bu hafta",

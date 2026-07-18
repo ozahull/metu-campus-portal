@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Bell, CheckCheck } from "lucide-react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -56,10 +57,17 @@ export function NotificationsView({
         prev.map((x) => (x.id === n.id ? { ...x, read_at: nowIso } : x)),
       );
       const supabase = createClient();
-      await supabase
+      const { error } = await supabase
         .from("notifications")
         .update({ read_at: nowIso })
         .eq("id", n.id);
+      // Hata: optimistic işareti geri al + sabit uyarı. Gezinme yine de devam eder.
+      if (error) {
+        setItems((prev) =>
+          prev.map((x) => (x.id === n.id ? { ...x, read_at: null } : x)),
+        );
+        toast.error(t("markError"));
+      }
     }
     if (n.link) {
       if (isExternalLink(n.link)) {
@@ -72,14 +80,20 @@ export function NotificationsView({
 
   async function markAllRead() {
     const nowIso = new Date().toISOString();
+    const prevItems = items;
     setItems((prev) =>
       prev.map((x) => (x.read_at ? x : { ...x, read_at: nowIso })),
     );
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("notifications")
       .update({ read_at: nowIso })
       .is("read_at", null);
+    if (error) {
+      setItems(prevItems);
+      toast.error(t("markError"));
+      return;
+    }
     // Navbar'ı (server) tazele: bildirim zili badge'i taze okunmamış sayısıyla
     // (0) yeniden render olsun — reload beklemeden. Zil prop'tan senkronlar.
     router.refresh();

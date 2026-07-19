@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Loader2, Plus, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,7 +56,7 @@ export function NewClubForm() {
     setDescription("");
     // Sunucu bileşenlerini tazele: kulüp tablosu + Genel Bakış stat kartları
     // (analytics RPC'leri) yeni kulübü reload beklemeden yansıtsın.
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   return (

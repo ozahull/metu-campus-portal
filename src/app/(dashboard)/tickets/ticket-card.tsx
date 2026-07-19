@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -16,7 +17,7 @@ import {
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { knownErrorKey } from "@/lib/known-errors";
-import { refreshRoute } from "@/lib/refresh-action";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { formatDateTime } from "@/lib/datetime";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -60,6 +61,7 @@ export function TicketCard({
   ticket: TicketCardData;
   locale: string;
 }) {
+  const router = useRouter();
   const t = useTranslations("tickets");
   const tCancel = useTranslations("events.ticket.cancel");
   const [cancelling, setCancelling] = useState(false);
@@ -78,9 +80,8 @@ export function TicketCard({
       return;
     }
     toast.success(tCancel("toastSuccess"));
-    // Next 16: router.refresh() açık sayfayı güncellemiyor — liste Server
-    // Action refresh ile YERİNDE tazelenir (lib/refresh-action.ts).
-    await refreshRoute();
+    // Çift kanallı yerinde tazeleme (canlı QA — bkz. lib/refresh.ts).
+    await refreshAfterMutation(router);
   }
 
   const stamp = ticket.checkedIn

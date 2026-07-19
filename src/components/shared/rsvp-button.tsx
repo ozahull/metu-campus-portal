@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Check, CalendarCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { refreshRoute } from "@/lib/refresh-action";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ export function RSVPButton({
   isAttending,
   className,
 }: RSVPButtonProps) {
+  const router = useRouter();
   const t = useTranslations("rsvp");
   // Optimistic durum: tıklamada anında değişir; sunucu tazelemesi (refreshRoute)
   // sonrası prop güncellenince senkronlanır. Hata olursa geri alınır.
@@ -58,9 +60,8 @@ export function RSVPButton({
     }
 
     toast.success(t(next ? "attendSuccess" : "cancelSuccess"));
-    // Next 16: istemci router.refresh() açık sayfayı güncellemiyor — sayaç ve
-    // kartlar Server Action refresh ile YERİNDE tazelenir (lib/refresh-action.ts).
-    await refreshRoute();
+    // Çift kanallı yerinde tazeleme (canlı QA — bkz. lib/refresh.ts).
+    await refreshAfterMutation(router);
   }
 
   if (attending) {

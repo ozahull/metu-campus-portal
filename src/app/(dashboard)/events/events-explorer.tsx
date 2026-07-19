@@ -21,6 +21,10 @@ export type EventRow = {
   cover_url: string | null;
   attendees: number;
   attending: boolean;
+  /** Kulüp bilet sistemini açtı mı (kartta RSVP yerine bilet aksiyonu). */
+  ticketed: boolean;
+  /** Kullanıcının bu etkinliğe bileti var mı ("Biletin var" durumu). */
+  has_ticket: boolean;
 };
 
 // text-base mobil: iOS Safari 16px altındaki form kontrolüne odakta kalıcı
@@ -154,6 +158,7 @@ export function EventsExplorer({
               <EventCard
                 key={e.id}
                 event={cardData}
+                ticket={{ ticketed: e.ticketed, hasTicket: e.has_ticket }}
                 rsvp={{ userId, isAttending: e.attending }}
               />
             );

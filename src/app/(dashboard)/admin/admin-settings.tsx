@@ -1,4 +1,5 @@
 "use client";
+import { refreshAfterMutation } from "@/lib/refresh";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -37,7 +38,7 @@ export function AdminSettings({ clubs }: { clubs: ClubSetting[] }) {
       return;
     }
     toast.success(t("toasts.settingUpdated"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   return (

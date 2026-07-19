@@ -1,4 +1,5 @@
 "use client";
+import { refreshAfterMutation } from "@/lib/refresh";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -126,7 +127,7 @@ function RequestRow({
     setMode(null);
     setNote("");
     setDone(true); // router.refresh()'ten ÖNCE: kart anında kaybolur, sayaç görsel azalır.
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   function toggleMode(next: "changes" | "reject") {

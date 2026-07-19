@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { ExternalLink, FileText, Loader2, Paperclip, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -90,7 +91,7 @@ export function ClubRequestDocuments({
     }
     setNote("");
     toast.success(t("toasts.uploaded"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   async function handleDelete(doc: ClubRequestDocument) {
@@ -107,7 +108,7 @@ export function ClubRequestDocuments({
       return;
     }
     toast.success(t("toasts.deleted"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   // Yükleme yetkisi yoksa ve hiç belge yoksa bileşeni gizle.

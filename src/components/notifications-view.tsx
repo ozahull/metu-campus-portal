@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Bell, CheckCheck } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { NotificationItem } from "@/components/notification-item";
@@ -100,7 +101,7 @@ export function NotificationsView({
     }
     // Navbar'ı (server) tazele: bildirim zili badge'i taze okunmamış sayısıyla
     // (0) yeniden render olsun — reload beklemeden. Zil prop'tan senkronlar.
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   if (items.length === 0) {

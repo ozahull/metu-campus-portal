@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Eye, EyeOff, KeyRound, Loader2, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { isDerivableEmail, nameMatchesEmail } from "@/lib/name-from-email";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,7 +71,7 @@ export function ProfileForm({
       return;
     }
     toast.success(t("toasts.nameUpdated"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   async function savePassword(e: React.FormEvent<HTMLFormElement>) {

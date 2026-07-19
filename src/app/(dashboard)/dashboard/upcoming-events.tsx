@@ -3,13 +3,14 @@ import { getTranslations } from "next-intl/server";
 import { ArrowRight, CalendarDays, CalendarX } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { fetchAttendanceCounts } from "@/lib/attendance";
+import { fetchMyTicketEventIds } from "@/lib/my-tickets";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { EmptyState } from "@/components/shared/empty-state";
 import { EventCard, type EventCardData } from "@/components/shared/event-card";
 
 type Attendee = { user_id: string };
 
-type Club = { name: string; cover_url: string | null };
+type Club = { name: string; cover_url: string | null; ticket_enabled: boolean };
 
 type UpcomingEvent = {
   id: string;
@@ -36,7 +37,7 @@ export async function UpcomingEvents() {
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, title, event_date, location, clubs(name, cover_url), event_attendees(user_id)",
+      "id, title, event_date, location, clubs(name, cover_url, ticket_enabled), event_attendees(user_id)",
     )
     .eq("status", "APPROVED")
     .gte("event_date", new Date().toISOString())
@@ -56,6 +57,14 @@ export async function UpcomingEvents() {
     supabase,
     events.map((e) => e.id),
   );
+  // Kart bilet durumu (EK1): kullanıcının bu etkinliklerdeki biletleri.
+  const myTickets = user
+    ? await fetchMyTicketEventIds(
+        supabase,
+        user.id,
+        events.map((e) => e.id),
+      )
+    : new Set<string>();
 
   return (
     <section className="mb-12">
@@ -100,6 +109,10 @@ export async function UpcomingEvents() {
                 >
                   <EventCard
                     event={cardData}
+                    ticket={{
+                      ticketed: Boolean(club?.ticket_enabled),
+                      hasTicket: myTickets.has(ev.id),
+                    }}
                     rsvp={
                       user
                         ? {

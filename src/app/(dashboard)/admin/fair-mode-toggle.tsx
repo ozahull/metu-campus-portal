@@ -1,4 +1,5 @@
 "use client";
+import { refreshAfterMutation } from "@/lib/refresh";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -33,7 +34,7 @@ export function FairModeToggle({ initialEnabled }: { initialEnabled: boolean }) 
       return;
     }
     toast.success(next ? t("toasts.on") : t("toasts.off"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   return (

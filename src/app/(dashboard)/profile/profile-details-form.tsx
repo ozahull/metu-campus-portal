@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { IdCard, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -73,7 +74,7 @@ export function ProfileDetailsForm({
       return;
     }
     toast.success(t("detailsToasts.updated"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   return (

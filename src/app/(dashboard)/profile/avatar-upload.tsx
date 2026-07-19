@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Loader2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
@@ -83,8 +84,7 @@ export function AvatarUpload({
     setUploading(false);
     toast.success(t("detailsToasts.avatarUpdated"));
     // Navbar avatarı da tazelensin.
-    router.refresh();
-
+    await refreshAfterMutation(router);
     // Orphan temizliği — kasıtlı olarak EN SONDA ve NON-FATAL: yükleme +
     // avatar_url güncellemesi başarıyla bittikten sonra klasördeki eski
     // dosyaları sil. Hata olursa sessizce geç (worst case orphan kalır =

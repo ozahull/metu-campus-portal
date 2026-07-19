@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Clock, MapPin, Users } from "lucide-react";
+import { Clock, MapPin, Ticket, Users } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
 import { RSVPButton } from "@/components/shared/rsvp-button";
 import { DateBadge } from "@/components/shared/date-badge";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
@@ -32,10 +33,15 @@ export type EventCardData = {
 export function EventCard({
   event,
   rsvp,
+  ticket,
   className,
 }: {
   event: EventCardData;
   rsvp?: { userId: string; isAttending: boolean };
+  /** Biletli etkinlik bilgisi: kart, DETAY sayfasıyla aynı mantığı gösterir —
+   *  bileti olana "Biletin var", biletli-ama-biletsize "Bilet Al" (detaya
+   *  gider); RSVP butonu YALNIZ biletsiz (RSVP) etkinlikte render edilir. */
+  ticket?: { ticketed: boolean; hasTicket: boolean };
   className?: string;
 }) {
   const t = useTranslations("home");
@@ -130,12 +136,36 @@ export function EventCard({
             <Users className="size-3.5" />
             {t("attendeeCount", { count: event.attendeeCount })}
           </span>
-          {rsvp && (
-            <RSVPButton
-              eventId={event.id}
-              userId={rsvp.userId}
-              isAttending={rsvp.isAttending}
-            />
+          {ticket?.hasTicket ? (
+            <Link
+              href={`/events/${event.id}`}
+              className={cn(
+                buttonVariants({ variant: "outline", size: "sm" }),
+                "gap-1.5 border-success/40 bg-success/15 text-success hover:bg-success/25 hover:text-success",
+              )}
+            >
+              <Ticket className="size-3.5" />
+              {t("hasTicket")}
+            </Link>
+          ) : ticket?.ticketed ? (
+            <Link
+              href={`/events/${event.id}`}
+              className={cn(
+                buttonVariants({ variant: "outline", size: "sm" }),
+                "gap-1.5 border-primary/50 hover:border-primary hover:bg-primary hover:text-primary-foreground",
+              )}
+            >
+              <Ticket className="size-3.5" />
+              {t("getTicket")}
+            </Link>
+          ) : (
+            rsvp && (
+              <RSVPButton
+                eventId={event.id}
+                userId={rsvp.userId}
+                isAttending={rsvp.isAttending}
+              />
+            )
           )}
         </div>
       </div>

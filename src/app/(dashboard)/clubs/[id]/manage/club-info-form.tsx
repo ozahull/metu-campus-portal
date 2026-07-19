@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { ImageIcon, Loader2, Save, Ticket, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -106,7 +107,7 @@ export function ClubInfoForm({ club }: { club: ClubInfo }) {
       return;
     }
     toast.success(t("toasts.saveSuccess"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   return (
@@ -293,7 +294,7 @@ function ImageUploadField({
     setUploading(false);
     if (inputRef.current) inputRef.current.value = "";
     toast.success(t("toasts.imageUpdated", { label }));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   return (

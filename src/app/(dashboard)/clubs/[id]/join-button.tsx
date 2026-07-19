@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Loader2, LogOut, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { Button } from "@/components/ui/button";
 
 type JoinButtonProps = {
@@ -40,7 +41,7 @@ export function JoinButton({ clubId, userId, isMember }: JoinButtonProps) {
       }
 
       toast.info(t("leaveInfo"));
-      router.refresh();
+      await refreshAfterMutation(router);
       return;
     }
 
@@ -58,7 +59,7 @@ export function JoinButton({ clubId, userId, isMember }: JoinButtonProps) {
     }
 
     toast.success(t("joinSuccess"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   if (isMember) {

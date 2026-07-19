@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { statusMeta } from "@/lib/event-status";
 import { knownErrorKey } from "@/lib/known-errors";
 import { normalizeMultiline } from "@/lib/text";
@@ -205,7 +206,7 @@ export function ManageEvents({
       }
       toast.success(t("toasts.updated"));
       setOpen(false);
-      router.refresh();
+      await refreshAfterMutation(router);
       return;
     }
 
@@ -236,7 +237,7 @@ export function ManageEvents({
     }
     toast.success(t("toasts.created"));
     setOpen(false);
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   async function handleDelete(ev: ManageEvent) {
@@ -248,7 +249,7 @@ export function ManageEvents({
       return;
     }
     toast.success(t("toasts.deleted"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   async function resubmit(ev: ManageEvent) {
@@ -262,7 +263,7 @@ export function ManageEvents({
       return;
     }
     toast.success(t("toasts.resubmitted"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   async function advisorDecide(
@@ -292,7 +293,7 @@ export function ManageEvents({
     );
     setNoteFor(null);
     setNote("");
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   return (

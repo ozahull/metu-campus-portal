@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { ExternalLink, FileText, Loader2, Paperclip, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -86,7 +87,7 @@ export function EventDocuments({
     }
     setNote("");
     toast.success(t("toasts.uploaded"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   async function handleDelete(doc: EventDocument) {
@@ -103,7 +104,7 @@ export function EventDocuments({
       return;
     }
     toast.success(t("toasts.deleted"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   // Görüntüleme yetkisi olanlar için (yükleme yoksa) yalnız liste; hiç belge ve

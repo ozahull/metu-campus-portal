@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { GraduationCap, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -97,7 +98,7 @@ export function AdminAssignments({
       return;
     }
     toast.success(advUser ? t("toasts.assigned") : t("toasts.removed"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   return (

@@ -25,6 +25,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { categoryLabel } from "@/lib/category";
 import { fetchAttendanceCounts } from "@/lib/attendance";
+import { fetchMyTicketEventIds } from "@/lib/my-tickets";
 import { roleLabel } from "@/lib/role-label";
 import { normalizeMultiline } from "@/lib/text";
 import { buttonVariants } from "@/components/ui/button";
@@ -70,6 +71,7 @@ type Club = {
   contact_phone: string | null;
   whatsapp_url: string | null;
   instagram_url: string | null;
+  ticket_enabled: boolean;
 };
 
 type MemberProfile = {
@@ -109,7 +111,7 @@ export default async function ClubDetailPage({
   const { data: club, error } = await supabase
     .from("clubs")
     .select(
-      "id, name, description, advisor_id, vision, logo_url, cover_url, category, contact_email, contact_phone, whatsapp_url, instagram_url",
+      "id, name, description, advisor_id, vision, logo_url, cover_url, category, contact_email, contact_phone, whatsapp_url, instagram_url, ticket_enabled",
     )
     .eq("id", id)
     .maybeSingle<Club>();
@@ -230,6 +232,12 @@ export default async function ClubDetailPage({
   // (tek batch RPC). Hata/eksikte event_attendees sayısına düşülür.
   const attendanceCounts = await fetchAttendanceCounts(
     supabase,
+    events.map((e) => e.id),
+  );
+  // Kart bilet durumu (EK1): kullanıcının bu etkinliklerdeki biletleri.
+  const myTickets = await fetchMyTicketEventIds(
+    supabase,
+    user.id,
     events.map((e) => e.id),
   );
 
@@ -578,6 +586,10 @@ export default async function ClubDetailPage({
                         <EventCard
                           key={ev.id}
                           event={cardData}
+                          ticket={{
+                            ticketed: club.ticket_enabled,
+                            hasTicket: myTickets.has(ev.id),
+                          }}
                           rsvp={{
                             userId: user.id,
                             isAttending: attendees.some(

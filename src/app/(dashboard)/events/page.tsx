@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { CalendarDays } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { fetchAttendanceCounts } from "@/lib/attendance";
+import { fetchMyTicketEventIds } from "@/lib/my-tickets";
 import { PageShell } from "@/components/shared/page-shell";
 import { EventsExplorer, type EventRow } from "./events-explorer";
 
@@ -21,8 +22,18 @@ type EventQueryRow = {
   location: string | null;
   club_id: string;
   clubs:
-    | { name: string; category: string | null; cover_url: string | null }
-    | { name: string; category: string | null; cover_url: string | null }[]
+    | {
+        name: string;
+        category: string | null;
+        cover_url: string | null;
+        ticket_enabled: boolean;
+      }
+    | {
+        name: string;
+        category: string | null;
+        cover_url: string | null;
+        ticket_enabled: boolean;
+      }[]
     | null;
   event_attendees: { user_id: string }[] | null;
 };
@@ -39,7 +50,7 @@ export default async function EventsPage() {
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, title, event_date, location, club_id, clubs(name, category, cover_url), event_attendees(user_id)",
+      "id, title, event_date, location, club_id, clubs(name, category, cover_url, ticket_enabled), event_attendees(user_id)",
     )
     .eq("status", "APPROVED")
     .gte("event_date", new Date().toISOString())
@@ -59,6 +70,12 @@ export default async function EventsPage() {
     supabase,
     rows.map((e) => e.id),
   );
+  // Kart bilet durumu (EK1): kullanıcının bu etkinliklerdeki biletleri.
+  const myTickets = await fetchMyTicketEventIds(
+    supabase,
+    user.id,
+    rows.map((e) => e.id),
+  );
 
   const events: EventRow[] = rows.map((e) => {
     const club = Array.isArray(e.clubs) ? e.clubs[0] : e.clubs;
@@ -74,6 +91,8 @@ export default async function EventsPage() {
       cover_url: club?.cover_url ?? null,
       attendees: counts[e.id] ?? att.length,
       attending: att.some((a) => a.user_id === user.id),
+      ticketed: Boolean(club?.ticket_enabled),
+      has_ticket: myTickets.has(e.id),
     };
   });
 

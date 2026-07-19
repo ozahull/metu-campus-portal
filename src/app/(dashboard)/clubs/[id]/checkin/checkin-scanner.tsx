@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { knownErrorKey } from "@/lib/known-errors";
 import { normalizeSearchText, searchIncludes } from "@/lib/search-text";
 import { Button } from "@/components/ui/button";
@@ -106,7 +107,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
     toast.success(
       t("successToast", { name: row?.full_name ?? t("successFallback") }),
     );
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   async function verifyManual() {

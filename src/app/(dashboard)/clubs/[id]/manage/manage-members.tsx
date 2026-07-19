@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { ShieldCheck, ShieldMinus, UserRound, UserX } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { roleLabel } from "@/lib/role-label";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -48,7 +49,7 @@ export function ManageMembers({
       return;
     }
     toast.success(role === "ADMIN" ? t("toasts.promoted") : t("toasts.demoted"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   async function removeMember(member: RosterMember) {
@@ -67,7 +68,7 @@ export function ManageMembers({
       return;
     }
     toast.success(t("toasts.removed"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   if (members.length === 0) {

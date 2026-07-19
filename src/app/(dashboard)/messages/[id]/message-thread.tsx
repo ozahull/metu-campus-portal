@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Info, Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { knownErrorKey } from "@/lib/known-errors";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -69,7 +70,7 @@ export function MessageThread({
           return;
         }
         // Navbar + inbox rozetlerini (unread_count) otoritatif düşür.
-        router.refresh();
+        void refreshAfterMutation(router);
       });
   }, [conversationId, currentUserId, router]);
 
@@ -102,7 +103,7 @@ export function MessageThread({
       return;
     }
     setBody("");
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   // Gün ayracı etiketi: bugün/dün çevirisi, aksi halde salt-tarih biçimi

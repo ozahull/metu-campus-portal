@@ -314,7 +314,9 @@
     "activeClubsEmptyBody": "They'll appear here as new clubs are added.",
     "clubsError": "Clubs could not be loaded",
     "clubsErrorBody": "Something went wrong. Please try again.",
-    "clubsRetry": "Try again"
+    "clubsRetry": "Try again",
+    "hasTicket": "You have a ticket",
+    "getTicket": "Get Ticket"
   },
   "events": {
     "title": "Events",

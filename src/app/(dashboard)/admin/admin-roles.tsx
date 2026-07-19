@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { GraduationCap, Loader2, UserMinus, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { refreshAfterMutation } from "@/lib/refresh";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -77,7 +78,7 @@ export function AdminRoles({
     if (ok) {
       toast.success(t("toasts.promoted"));
       setUserId("");
-      router.refresh();
+      await refreshAfterMutation(router);
     }
   }
 
@@ -87,7 +88,7 @@ export function AdminRoles({
     setDemoteBusy(null);
     if (ok) {
       toast.success(t("toasts.demoted"));
-      router.refresh();
+      await refreshAfterMutation(router);
     }
   }
 

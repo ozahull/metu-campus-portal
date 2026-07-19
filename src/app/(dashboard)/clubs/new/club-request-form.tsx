@@ -1,4 +1,5 @@
 "use client";
+import { refreshAfterMutation } from "@/lib/refresh";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -124,7 +125,7 @@ export function ClubRequestForm({
         return;
       }
       toast.success(t("toasts.resubmitted"));
-      router.refresh();
+      await refreshAfterMutation(router);
       return;
     }
 
@@ -145,7 +146,7 @@ export function ClubRequestForm({
     // refresh sonrası server yeni PENDING kaydı döndürür → fresh'i kapat.
     setFreshForm(false);
     clearFields();
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   // Etkin durum: fresh form ya da hiç kayıt yoksa düzenlenebilir "NEW" form.

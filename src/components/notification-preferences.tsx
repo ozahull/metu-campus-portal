@@ -1,4 +1,5 @@
 "use client";
+import { refreshAfterMutation } from "@/lib/refresh";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -55,7 +56,7 @@ export function NotificationPreferences({
       return;
     }
     toast.success(t("toasts.saved"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   return (

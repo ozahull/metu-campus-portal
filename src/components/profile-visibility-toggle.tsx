@@ -1,4 +1,5 @@
 "use client";
+import { refreshAfterMutation } from "@/lib/refresh";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -50,7 +51,7 @@ export function ProfileVisibilityToggle({
       return;
     }
     toast.success(next ? t("toastHidden") : t("toastVisible"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   return (

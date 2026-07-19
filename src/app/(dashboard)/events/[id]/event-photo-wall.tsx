@@ -1,4 +1,5 @@
 "use client";
+import { refreshAfterMutation } from "@/lib/refresh";
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
@@ -106,7 +107,7 @@ export function EventPhotoWall({
       toast.success(t("toasts.uploaded", { count: ok }));
     }
     setUploading(false);
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   async function remove(photo: EventPhoto) {
@@ -126,7 +127,7 @@ export function EventPhotoWall({
     await supabase.storage.from(IMAGE_BUCKET).remove([photo.storage_path]);
     setDeletingId(null);
     toast.success(t("toasts.deleted"));
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   return (

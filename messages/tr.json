@@ -314,7 +314,9 @@
     "activeClubsEmptyBody": "Yeni kulüpler eklendiğinde burada görünecek.",
     "clubsError": "Kulüpler yüklenemedi",
     "clubsErrorBody": "Bir sorun oluştu. Lütfen tekrar deneyin.",
-    "clubsRetry": "Tekrar dene"
+    "clubsRetry": "Tekrar dene",
+    "hasTicket": "Biletin var",
+    "getTicket": "Bilet Al"
   },
   "events": {
     "title": "Etkinlikler",

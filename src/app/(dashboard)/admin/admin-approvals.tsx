@@ -1,4 +1,5 @@
 "use client";
+import { refreshAfterMutation } from "@/lib/refresh";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -110,7 +111,7 @@ function PendingRow({ ev, userId }: { ev: PendingEvent; userId: string }) {
     );
     setNoteMode(false);
     setNote("");
-    router.refresh();
+    await refreshAfterMutation(router);
   }
 
   function submitChanges() {

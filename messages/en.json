@@ -566,8 +566,8 @@
       "imageChange": "Change",
       "toasts": {
         "nameRequired": "Club name cannot be empty.",
-        "whatsappInvalid": "WhatsApp link must start with https://.",
-        "instagramInvalid": "Instagram link must start with https://.",
+        "whatsappInvalid": "Enter a valid WhatsApp link (wa.me or chat.whatsapp.com).",
+        "instagramInvalid": "Enter a valid Instagram link (instagram.com).",
         "saveError": "Could not save. Please try again.",
         "saveSuccess": "Club information updated",
         "imageUploadError": "Could not upload image. Please try again.",

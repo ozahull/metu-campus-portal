@@ -53,8 +53,14 @@ function safeTargetUrl(link) {
   }
   if (url.origin === self.location.origin) return url.href;
   const host = url.hostname.toLowerCase();
+  // GERÇEK host allow-list'te olmalı; ayrıca userinfo/port aldatması reddedilir
+  // (https://evil.com@instagram.com host'u izinli olsa da userinfo taşır) —
+  // src/lib/url.ts safeExternalHref + DB is_safe_notification_link ile AYNI kural.
   const allowed =
     url.protocol === "https:" &&
+    url.username === "" &&
+    url.password === "" &&
+    url.port === "" &&
     (ALLOWED_EXTERNAL_HOSTS.includes(host) || host.endsWith(".metu.edu.tr"));
   return allowed ? url.href : self.location.origin + "/";
 }

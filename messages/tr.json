@@ -566,8 +566,8 @@
       "imageChange": "Değiştir",
       "toasts": {
         "nameRequired": "Kulüp adı boş olamaz.",
-        "whatsappInvalid": "WhatsApp linki https:// ile başlamalı.",
-        "instagramInvalid": "Instagram linki https:// ile başlamalı.",
+        "whatsappInvalid": "Geçerli bir WhatsApp linki girin (wa.me veya chat.whatsapp.com).",
+        "instagramInvalid": "Geçerli bir Instagram linki girin (instagram.com).",
         "saveError": "Kaydedilemedi. Lütfen tekrar deneyin.",
         "saveSuccess": "Kulüp bilgileri güncellendi",
         "imageUploadError": "Görsel yüklenemedi. Lütfen tekrar deneyin.",

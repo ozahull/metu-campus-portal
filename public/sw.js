@@ -31,11 +31,39 @@ self.addEventListener("push", (event) => {
   );
 });
 
+/* GÜVENLİK (#4): openWindow'a yalnız kendi origin'imiz ya da izinli https
+   host'ları (DB allow-list'iyle aynı küme) gider. Parse-sonrası origin
+   kontrolü '//evil.com' ve '/\evil.com' hilelerini de yakalar (URL parser
+   bunları protokol-göreli çözer → origin farkı burada görünür). İzin dışı
+   hedef ana sayfaya düşer — tıklama saldırgan URL'yi asla açmaz. */
+const ALLOWED_EXTERNAL_HOSTS = [
+  "instagram.com",
+  "www.instagram.com",
+  "wa.me",
+  "chat.whatsapp.com",
+  "metu.edu.tr",
+];
+
+function safeTargetUrl(link) {
+  let url;
+  try {
+    url = new URL(link, self.location.origin);
+  } catch {
+    return self.location.origin + "/";
+  }
+  if (url.origin === self.location.origin) return url.href;
+  const host = url.hostname.toLowerCase();
+  const allowed =
+    url.protocol === "https:" &&
+    (ALLOWED_EXTERNAL_HOSTS.includes(host) || host.endsWith(".metu.edu.tr"));
+  return allowed ? url.href : self.location.origin + "/";
+}
+
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const link = (event.notification.data && event.notification.data.link) || "/";
-  // link uygulama içi yol ("/events/..") veya tam URL olabilir.
-  const url = new URL(link, self.location.origin).href;
+  // link uygulama içi yol ("/events/..") veya izinli tam URL olabilir.
+  const url = safeTargetUrl(link);
   event.waitUntil(
     self.clients
       .matchAll({ type: "window", includeUncontrolled: true })

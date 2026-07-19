@@ -9,7 +9,11 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { NotificationItem } from "@/components/notification-item";
-import { isExternalLink, type AppNotification } from "@/lib/notification-meta";
+import {
+  isExternalLink,
+  isSafeInternalPath,
+  type AppNotification,
+} from "@/lib/notification-meta";
 import { DAY_MS, startOfAppDay } from "@/lib/datetime";
 
 type Group = { key: "today" | "week" | "older"; items: AppNotification[] };
@@ -71,9 +75,10 @@ export function NotificationsView({
     if (n.link) {
       if (isExternalLink(n.link)) {
         window.open(n.link, "_blank", "noopener,noreferrer");
-      } else {
+      } else if (isSafeInternalPath(n.link)) {
         router.push(n.link);
       }
+      // Aksi (örn. '//evil.com'): gezinme YOK — yalnız okundu işaretlenir (#4).
     }
   }
 

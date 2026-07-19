@@ -682,7 +682,8 @@
         "titleRequired": "Title and message are required.",
         "sent": "Announcement sent to {count, plural, one {# member} other {# members}}",
         "error": "Could not send. Please try again.",
-        "rateLimit": "You can send at most 3 announcements per hour."
+        "rateLimit": "You can send at most 3 announcements per hour.",
+        "invalidLink": "Invalid link: use an in-app path (/...) or an Instagram, WhatsApp, or metu.edu.tr link."
       }
     }
   },

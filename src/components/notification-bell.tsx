@@ -8,7 +8,11 @@ import { Bell, CheckCheck } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { NotificationItem } from "@/components/notification-item";
-import { isExternalLink, type AppNotification } from "@/lib/notification-meta";
+import {
+  isExternalLink,
+  isSafeInternalPath,
+  type AppNotification,
+} from "@/lib/notification-meta";
 import { cn } from "@/lib/utils";
 
 const SELECT_COLS = "id, type, title, body, link, read_at, created_at";
@@ -132,9 +136,10 @@ export function NotificationBell({
     if (n.link) {
       if (isExternalLink(n.link)) {
         window.open(n.link, "_blank", "noopener,noreferrer");
-      } else {
+      } else if (isSafeInternalPath(n.link)) {
         router.push(n.link);
       }
+      // Aksi (örn. '//evil.com'): gezinme YOK — yalnız okundu işaretlenir (#4).
     }
   }
 

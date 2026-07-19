@@ -49,3 +49,16 @@ export function notificationIcon(type: string): LucideIcon {
 export function isExternalLink(link: string | null): boolean {
   return !!link && /^https?:\/\//i.test(link);
 }
+
+// GÜVENLİK (#4): router.push YALNIZ güvenli uygulama içi yola. '//evil.com'
+// (protokol-göreli) ^https?:// kalıbından kaçıp push'a düşüyor ve
+// https://evil.com'a çözülüyordu; '/\' tarayıcılarca '//' gibi yorumlanır.
+// İkisi de reddedilir. Ne harici ne güvenli-iç olan link'te GEZİNME YAPILMAZ.
+export function isSafeInternalPath(link: string | null): boolean {
+  return (
+    !!link &&
+    link.startsWith("/") &&
+    !link.startsWith("//") &&
+    !link.startsWith("/\\")
+  );
+}

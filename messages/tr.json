@@ -682,7 +682,8 @@
         "titleRequired": "Başlık ve mesaj gerekli.",
         "sent": "Duyuru {count} üyeye gönderildi",
         "error": "Gönderilemedi. Lütfen tekrar deneyin.",
-        "rateLimit": "Son bir saatte en fazla 3 duyuru gönderebilirsiniz."
+        "rateLimit": "Son bir saatte en fazla 3 duyuru gönderebilirsiniz.",
+        "invalidLink": "Bağlantı geçersiz: uygulama içi bir yol (/...) ya da Instagram, WhatsApp veya metu.edu.tr linki kullanın."
       }
     }
   },

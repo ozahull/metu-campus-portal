@@ -38,10 +38,12 @@ export function ClubAnnounceForm({ clubId }: { clubId: string }) {
     setLoading(false);
 
     if (error) {
-      // Ham RPC metni gösterilmez (D8); bilinen spam sınırı ayırt edilir.
+      // Ham RPC metni gösterilmez (D8); bilinen spam sınırı ve geçersiz link
+      // ayırt edilir (link allow-list — güvenlik #4).
       console.error("[club-announce] duyuru gönderme hatası:", error);
       const known = knownErrorKey(error.message, [
         ["en fazla 3 duyuru", "rateLimit"],
+        ["Geçersiz bağlantı", "invalidLink"],
       ]);
       toast.error(known ? t(`toasts.${known}`) : t("toasts.error"));
       return;

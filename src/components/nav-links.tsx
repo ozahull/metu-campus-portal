@@ -20,8 +20,11 @@ const baseLinks = [
 ] as const;
 
 /**
- * Ana gezinme linkleri, aktif sayfa göstergeli. Masaüstünde yatay pill'ler,
- * mobilde tam genişlik satırlar (drawer içinde). Aktiflik usePathname ile.
+ * Ana gezinme linkleri, aktif sayfa göstergeli. Masaüstü varyantı responsive:
+ * md-lg arası YALNIZ İKON (metin gizli, aria-label + title ile erişilebilir,
+ * dokunma hedefi >=44px), lg+ ikon + metin — 6 öğe 768px'te taşmadan sığar,
+ * öğeler asla satır kırmaz (whitespace-nowrap). Mobilde (md altı) bu bileşen
+ * drawer içinde tam genişlik satırlar olarak render edilir (NavMobile).
  * "Mesajlar" koşulludur: yalnız en az bir mesaj kanalı olan kullanıcıya
  * görünür (showMessages — navbar list_my_conversations'tan besler).
  */
@@ -56,6 +59,7 @@ export function NavLinks({
           href === "/dashboard"
             ? pathname === href
             : pathname.startsWith(href);
+        const label = t(key);
 
         return (
           <Link
@@ -63,18 +67,26 @@ export function NavLinks({
             href={href}
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
+            // İkon-only halde erişilebilir isim + fare tooltipi.
+            aria-label={label}
+            title={variant === "desktop" ? label : undefined}
             className={cn(
-              "flex items-center gap-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "flex items-center gap-2 rounded-lg font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               variant === "desktop"
-                ? "px-3 py-1.5 text-sm"
+                ? // md-lg: ikon-only, >=44px dokunma hedefi; lg+: pill + metin.
+                  "min-h-11 min-w-11 justify-center px-2.5 py-1.5 text-sm lg:min-h-0 lg:min-w-0 lg:justify-start lg:px-3"
                 : "px-3 py-2.5 text-base",
               active
                 ? "bg-primary/10 text-primary hover:bg-muted"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
           >
-            <Icon className={variant === "desktop" ? "size-4" : "size-5"} />
-            {t(key)}
+            <Icon
+              className={variant === "desktop" ? "size-5 lg:size-4" : "size-5"}
+            />
+            <span className={variant === "desktop" ? "hidden lg:inline" : undefined}>
+              {label}
+            </span>
             {key === "messages" && messagesUnread > 0 && (
               <span
                 aria-label={tMessages("unreadBadgeAria", {

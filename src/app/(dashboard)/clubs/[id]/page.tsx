@@ -25,6 +25,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { categoryLabel } from "@/lib/category";
 import { fetchAttendanceCounts } from "@/lib/attendance";
+import { unwrapEmbed } from "@/lib/embed";
 import { fetchMyTicketEventIds } from "@/lib/my-tickets";
 import { roleLabel } from "@/lib/role-label";
 import { normalizeMultiline } from "@/lib/text";
@@ -139,8 +140,7 @@ export default async function ClubDetailPage({
     user_id: MemberProfile | MemberProfile[] | null;
   };
   const memberRows = (membersRaw ?? []) as MemberRow[];
-  const unwrapMember = (row: MemberRow) =>
-    Array.isArray(row.user_id) ? row.user_id[0] : row.user_id;
+  const unwrapMember = (row: MemberRow) => unwrapEmbed(row.user_id);
 
   const members: MemberProfile[] = memberRows
     .map(unwrapMember)

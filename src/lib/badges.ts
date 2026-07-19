@@ -19,7 +19,7 @@ export const BADGE_ORDER = [
   "CLUB_LEADER",
 ] as const;
 
-export type BadgeCode = (typeof BADGE_ORDER)[number];
+
 
 const ICONS: Record<string, LucideIcon> = {
   FIRST_EVENT: PartyPopper,

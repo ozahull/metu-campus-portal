@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { unwrapEmbed } from "@/lib/embed";
 import { roleLabel } from "@/lib/role-label";
 import { buttonVariants } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTab, TabsPanel } from "@/components/ui/tabs";
@@ -50,10 +51,6 @@ type EventDocumentRow = {
   file_name: string;
   note: string | null;
 };
-
-function unwrap<T>(v: T | T[] | null): T | null {
-  return Array.isArray(v) ? (v[0] ?? null) : v;
-}
 
 export default async function ClubManagePage({
   params,
@@ -191,7 +188,7 @@ export default async function ClubManagePage({
   // Etkinlik bazlı grupla: verilen bilet (APPROVED+CHECKED_IN) + giriş sayacı.
   const groupMap = new Map<string, EventTicketGroup>();
   for (const t of ticketRows) {
-    const ev = unwrap(t.events);
+    const ev = unwrapEmbed(t.events);
     if (!ev) continue;
     let g = groupMap.get(t.event_id);
     if (!g) {

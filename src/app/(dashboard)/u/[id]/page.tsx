@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { nameInitials } from "@/lib/display-name";
 import { roleLabel } from "@/lib/role-label";
 import { PageShell } from "@/components/shared/page-shell";
 import { ComposeButton } from "@/components/messaging/compose-button";
@@ -50,19 +51,6 @@ type PersonProfile = {
   avatar_url: string | null;
   clubs: ProfileClub[];
 };
-
-function initialsOf(name: string): string {
-  return (
-    name
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((w) => w[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase() || "?"
-  );
-}
 
 export async function generateMetadata({
   params,
@@ -103,7 +91,7 @@ export default async function PersonProfilePage({
   if (!profile) notFound();
 
   const displayName = profile.full_name ?? "";
-  const initials = initialsOf(displayName);
+  const initials = nameInitials(displayName);
 
   // Avatar: RPC avatar_url'i zaten rol-katmanlı döndürür (dolu ise gösterebiliriz).
   // PRIVATE bucket → signed URL üret (event-documents deseni; public URL YOK).

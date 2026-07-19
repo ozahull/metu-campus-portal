@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/datetime";
-import { resolveDisplayName } from "@/lib/display-name";
+import { nameInitials, resolveDisplayName } from "@/lib/display-name";
 import { roleLabel } from "@/lib/role-label";
 import { PageShell } from "@/components/shared/page-shell";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
@@ -89,14 +89,7 @@ export default async function ProfilePage() {
         (user.user_metadata?.full_name as string | undefined),
       user.email,
     ) ?? "";
-  const initials =
-    displayName
-      .trim()
-      .split(/\s+/)
-      .map((w) => w[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase() || "?";
+  const initials = nameInitials(displayName);
 
   // Bildirim tercihi (satır yoksa varsayılan MEMBER_CLUBS).
   const { data: pref } = await supabase

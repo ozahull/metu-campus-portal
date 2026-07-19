@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ArrowLeft, QrCode } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { unwrapEmbed } from "@/lib/embed";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CheckinScanner, type ApprovedTicket } from "./checkin-scanner";
@@ -18,10 +19,6 @@ type TicketRow = {
     | { title: string; club_id: string }[]
     | null;
 };
-
-function unwrap<T>(v: T | T[] | null): T | null {
-  return Array.isArray(v) ? (v[0] ?? null) : v;
-}
 
 export default async function CheckinPage({
   params,
@@ -78,8 +75,8 @@ export default async function CheckinPage({
   const approved: ApprovedTicket[] = ((ticketRaw ?? []) as unknown as TicketRow[])
     .map((t) => ({
       token: t.token,
-      full_name: unwrap(t.profile)?.full_name ?? null,
-      event_title: unwrap(t.events)?.title ?? "",
+      full_name: unwrapEmbed(t.profile)?.full_name ?? null,
+      event_title: unwrapEmbed(t.events)?.title ?? "",
     }))
     .sort((a, b) => (a.full_name ?? "").localeCompare(b.full_name ?? "", "tr"));
 

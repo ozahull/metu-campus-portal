@@ -12,3 +12,14 @@ export function resolveDisplayName(
   const local = email?.split("@")[0]?.trim();
   return local ? local : null;
 }
+
+// Avatar baş harfleri TEK kuralı (hijyen turu — navbar/u/[id]/profil'deki üç
+// kopya buraya indi): iki+ kelimede ilk iki kelimenin baş harfi; tek kelimede
+// ilk iki karakter (navbar'ın e-posta fallback davranışı); boş kaynakta "?".
+export function nameInitials(source: string | null | undefined): string {
+  const parts = (source ?? "").trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return (parts[0]?.slice(0, 2).toUpperCase() ?? "") || "?";
+}

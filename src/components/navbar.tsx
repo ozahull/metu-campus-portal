@@ -9,18 +9,9 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationBell } from "@/components/notification-bell";
 import { UserMenu } from "@/components/user-menu";
 import type { AppNotification } from "@/lib/notification-meta";
-import { resolveDisplayName } from "@/lib/display-name";
+import { nameInitials, resolveDisplayName } from "@/lib/display-name";
 
 export const dynamic = "force-dynamic";
-
-function getInitials(name: string, email: string): string {
-  const source = name.trim() || email;
-  const parts = source.split(/\s+/).filter(Boolean);
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[1][0]).toUpperCase();
-  }
-  return source.slice(0, 2).toUpperCase();
-}
 
 export async function Navbar() {
   const t = await getTranslations("nav");
@@ -157,7 +148,7 @@ export async function Navbar() {
             email={email}
             role={displayRole}
             isSuperAdmin={isSuperAdmin}
-            initials={getInitials(fullName, email)}
+            initials={nameInitials(fullName.trim() || email)}
             avatarUrl={avatarUrl}
           />
 

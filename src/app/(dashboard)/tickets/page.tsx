@@ -8,6 +8,7 @@ import { PageShell } from "@/components/shared/page-shell";
 import { EmptyState } from "@/components/shared/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { unwrapEmbed } from "@/lib/embed";
 import { TicketCard, type TicketCardData } from "./ticket-card";
 
 export const dynamic = "force-dynamic";
@@ -45,10 +46,6 @@ type TicketRow = {
       }[]
     | null;
 };
-
-function unwrap<T>(v: T | T[] | null): T | null {
-  return Array.isArray(v) ? (v[0] ?? null) : v;
-}
 
 export default async function TicketsPage() {
   const t = await getTranslations("tickets");
@@ -108,7 +105,7 @@ export default async function TicketsPage() {
     (data ?? []) as unknown as TicketRow[]
   )
     .map((row) => {
-      const ev = unwrap(row.events);
+      const ev = unwrapEmbed(row.events);
       if (!ev) return null; // embed boş (beklenmez) — kart üretilmez
       const eventDateMs = new Date(ev.event_date).getTime();
       const checkedIn = row.status === "CHECKED_IN";
@@ -120,7 +117,7 @@ export default async function TicketsPage() {
         eventTitle: ev.title,
         eventDateISO: ev.event_date,
         location: ev.location,
-        clubName: unwrap(ev.clubs)?.name ?? null,
+        clubName: unwrapEmbed(ev.clubs)?.name ?? null,
         checkedIn,
         // AKTİF: onaylı + başlamamış. Diğer her şey geçmiş bölümüne.
         active: row.status === "APPROVED" && !started,

@@ -86,7 +86,7 @@ function LoginCard() {
               type="email"
               inputMode="email"
               autoComplete="email"
-              placeholder="ad.soyad@metu.edu.tr"
+              placeholder={t("emailPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}

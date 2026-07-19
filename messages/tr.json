@@ -10,7 +10,7 @@
   "nav": {
     "brand": "ODTÜ Kampüs Portalı",
     "home": "Ana Sayfa",
-    "communities": "Topluluklar",
+    "communities": "Kulüpler",
     "events": "Etkinlikler",
     "calendar": "Takvimim",
     "messages": "Mesajlar",
@@ -59,11 +59,11 @@
       "MEMBERSHIP": "Kulübe hoş geldiniz",
       "EVENT_PHOTOS": "Etkinlik fotoğrafları",
       "BADGE_EARNED": "Yeni rozet kazandın",
-      "CLUB_REQUEST": "Topluluk başvurusu",
+      "CLUB_REQUEST": "Kulüp başvurusu",
       "MESSAGE": "Yeni mesaj"
     },
     "clubRequest": {
-      "NEW": "Yeni topluluk başvurusu",
+      "NEW": "Yeni kulüp başvurusu",
       "APPROVED": "Başvurun onaylandı",
       "REJECTED": "Başvurun reddedildi",
       "CHANGES_REQUESTED": "Başvurunda revizyon istendi"
@@ -297,11 +297,12 @@
       "submit": "Şifreyi Güncelle",
       "submitting": "Güncelleniyor…",
       "requestNew": "Yeni sıfırlama linki iste"
-    }
+    },
+    "emailPlaceholder": "ad.soyad@metu.edu.tr"
   },
   "home": {
     "welcome": "Hoş Geldiniz, {name}",
-    "subtitle": "Kampüsteki aktif kulüpleri keşfedin ve topluluklara katılın.",
+    "subtitle": "Kampüsteki aktif kulüpleri keşfedin ve size uyan kulübe katılın.",
     "upcomingTitle": "Yaklaşan Kampüs Etkinlikleri",
     "noUpcoming": "Şu an planlanan bir etkinlik yok.",
     "attendeeCount": "{count} Kişi Katılıyor",
@@ -310,7 +311,7 @@
     "statEvents": "Yaklaşan katılımın",
     "activeClubs": "Aktif Kulüpler",
     "activeClubsEmptyTitle": "Henüz aktif kulüp bulunmuyor",
-    "activeClubsEmptyBody": "Yeni topluluklar eklendiğinde burada görünecek.",
+    "activeClubsEmptyBody": "Yeni kulüpler eklendiğinde burada görünecek.",
     "clubsError": "Kulüpler yüklenemedi",
     "clubsErrorBody": "Bir sorun oluştu. Lütfen tekrar deneyin.",
     "clubsRetry": "Tekrar dene"
@@ -334,7 +335,7 @@
     "downloadIcs": ".ics indir",
     "ticket": {
       "yourTicket": "Biletiniz",
-      "buy": "Yerini Ayırt",
+      "buy": "Bilet Al",
       "free": "Ücretsiz",
       "freeLabel": "Katılım Bileti",
       "salesClosed": "Katılım kaydı kapandı",
@@ -347,7 +348,7 @@
       "cancel": {
         "button": "Vazgeç",
         "confirmTitle": "Bileti iptal et",
-        "confirmBody": "Bu etkinlikteki yerini bırakmak istediğine emin misin? Yerin başkalarına açılır ve tekrar bilet almak için kontenjan gerekebilir.",
+        "confirmBody": "Biletini iptal etmek istediğine emin misin? Kontenjandaki yerin başkalarına açılır; istersen daha sonra tekrar bilet alabilirsin.",
         "confirmLabel": "Evet, iptal et",
         "toastSuccess": "Biletin iptal edildi.",
         "toastError": "Bilet iptal edilemedi. Lütfen tekrar deneyin.",
@@ -409,7 +410,7 @@
     "leaveInfo": "Kulüpten ayrıldınız."
   },
   "clubs": {
-    "listTitle": "Kampüs Toplulukları",
+    "listTitle": "Kampüs Kulüpleri",
     "listSubtitle": "İlginizi çeken kulüpleri arayın, keşfedin ve topluluğun bir parçası olun.",
     "searchPlaceholder": "Kulüp adı veya açıklamasında ara…",
     "emptyTitle": "Aradığınız kriterlere uygun kulüp bulunamadı",
@@ -423,7 +424,7 @@
     "notFoundTitle": "Kulüp bulunamadı",
     "notFoundBody": "Aradığınız kulüp mevcut değil veya kaldırılmış olabilir.",
     "backToDashboard": "Dashboard'a Dön",
-    "defaultCategory": "Kampüs Topluluğu",
+    "defaultCategory": "Kampüs Kulübü",
     "manage": "Yönet",
     "about": "Hakkında",
     "vision": "Vizyonumuz",
@@ -444,23 +445,23 @@
     "logoAlt": "{name} logosu"
   },
   "clubRequest": {
-    "metaTitle": "Topluluk Aç",
-    "pageTitle": "Topluluk Açma Başvurusu",
-    "pageSubtitle": "Yeni bir kampüs topluluğu kurmak için başvurunu okul yönetimine ilet. Onaylandığında kulübün danışmanı sen olursun.",
+    "metaTitle": "Kulüp Aç",
+    "pageTitle": "Kulüp Açma Başvurusu",
+    "pageSubtitle": "Yeni bir kampüs kulübü kurmak için başvurunu okul yönetimine ilet. Onaylandığında kulübün danışmanı sen olursun.",
     "cta": {
-      "title": "Bir topluluk açmak ister misin?",
-      "body": "Hoca olarak yeni bir kampüs topluluğu kurmak için başvuru yapabilirsin.",
-      "button": "Topluluk açma başvurusu"
+      "title": "Bir kulüp açmak ister misin?",
+      "body": "Danışman rolünle yeni bir kampüs kulübü kurmak için başvuru yapabilirsin.",
+      "button": "Kulüp açma başvurusu"
     },
     "form": {
-      "nameLabel": "Topluluk adı",
+      "nameLabel": "Kulüp adı",
       "namePlaceholder": "örn. Robotik Kulübü",
       "descriptionLabel": "Kısa açıklama",
       "descriptionPlaceholder": "Topluluğun amacını birkaç cümleyle anlat (opsiyonel).",
       "categoryLabel": "Kategori",
       "categoryPlaceholder": "örn. Teknoloji, Sanat, Spor (opsiyonel)",
       "rationaleLabel": "Gerekçe",
-      "rationalePlaceholder": "Bu topluluk neden kurulmalı? Okul yönetiminin kararına yardımcı olacak gerekçeyi yaz.",
+      "rationalePlaceholder": "Bu kulüp neden kurulmalı? Okul yönetiminin kararına yardımcı olacak gerekçeyi yaz.",
       "submit": "Başvuruyu gönder",
       "resubmit": "Yeniden gönder"
     },
@@ -468,7 +469,7 @@
       "title": "Başvurun incelemede",
       "body": "Başvurun okul yönetimine iletildi. Karar verildiğinde bilgilendirileceksin.",
       "submittedAt": "Gönderim tarihi: {date}",
-      "nameLabel": "Topluluk adı",
+      "nameLabel": "Kulüp adı",
       "categoryLabel": "Kategori",
       "descriptionLabel": "Açıklama",
       "rationaleLabel": "Gerekçe",
@@ -481,7 +482,7 @@
     },
     "approved": {
       "title": "Başvurun onaylandı!",
-      "body": "Tebrikler — “{name}” topluluğu kuruldu ve danışmanı sen oldun. Başkan atamak ve etkinlik eklemek için kulüp yönetim paneline gidebilirsin.",
+      "body": "Tebrikler — “{name}” kulübü kuruldu ve danışmanı sen oldun. Başkan atamak ve etkinlik eklemek için kulüp yönetim paneline gidebilirsin.",
       "viewClub": "Kulübünü görüntüle",
       "newRequest": "Yeni başvuru yap"
     },
@@ -509,7 +510,7 @@
       }
     },
     "toasts": {
-      "nameRequired": "Topluluk adı gerekli.",
+      "nameRequired": "Kulüp adı gerekli.",
       "rationaleRequired": "Gerekçe gerekli.",
       "submitted": "Başvurun gönderildi.",
       "resubmitted": "Başvurun yeniden gönderildi.",
@@ -693,7 +694,8 @@
   },
   "meta": {
     "title": "ODTÜ Kampüs Portalı",
-    "description": "ODTÜ KKK Topluluk ve Etkinlik Portalı"
+    "description": "ODTÜ KKK Topluluk ve Etkinlik Portalı",
+    "appleTitle": "Kampüs"
   },
   "notFound": {
     "title": "Sayfa bulunamadı",
@@ -723,7 +725,7 @@
       "tabOverview": "Genel Bakış",
       "tabClubs": "Kulüpler",
       "tabApprovals": "Onay Kuyruğu",
-      "tabClubRequests": "Topluluk Başvuruları",
+      "tabClubRequests": "Kulüp Başvuruları",
       "tabAssignments": "Atamalar",
       "tabAnalytics": "Analitik",
       "tabReport": "Dönem Raporu",
@@ -755,7 +757,7 @@
     },
     "newClub": {
       "title": "Yeni Kulüp Ekle",
-      "subtitle": "Yönetici paneli · Topluluk oluşturma",
+      "subtitle": "Yönetici paneli · Kulüp oluşturma",
       "nameLabel": "Kulüp Adı",
       "namePlaceholder": "Örn. Bilgisayar Topluluğu",
       "descLabel": "Kulüp Açıklaması",
@@ -788,21 +790,21 @@
       }
     },
     "roles": {
-      "title": "Hoca Rolü",
-      "desc": "Bir kullanıcıyı hoca yapın veya rolünü geri alın. Hocalar, kulübe bağlı olmadan da topluluk açma başvurusu yapabilecek (yetki sonraki aşamada).",
+      "title": "Danışman Rolü",
+      "desc": "Bir kullanıcıya danışman rolü verin veya geri alın. Danışman rolündeki öğretim üyeleri bir kulübe bağlı olmadan da kulüp açma başvurusu yapabilir.",
       "userLabel": "Kullanıcı",
       "userPlaceholder": "Seçin…",
-      "promote": "Hoca Yap",
-      "demote": "Hoca Rolünü Kaldır",
-      "noCandidates": "Hoca yapılabilecek kullanıcı yok.",
-      "currentTitle": "Mevcut Hocalar",
-      "noneAssigned": "Henüz hoca yok.",
+      "promote": "Danışman Yap",
+      "demote": "Danışman Rolünü Kaldır",
+      "noCandidates": "Danışman yapılabilecek kullanıcı yok.",
+      "currentTitle": "Mevcut Danışmanlar",
+      "noneAssigned": "Henüz danışman yok.",
       "toasts": {
         "userRequired": "Kullanıcı seçin.",
         "error": "İşlem başarısız. Lütfen tekrar deneyin.",
         "notSaved": "Rol kaydedilemedi (yetki reddedildi). Lütfen tekrar deneyin.",
-        "promoted": "Kullanıcı hoca yapıldı",
-        "demoted": "Hoca rolü kaldırıldı"
+        "promoted": "Kullanıcı danışman yapıldı",
+        "demoted": "Danışman rolü kaldırıldı"
       }
     },
     "approvals": {
@@ -833,8 +835,8 @@
       }
     },
     "clubRequests": {
-      "queueTitle": "Topluluk Başvuru Kuyruğu",
-      "queueDesc": "Hocaların açtığı topluluk başvuruları. Onaylanınca gerçek kulüp oluşur ve başvuran hoca danışman olur.",
+      "queueTitle": "Kulüp Başvuru Kuyruğu",
+      "queueDesc": "Danışmanların açtığı kulüp başvuruları. Onaylanınca gerçek kulüp oluşur ve başvuran kişi kulübün danışmanı olur.",
       "emptyQueue": "Bekleyen başvuru yok.",
       "requesterLabel": "Başvuran",
       "descriptionLabel": "Açıklama",
@@ -843,12 +845,12 @@
       "requestChanges": "Revizyon",
       "reject": "Reddet",
       "changesPlaceholder": "Neyin düzeltilmesi gerektiğini yazın…",
-      "rejectPlaceholder": "Reddetme gerekçesini yazın (hocaya iletilecek)…",
+      "rejectPlaceholder": "Reddetme gerekçesini yazın (başvurana iletilecek)…",
       "rejectNoteHint": "Reddetmek için önce gerekçe girin.",
       "sendChanges": "Revizyon Gönder",
       "cancelChanges": "Vazgeç",
       "rejectConfirmTitle": "Başvuruyu reddet",
-      "rejectConfirmBody": "\"{name}\" başvurusu reddedilecek. Başvuran hoca gerekçeyle bilgilendirilecek.",
+      "rejectConfirmBody": "\"{name}\" başvurusu reddedilecek. Başvuru sahibi gerekçeyle bilgilendirilecek.",
       "toasts": {
         "approved": "Başvuru onaylandı ve kulüp oluşturuldu",
         "rejected": "Başvuru reddedildi",
@@ -864,7 +866,7 @@
       "metricMembers": "Toplam Üyelik",
       "metricEvents": "Toplam Etkinlik",
       "metricApproved": "Onaylı Etkinlik",
-      "metricTickets": "Satılan Bilet",
+      "metricTickets": "Verilen Bilet",
       "metricCheckins": "Gelen Kişi",
       "growthTitle": "Aylık Üye Artışı",
       "growthDesc": "Her ay kulüplere katılan yeni üye sayısı.",
@@ -997,9 +999,9 @@
     "activeTitle": "Aktif Biletler",
     "pastTitle": "Geçmiş",
     "emptyAllTitle": "Henüz biletin yok",
-    "emptyAllBody": "Katılım bileti olan bir etkinliğe kaydolduğunda biletin burada görünür.",
+    "emptyAllBody": "Katılım bileti olan bir etkinliğe katıldığında biletin burada görünür.",
     "browseEvents": "Etkinliklere göz at",
-    "emptyActive": "Aktif biletin yok. Yeni bir etkinliğe kaydolduğunda burada görünür.",
+    "emptyActive": "Aktif biletin yok. Bir etkinliğe katıldığında biletin burada görünür.",
     "loadErrorTitle": "Biletler yüklenemedi",
     "loadErrorBody": "Bir sorun oluştu. Lütfen tekrar deneyin.",
     "retry": "Tekrar dene",

@@ -12,6 +12,10 @@ import type { MetadataRoute } from "next";
 // karşılıkları: --background oklch(0.951 0.013 82) ≈ #f3eee5 (Dil A sıcak
 // kum), --primary oklch(0.48 0.15 27) ≈ #a1302b (src/app/icon.svg ile aynı
 // marka kırmızısı).
+// METİN İSTİSNASI: name/short_name/description de i18n DIŞI kalır — manifest
+// statik üretilir, istek bağlamı (NEXT_LOCALE cookie) burada okunamaz; kurulum
+// diyaloğundaki bu metinler marka kimliğidir ("Topluluk ve Etkinlik Portalı"
+// sloganıyla birlikte t() kapsamı dışında bilinçli istisna).
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "ODTÜ KKK Kampüs Portalı",

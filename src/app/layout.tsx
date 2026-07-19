@@ -43,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
     appleWebApp: {
       capable: true,
       statusBarStyle: "default",
-      title: "Kampüs",
+      title: t("appleTitle"),
     },
     // İkonlar dosya konvansiyonuyla: app/icon.svg (sekme), app/favicon.ico
     // (/favicon.ico 404 fix'i), app/apple-icon.png (180x180 full-bleed —

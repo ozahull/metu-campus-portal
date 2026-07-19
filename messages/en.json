@@ -10,7 +10,7 @@
   "nav": {
     "brand": "METU Campus Portal",
     "home": "Home",
-    "communities": "Communities",
+    "communities": "Clubs",
     "events": "Events",
     "calendar": "My Calendar",
     "messages": "Messages",
@@ -26,7 +26,7 @@
       "noResults": "No results",
       "minChars": "Type at least 2 characters"
     },
-    "tickets": "My Passes"
+    "tickets": "My Tickets"
   },
   "theme": {
     "toggle": "Toggle theme",
@@ -59,11 +59,11 @@
       "MEMBERSHIP": "Welcome to the club",
       "EVENT_PHOTOS": "Event photos",
       "BADGE_EARNED": "You earned a badge",
-      "CLUB_REQUEST": "Community application",
+      "CLUB_REQUEST": "Club application",
       "MESSAGE": "New message"
     },
     "clubRequest": {
-      "NEW": "New community application",
+      "NEW": "New club application",
       "APPROVED": "Your application was approved",
       "REJECTED": "Your application was rejected",
       "CHANGES_REQUESTED": "Changes requested on your application"
@@ -297,11 +297,12 @@
       "submit": "Update Password",
       "submitting": "Updating…",
       "requestNew": "Request a new reset link"
-    }
+    },
+    "emailPlaceholder": "name.surname@metu.edu.tr"
   },
   "home": {
     "welcome": "Welcome, {name}",
-    "subtitle": "Discover active campus clubs and join communities.",
+    "subtitle": "Discover active campus clubs and find the one for you.",
     "upcomingTitle": "Upcoming Campus Events",
     "noUpcoming": "No events are currently scheduled.",
     "attendeeCount": "{count} attending",
@@ -310,7 +311,7 @@
     "statEvents": "Upcoming RSVPs",
     "activeClubs": "Active Clubs",
     "activeClubsEmptyTitle": "No active clubs yet",
-    "activeClubsEmptyBody": "They'll appear here as new communities are added.",
+    "activeClubsEmptyBody": "They'll appear here as new clubs are added.",
     "clubsError": "Clubs could not be loaded",
     "clubsErrorBody": "Something went wrong. Please try again.",
     "clubsRetry": "Try again"
@@ -363,11 +364,11 @@
       "errors": {
         "full": "The event is at capacity.",
         "closed": "Registration has closed.",
-        "disabled": "Attendance passes are not enabled for this event.",
+        "disabled": "Ticketing is not enabled for this event.",
         "notPublished": "The event is not published.",
         "tooManyAttempts": "Too many attempts. Please wait a bit and try again."
       },
-      "showMine": "View my pass"
+      "showMine": "View my ticket"
     }
   },
   "fair": {
@@ -409,8 +410,8 @@
     "leaveInfo": "You left the club."
   },
   "clubs": {
-    "listTitle": "Campus Communities",
-    "listSubtitle": "Search, discover, and become part of communities you're interested in.",
+    "listTitle": "Campus Clubs",
+    "listSubtitle": "Search, discover, and become part of the clubs you're interested in.",
     "searchPlaceholder": "Search by club name or description…",
     "emptyTitle": "No clubs match your search",
     "emptyBody": "Try a different keyword.",
@@ -423,7 +424,7 @@
     "notFoundTitle": "Club not found",
     "notFoundBody": "The club you're looking for doesn't exist or may have been removed.",
     "backToDashboard": "Back to Dashboard",
-    "defaultCategory": "Campus Community",
+    "defaultCategory": "Campus Club",
     "manage": "Manage",
     "about": "About",
     "vision": "Our Vision",
@@ -444,23 +445,23 @@
     "logoAlt": "{name} logo"
   },
   "clubRequest": {
-    "metaTitle": "Start a Community",
-    "pageTitle": "Community Application",
-    "pageSubtitle": "Apply to the school administration to start a new campus community. Once approved, you become the club's advisor.",
+    "metaTitle": "Start a Club",
+    "pageTitle": "Club Application",
+    "pageSubtitle": "Apply to the school administration to start a new campus club. Once approved, you become the club's advisor.",
     "cta": {
-      "title": "Want to start a community?",
-      "body": "As an advisor, you can apply to establish a new campus community.",
-      "button": "Apply to start a community"
+      "title": "Want to start a club?",
+      "body": "As an advisor, you can apply to establish a new campus club.",
+      "button": "Apply to start a club"
     },
     "form": {
-      "nameLabel": "Community name",
+      "nameLabel": "Club name",
       "namePlaceholder": "e.g. Robotics Club",
       "descriptionLabel": "Short description",
-      "descriptionPlaceholder": "Describe the community's purpose in a few sentences (optional).",
+      "descriptionPlaceholder": "Describe the club's purpose in a few sentences (optional).",
       "categoryLabel": "Category",
       "categoryPlaceholder": "e.g. Technology, Art, Sports (optional)",
       "rationaleLabel": "Rationale",
-      "rationalePlaceholder": "Why should this community exist? Provide a rationale to help the school administration decide.",
+      "rationalePlaceholder": "Why should this club exist? Provide a rationale to help the school administration decide.",
       "submit": "Submit application",
       "resubmit": "Resubmit"
     },
@@ -468,7 +469,7 @@
       "title": "Your application is under review",
       "body": "Your application has been sent to the school administration. You'll be notified once a decision is made.",
       "submittedAt": "Submitted: {date}",
-      "nameLabel": "Community name",
+      "nameLabel": "Club name",
       "categoryLabel": "Category",
       "descriptionLabel": "Description",
       "rationaleLabel": "Rationale",
@@ -481,7 +482,7 @@
     },
     "approved": {
       "title": "Your application was approved!",
-      "body": "Congratulations — the “{name}” community has been created and you are its advisor. Head to the club management panel to appoint a president and add events.",
+      "body": "Congratulations — the “{name}” club has been created and you are its advisor. Head to the club management panel to appoint a president and add events.",
       "viewClub": "View your club",
       "newRequest": "Start another application"
     },
@@ -509,7 +510,7 @@
       }
     },
     "toasts": {
-      "nameRequired": "Community name is required.",
+      "nameRequired": "Club name is required.",
       "rationaleRequired": "Rationale is required.",
       "submitted": "Your application has been submitted.",
       "resubmitted": "Your application has been resubmitted.",
@@ -527,7 +528,7 @@
       "title": "{name} · Management",
       "access": "{role} access",
       "infoTitle": "Club Information",
-      "infoDesc": "Edit the community's general information and contact channels.",
+      "infoDesc": "Edit the club's general information and contact channels.",
       "eventsTitle": "Events",
       "eventsDesc": "Create, edit, or delete your club's events.",
       "ticketsTitle": "Tickets",
@@ -650,7 +651,7 @@
     },
     "tickets": {
       "empty": "No attendance passes issued for this club yet.",
-      "issued": "{count, plural, one {# pass} other {# passes}}",
+      "issued": "{count, plural, one {# ticket} other {# tickets}}",
       "capacity": " / {count} capacity",
       "checkedIn": "{count} checked in"
     },
@@ -693,7 +694,8 @@
   },
   "meta": {
     "title": "METU Campus Portal",
-    "description": "METU NCC Community & Event Portal"
+    "description": "METU NCC Community & Event Portal",
+    "appleTitle": "Campus"
   },
   "notFound": {
     "title": "Page not found",
@@ -723,7 +725,7 @@
       "tabOverview": "Overview",
       "tabClubs": "Clubs",
       "tabApprovals": "Approvals",
-      "tabClubRequests": "Community Requests",
+      "tabClubRequests": "Club Requests",
       "tabAssignments": "Assignments",
       "tabAnalytics": "Analytics",
       "tabReport": "Term Report",
@@ -755,7 +757,7 @@
     },
     "newClub": {
       "title": "Add New Club",
-      "subtitle": "Admin panel · Create a community",
+      "subtitle": "Admin panel · Create a club",
       "nameLabel": "Club Name",
       "namePlaceholder": "e.g. Computer Science Society",
       "descLabel": "Club Description",
@@ -789,7 +791,7 @@
     },
     "roles": {
       "title": "Advisor Role",
-      "desc": "Make a user an advisor or revoke the role. Advisors will be able to apply to open a community even without belonging to a club (permissions come in a later stage).",
+      "desc": "Make a user an advisor or revoke the role. Advisors will be able to apply to open a club even without belonging to a club (permissions come in a later stage).",
       "userLabel": "User",
       "userPlaceholder": "Select…",
       "promote": "Make Advisor",
@@ -833,8 +835,8 @@
       }
     },
     "clubRequests": {
-      "queueTitle": "Community Request Queue",
-      "queueDesc": "Community applications opened by advisors. Once approved, a real club is created and the applicant becomes its advisor.",
+      "queueTitle": "Club Request Queue",
+      "queueDesc": "Club applications opened by advisors. Once approved, a real club is created and the applicant becomes its advisor.",
       "emptyQueue": "No pending applications.",
       "requesterLabel": "Applicant",
       "descriptionLabel": "Description",
@@ -864,7 +866,7 @@
       "metricMembers": "Total Memberships",
       "metricEvents": "Total Events",
       "metricApproved": "Approved Events",
-      "metricTickets": "Tickets Sold",
+      "metricTickets": "Tickets Issued",
       "metricCheckins": "Attendees",
       "growthTitle": "Monthly Member Growth",
       "growthDesc": "New members joining clubs each month.",
@@ -992,15 +994,15 @@
     "member": "Member"
   },
   "tickets": {
-    "title": "My Passes",
+    "title": "My Tickets",
     "subtitle": "Just show the QR code at the door.",
-    "activeTitle": "Active Passes",
+    "activeTitle": "Active Tickets",
     "pastTitle": "Past",
-    "emptyAllTitle": "No passes yet",
-    "emptyAllBody": "When you register for an event with attendance passes, your pass will appear here.",
+    "emptyAllTitle": "No tickets yet",
+    "emptyAllBody": "When you join an event with attendance tickets, your ticket will appear here.",
     "browseEvents": "Browse events",
-    "emptyActive": "You have no active passes. Register for an event and it will show up here.",
-    "loadErrorTitle": "Passes could not be loaded",
+    "emptyActive": "You have no active tickets. Join an event and yours will show up here.",
+    "loadErrorTitle": "Tickets could not be loaded",
     "loadErrorBody": "Something went wrong. Please try again.",
     "retry": "Try again",
     "stampCheckedIn": "Checked in",

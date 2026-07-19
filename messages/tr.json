@@ -25,7 +25,8 @@
       "loading": "Aranıyor…",
       "noResults": "Sonuç bulunamadı",
       "minChars": "En az 2 karakter yazın"
-    }
+    },
+    "tickets": "Biletlerim"
   },
   "theme": {
     "toggle": "Temayı değiştir",
@@ -365,7 +366,8 @@
         "disabled": "Bu etkinlikte katılım bileti kapalı.",
         "notPublished": "Etkinlik yayında değil.",
         "tooManyAttempts": "Çok fazla deneme yaptınız. Lütfen biraz bekleyip tekrar deneyin."
-      }
+      },
+      "showMine": "Biletimi göster"
     }
   },
   "fair": {
@@ -988,5 +990,20 @@
     "advisor": "Danışman",
     "president": "Başkan",
     "member": "Üye"
+  },
+  "tickets": {
+    "title": "Biletlerim",
+    "subtitle": "Kapıda QR kodunu okutman yeterli.",
+    "activeTitle": "Aktif Biletler",
+    "pastTitle": "Geçmiş",
+    "emptyAllTitle": "Henüz biletin yok",
+    "emptyAllBody": "Katılım bileti olan bir etkinliğe kaydolduğunda biletin burada görünür.",
+    "browseEvents": "Etkinliklere göz at",
+    "emptyActive": "Aktif biletin yok. Yeni bir etkinliğe kaydolduğunda burada görünür.",
+    "loadErrorTitle": "Biletler yüklenemedi",
+    "loadErrorBody": "Bir sorun oluştu. Lütfen tekrar deneyin.",
+    "retry": "Tekrar dene",
+    "stampCheckedIn": "Giriş yapıldı",
+    "stampExpired": "Etkinlik geçti"
   }
 }

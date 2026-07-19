@@ -8,6 +8,7 @@ import {
   CalendarDays,
   Home,
   MessagesSquare,
+  Ticket,
   Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -43,12 +44,14 @@ export function NavLinks({
   const t = useTranslations("nav");
   const tMessages = useTranslations("messages");
 
-  const links = showMessages
-    ? [
-        ...baseLinks,
-        { href: "/messages", key: "messages", icon: MessagesSquare } as const,
-      ]
-    : [...baseLinks];
+  // Biletlerim herkese görünür; Mesajlar koşullu ve ondan önce gelir.
+  const links = [
+    ...baseLinks,
+    ...(showMessages
+      ? [{ href: "/messages", key: "messages", icon: MessagesSquare } as const]
+      : []),
+    { href: "/tickets", key: "tickets", icon: Ticket } as const,
+  ];
 
   const unreadBadge = messagesUnread > 99 ? "99+" : String(messagesUnread);
 

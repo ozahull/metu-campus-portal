@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { QRCodeSVG } from "qrcode.react";
 import { BadgeCheck, Ban, Loader2, Ticket as TicketIcon, X } from "lucide-react";
@@ -8,7 +9,8 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { knownErrorKey } from "@/lib/known-errors";
 import { refreshRoute } from "@/lib/refresh-action";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ticketStatusMeta } from "@/lib/ticket-status";
 
@@ -193,6 +195,19 @@ export function TicketFlow({
           {t("checkedInNote")}
         </p>
       )}
+
+      {/* Biletlerim sayfasına EK yol (mevcut QR gösterimi kalır) — kapıda
+          "nereden bulacağım" derdine merkezi cevap. */}
+      <Link
+        href="/tickets"
+        className={cn(
+          buttonVariants({ variant: "outline", size: "lg" }),
+          "mt-4 h-11 w-full gap-2",
+        )}
+      >
+        <TicketIcon className="size-4" />
+        {t("showMine")}
+      </Link>
     </div>
   );
 }

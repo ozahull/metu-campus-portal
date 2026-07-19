@@ -25,7 +25,8 @@
       "loading": "Searching…",
       "noResults": "No results",
       "minChars": "Type at least 2 characters"
-    }
+    },
+    "tickets": "My Passes"
   },
   "theme": {
     "toggle": "Toggle theme",
@@ -365,7 +366,8 @@
         "disabled": "Attendance passes are not enabled for this event.",
         "notPublished": "The event is not published.",
         "tooManyAttempts": "Too many attempts. Please wait a bit and try again."
-      }
+      },
+      "showMine": "View my pass"
     }
   },
   "fair": {
@@ -988,5 +990,20 @@
     "advisor": "Advisor",
     "president": "President",
     "member": "Member"
+  },
+  "tickets": {
+    "title": "My Passes",
+    "subtitle": "Just show the QR code at the door.",
+    "activeTitle": "Active Passes",
+    "pastTitle": "Past",
+    "emptyAllTitle": "No passes yet",
+    "emptyAllBody": "When you register for an event with attendance passes, your pass will appear here.",
+    "browseEvents": "Browse events",
+    "emptyActive": "You have no active passes. Register for an event and it will show up here.",
+    "loadErrorTitle": "Passes could not be loaded",
+    "loadErrorBody": "Something went wrong. Please try again.",
+    "retry": "Try again",
+    "stampCheckedIn": "Checked in",
+    "stampExpired": "Event has passed"
   }
 }

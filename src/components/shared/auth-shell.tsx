@@ -1,5 +1,5 @@
-"use client";
-
+// Server component: hook/etkileşim yok — "use client" gereksizdi (bundle'a
+// istemci sınırı ekliyordu). ImageWithFallback zaten kendi sınırını kurar.
 import type { ReactNode } from "react";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 

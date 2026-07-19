@@ -72,7 +72,8 @@ export default async function CheckinPage({
     .from("tickets")
     .select("token, status, profile:user_id(full_name), events!inner(title, club_id)")
     .eq("events.club_id", id)
-    .eq("status", "APPROVED");
+    .eq("status", "APPROVED")
+    .limit(1000);
 
   const approved: ApprovedTicket[] = ((ticketRaw ?? []) as unknown as TicketRow[])
     .map((t) => ({

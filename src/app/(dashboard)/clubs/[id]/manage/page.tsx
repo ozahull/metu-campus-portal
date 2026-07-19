@@ -114,7 +114,8 @@ export default async function ClubManagePage({
     )
     .eq("club_id", id)
     .order("event_date", { ascending: true })
-    .order("id", { ascending: true });
+    .order("id", { ascending: true })
+    .limit(200);
   const events = (eventsRaw ?? []) as ManageEvent[];
 
   // Belge ekleri: bu kulübün etkinliklerine ait event_documents. Görüntüleme
@@ -130,14 +131,20 @@ export default async function ClubManagePage({
       .order("created_at", { ascending: true })
       .order("id", { ascending: true });
 
-    for (const d of (docRaw ?? []) as EventDocumentRow[]) {
-      let signedUrl: string | null = null;
-      if (d.file_url) {
-        const { data: signed } = await supabase.storage
-          .from(DOC_BUCKET)
-          .createSignedUrl(d.file_url, 120);
-        signedUrl = signed?.signedUrl ?? null;
-      }
+    // Signed URL üretimi PARALEL (N+1 sıralı await yerine — clubs/new deseni).
+    const signedDocs = await Promise.all(
+      ((docRaw ?? []) as EventDocumentRow[]).map(async (d) => {
+        let signedUrl: string | null = null;
+        if (d.file_url) {
+          const { data: signed } = await supabase.storage
+            .from(DOC_BUCKET)
+            .createSignedUrl(d.file_url, 120);
+          signedUrl = signed?.signedUrl ?? null;
+        }
+        return { d, signedUrl };
+      }),
+    );
+    for (const { d, signedUrl } of signedDocs) {
       (documentsByEvent[d.event_id] ??= []).push({
         id: d.id,
         file_name: d.file_name,
@@ -154,7 +161,9 @@ export default async function ClubManagePage({
     .select("user_id, role, profile:user_id(full_name)")
     .eq("club_id", id)
     .order("created_at", { ascending: true })
-    .order("id", { ascending: true });
+    // club_members'ta "id" kolonu YOK (PK club_id+user_id) — ikincil sıralama user_id.
+    .order("user_id", { ascending: true })
+    .limit(500);
 
   const members: RosterMember[] = ((rosterRaw ?? []) as unknown as RosterRow[]).map(
     (r) => {
@@ -174,7 +183,8 @@ export default async function ClubManagePage({
     .select("status, event_id, events!inner(title, club_id, ticket_capacity)")
     .eq("events.club_id", id)
     .order("created_at", { ascending: true })
-    .order("id", { ascending: true });
+    .order("id", { ascending: true })
+    .limit(1000);
 
   const ticketRows = (ticketRaw ?? []) as unknown as TicketRow[];
 

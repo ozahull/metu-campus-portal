@@ -124,7 +124,8 @@ export default async function ClubDetailPage({
   const { data: membersRaw, error: membersError } = await supabase
     .from("club_members")
     .select("role, user_id(id, full_name)")
-    .eq("club_id", id);
+    .eq("club_id", id)
+    .limit(500);
 
   if (membersError) {
     console.error("[ClubDetail] Üyeler çekme hatası:", membersError);
@@ -216,7 +217,8 @@ export default async function ClubDetailPage({
     .eq("club_id", id)
     .eq("status", "APPROVED")
     .order("event_date", { ascending: true })
-    .order("id", { ascending: true });
+    .order("id", { ascending: true })
+    .limit(100);
 
   if (eventsError) {
     console.error("[ClubDetail] Etkinlikler çekme hatası:", eventsError);

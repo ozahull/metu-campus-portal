@@ -153,7 +153,8 @@ export default async function EventDetailPage({
       .select("id, storage_path, caption")
       .eq("event_id", data.id)
       .order("created_at", { ascending: false })
-      .order("id", { ascending: true });
+      .order("id", { ascending: true })
+      .limit(100);
     photos = (photoRows ?? []).map((p) => ({
       id: p.id,
       storage_path: p.storage_path,

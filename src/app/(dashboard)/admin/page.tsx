@@ -66,12 +66,16 @@ export default async function AdminPage() {
     .from("clubs")
     .select("id, name, requires_advisor_approval, advisor_id")
     .order("name", { ascending: true })
-    .order("id", { ascending: true });
+    .order("id", { ascending: true })
+    .limit(500);
   const { data: usersRaw } = await supabase
     .from("profiles")
     .select("id, full_name, role")
     .order("full_name", { ascending: true })
-    .order("id", { ascending: true });
+    .order("id", { ascending: true })
+    // Açık tavan (PostgREST zaten 1000'de keser). Kampüs 500 kullanıcıyı aşarsa
+    // bu dropdown'lar aramalı seçiciye taşınmalı (rapor: SENİN KARARIN).
+    .limit(500);
 
   const clubOptions: Option[] = (clubsRaw ?? []).map((c) => ({
     id: c.id,
@@ -143,20 +147,27 @@ export default async function AdminPage() {
       .order("created_at", { ascending: true })
       .order("id", { ascending: true });
 
-    for (const d of (docRaw ?? []) as {
+    // Signed URL üretimi PARALEL (N+1 sıralı await yerine — clubs/new deseni).
+    const docRows = (docRaw ?? []) as {
       id: string;
       event_id: string;
       file_url: string;
       file_name: string;
       note: string | null;
-    }[]) {
-      let signedUrl: string | null = null;
-      if (d.file_url) {
-        const { data: signed } = await supabase.storage
-          .from(DOC_BUCKET)
-          .createSignedUrl(d.file_url, 120);
-        signedUrl = signed?.signedUrl ?? null;
-      }
+    }[];
+    const signedDocs = await Promise.all(
+      docRows.map(async (d) => {
+        let signedUrl: string | null = null;
+        if (d.file_url) {
+          const { data: signed } = await supabase.storage
+            .from(DOC_BUCKET)
+            .createSignedUrl(d.file_url, 120);
+          signedUrl = signed?.signedUrl ?? null;
+        }
+        return { d, signedUrl };
+      }),
+    );
+    for (const { d, signedUrl } of signedDocs) {
       (docsByEvent[d.event_id] ??= []).push({
         id: d.id,
         file_name: d.file_name,
@@ -210,20 +221,27 @@ export default async function AdminPage() {
       .order("created_at", { ascending: true })
       .order("id", { ascending: true });
 
-    for (const d of (reqDocRaw ?? []) as {
+    // Signed URL üretimi PARALEL (N+1 sıralı await yerine).
+    const reqDocRows = (reqDocRaw ?? []) as {
       id: string;
       request_id: string;
       file_url: string;
       file_name: string;
       note: string | null;
-    }[]) {
-      let signedUrl: string | null = null;
-      if (d.file_url) {
-        const { data: signed } = await supabase.storage
-          .from(DOC_BUCKET_REQ)
-          .createSignedUrl(d.file_url, 120);
-        signedUrl = signed?.signedUrl ?? null;
-      }
+    }[];
+    const signedReqDocs = await Promise.all(
+      reqDocRows.map(async (d) => {
+        let signedUrl: string | null = null;
+        if (d.file_url) {
+          const { data: signed } = await supabase.storage
+            .from(DOC_BUCKET_REQ)
+            .createSignedUrl(d.file_url, 120);
+          signedUrl = signed?.signedUrl ?? null;
+        }
+        return { d, signedUrl };
+      }),
+    );
+    for (const { d, signedUrl } of signedReqDocs) {
       (reqDocs[d.request_id] ??= []).push({
         id: d.id,
         file_name: d.file_name,

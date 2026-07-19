@@ -7,9 +7,31 @@ import type { Database } from "@/types/database";
  * hem isteğe hem de yanıta senkronize eder. Server Component'ler bu sayede
  * geçerli bir oturuma erişebilir.
  *
- * Not: Yönlendirme (login'e atma vb.) kuralları, arayüz hazır olduğunda
- * aşağıdaki `user` kontrolü üzerinden eklenebilir.
+ * GÜVENLİK SERTLEŞTİRME #2 — merkezî oturum kapısı: public allowlist DIŞINDA
+ * kalan her yolda oturum yoksa /login'e yönlendirilir. Sayfa içi
+ * getUser()+redirect kontrolleri İKİNCİ KATMAN olarak DURUR (kaldırma) —
+ * bu kapı, yeni eklenen bir sayfada kontrol unutulursa SSR/yapı sızıntısını
+ * önleyen emniyet ağıdır.
  */
+
+// Oturumsuz erişilebilen yollar. /login'de oturumluya yönlendirme YOK (form
+// görünür) — bu kapıyla döngü oluşmaz. /auth/* public: callback code'u oturuma
+// çevirir, reset-password oturumsuz açılınca kendi "geçersiz link" ekranını
+// gösterir (çıkış yollu). Statik varlıkların çoğu matcher'da zaten hariç;
+// uzantıyla hariç OLMAYAN public dosyalar (sw.js, manifest) burada sayılır.
+const PUBLIC_PATHS = new Set([
+  "/",
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/sw.js",
+  "/manifest.webmanifest",
+]);
+
+function isPublicPath(pathname: string): boolean {
+  return PUBLIC_PATHS.has(pathname) || pathname.startsWith("/auth/");
+}
+
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -41,13 +63,19 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Oturum yönlendirme mantığı (arayüz hazır olduğunda doldurulacak):
-  // if (!user && !request.nextUrl.pathname.startsWith("/login")) {
-  //   const url = request.nextUrl.clone();
-  //   url.pathname = "/login";
-  //   return NextResponse.redirect(url);
-  // }
-  void user;
+  // Merkezî kapı: public olmayan yolda oturum yoksa /login. Yenilenmiş auth
+  // cookie'leri yönlendirme yanıtına da kopyalanır (Supabase SSR deseni —
+  // aksi halde tazelenen token kaybolur ve oturum rastgele düşer).
+  if (!user && !isPublicPath(request.nextUrl.pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.search = "";
+    const redirectResponse = NextResponse.redirect(url);
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie);
+    });
+    return redirectResponse;
+  }
 
   return supabaseResponse;
 }

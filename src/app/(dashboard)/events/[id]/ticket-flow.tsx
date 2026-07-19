@@ -25,6 +25,7 @@ const BUY_ERRORS = [
   ["Bilet alımı kapandı", "closed"],
   ["katılım bileti kapalı", "disabled"],
   ["Etkinlik yayında değil", "notPublished"],
+  ["Çok fazla deneme", "tooManyAttempts"], // hız sınırı (güvenlik #5)
 ] as const;
 const CANCEL_ERRORS = [
   ["Giriş yapılmış bilet", "checkedIn"],

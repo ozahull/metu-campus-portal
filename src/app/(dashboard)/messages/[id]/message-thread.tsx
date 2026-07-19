@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Info, Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { knownErrorKey } from "@/lib/known-errors";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { appDayKey, DAY_MS, formatDateTime } from "@/lib/datetime";
@@ -93,7 +94,11 @@ export function MessageThread({
 
     if (error) {
       console.error("[messages] mesaj gönderme hatası:", error);
-      toast.error(t("sendError"));
+      // Bilinen hız sınırı (güvenlik #5) ayırt edilir; kalanı generic.
+      const known = knownErrorKey(error.message, [
+        ["Çok hızlı mesaj", "sendRateLimit"],
+      ]);
+      toast.error(known ? t(known) : t("sendError"));
       return;
     }
     setBody("");

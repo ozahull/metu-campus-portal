@@ -128,7 +128,8 @@
       "today": "Bugün",
       "yesterday": "Dün"
     },
-    "historyTruncated": "Yalnızca son {count} mesaj gösteriliyor; daha eski mesajlar bu görünümde yüklenmiyor."
+    "historyTruncated": "Yalnızca son {count} mesaj gösteriliyor; daha eski mesajlar bu görünümde yüklenmiyor.",
+    "sendRateLimit": "Çok hızlı mesaj gönderiyorsunuz. Lütfen kısa bir süre bekleyin."
   },
   "badges": {
     "title": "Rozetler",
@@ -362,7 +363,8 @@
         "full": "Kontenjan dolu.",
         "closed": "Katılım kaydı kapandı.",
         "disabled": "Bu etkinlikte katılım bileti kapalı.",
-        "notPublished": "Etkinlik yayında değil."
+        "notPublished": "Etkinlik yayında değil.",
+        "tooManyAttempts": "Çok fazla deneme yaptınız. Lütfen biraz bekleyip tekrar deneyin."
       }
     }
   },

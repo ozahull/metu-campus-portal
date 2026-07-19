@@ -128,7 +128,8 @@
       "today": "Today",
       "yesterday": "Yesterday"
     },
-    "historyTruncated": "Only the last {count} messages are shown; older messages are not loaded in this view."
+    "historyTruncated": "Only the last {count} messages are shown; older messages are not loaded in this view.",
+    "sendRateLimit": "You are sending messages too quickly. Please wait a moment."
   },
   "badges": {
     "title": "Badges",
@@ -362,7 +363,8 @@
         "full": "The event is at capacity.",
         "closed": "Registration has closed.",
         "disabled": "Attendance passes are not enabled for this event.",
-        "notPublished": "The event is not published."
+        "notPublished": "The event is not published.",
+        "tooManyAttempts": "Too many attempts. Please wait a bit and try again."
       }
     }
   },

@@ -23,6 +23,7 @@ import {
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { canManageClub, isClubPresidentRole } from "@/lib/authz";
 import { categoryLabel } from "@/lib/category";
 import { fetchAttendanceCounts } from "@/lib/attendance";
 import { unwrapEmbed } from "@/lib/embed";
@@ -206,9 +207,13 @@ export default async function ClubDetailPage({
     .eq("club_id", id)
     .eq("user_id", user.id)
     .maybeSingle();
-  const isClubAdmin = myMembership?.role?.toString().toUpperCase() === "ADMIN";
+  const isClubAdmin = isClubPresidentRole(myMembership?.role);
   const isClubAdvisor = club?.advisor_id === user.id;
-  const canManage = isSuperAdmin || isClubAdvisor || isClubAdmin;
+  const canManage = canManageClub({
+    isSuperAdmin,
+    isClubAdvisor,
+    isClubPresident: isClubAdmin,
+  });
 
   // Onaylanmış etkinlikleri tarihe göre artan sırada çek.
   const { data: eventsRaw, error: eventsError } = await supabase

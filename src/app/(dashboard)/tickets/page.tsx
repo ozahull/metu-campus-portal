@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { unwrapEmbed } from "@/lib/embed";
+import { classifyTicket } from "@/lib/ticket-classify";
 import { TicketCard, type TicketCardData } from "./ticket-card";
 
 export const dynamic = "force-dynamic";
@@ -108,8 +109,13 @@ export default async function TicketsPage() {
       const ev = unwrapEmbed(row.events);
       if (!ev) return null; // embed boş (beklenmez) — kart üretilmez
       const eventDateMs = new Date(ev.event_date).getTime();
-      const checkedIn = row.status === "CHECKED_IN";
-      const started = eventDateMs <= now;
+      // Sınıflandırma (aktif/geçmiş/damga) saf fonksiyonda — bkz.
+      // lib/ticket-classify.ts. Davranış birebir aynı; yalnız test edilebilir.
+      const { checkedIn, active, expired } = classifyTicket({
+        status: row.status,
+        eventDateMs,
+        now,
+      });
       return {
         id: row.id,
         token: row.token,
@@ -119,10 +125,8 @@ export default async function TicketsPage() {
         location: ev.location,
         clubName: unwrapEmbed(ev.clubs)?.name ?? null,
         checkedIn,
-        // AKTİF: onaylı + başlamamış. Diğer her şey geçmiş bölümüne.
-        active: row.status === "APPROVED" && !started,
-        // Damga: girildi > geçti (girilmiş bilette "geçti" gösterilmez).
-        expired: !checkedIn && started,
+        active,
+        expired,
         eventDateMs,
       };
     })

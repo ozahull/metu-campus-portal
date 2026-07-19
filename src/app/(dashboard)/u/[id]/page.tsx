@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { isSameUser } from "@/lib/authz";
 import { nameInitials } from "@/lib/display-name";
 import { roleLabel } from "@/lib/role-label";
 import { PageShell } from "@/components/shared/page-shell";
@@ -123,7 +124,7 @@ export default async function PersonProfilePage({
   // (p_uid = auth.uid()) auth bağlamı REST çağrısına taşınamazsa false değil
   // SQL NULL döner; null && ... self dalını sessizce düşürürken !null admin
   // dalını ayakta bırakır (4C QA 2a asimetrisi).
-  const isSelf = user.id === profile.id;
+  const isSelf = isSameUser(user.id, profile.id);
   const personIsAdvisor = profile.clubs.some((c) => c.relation === "advisor");
   let viewerIsSuperAdmin = false;
   if (personIsAdvisor && !isSelf) {

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowLeft, CalendarClock, MapPin, Ticket, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { canManageClub, isClubPresidentRole } from "@/lib/authz";
 import { RSVPButton } from "@/components/shared/rsvp-button";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { AddToCalendar } from "./add-to-calendar";
@@ -142,9 +143,13 @@ export default async function EventDetailPage({
     .eq("club_id", data.club_id)
     .eq("user_id", user.id)
     .maybeSingle();
-  const isClubAdmin = myMembership?.role?.toString().toUpperCase() === "ADMIN";
+  const isClubAdmin = isClubPresidentRole(myMembership?.role);
   const isClubAdvisor = club?.advisor_id === user.id;
-  const canManagePhotos = isSuperAdmin || isClubAdmin || isClubAdvisor;
+  const canManagePhotos = canManageClub({
+    isSuperAdmin,
+    isClubAdvisor,
+    isClubPresident: isClubAdmin,
+  });
 
   let photos: EventPhoto[] = [];
   if (isPast) {

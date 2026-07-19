@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { rpcGrant } from "@/lib/authz";
 import { PageShell } from "@/components/shared/page-shell";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -78,7 +79,7 @@ export default async function MessageThreadPage({
   if (canWriteError) {
     console.error("[messages] can_write_conversation hatası:", canWriteError);
   }
-  const canWrite = canWriteRaw === true;
+  const canWrite = rpcGrant(canWriteRaw);
 
   // Son 200 mesaj. Embed FK (messages.sender_user_id → profiles) 4A'da mevcut;
   // DESC + limit ile en YENİ 200 alınır, kodda reverse ile kronolojiye döner.

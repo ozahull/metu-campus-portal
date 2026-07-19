@@ -45,9 +45,11 @@ export async function generateMetadata(): Promise<Metadata> {
       statusBarStyle: "default",
       title: "Kampüs",
     },
-    icons: {
-      apple: "/icons/icon-192.png",
-    },
+    // İkonlar dosya konvansiyonuyla: app/icon.svg (sekme), app/favicon.ico
+    // (/favicon.ico 404 fix'i), app/apple-icon.png (180x180 full-bleed —
+    // iOS "Ana Ekrana Ekle"). Elle icons.apple tanımı kaldırıldı: eski 192'lik
+    // yuvarlak-şeffaf PNG apple-touch-icon için yanlış biçimdi ve dosya
+    // konvansiyonuyla çift <link> üretiyordu.
   };
 }
 

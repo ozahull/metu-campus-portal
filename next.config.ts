@@ -10,18 +10,21 @@ const SUPABASE_URL =
   "https://zmnmdcuvdrvgdkdcaxjj.supabase.co";
 const SUPABASE_WSS = SUPABASE_URL.replace(/^https:/, "wss:");
 
-// GÜVENLİK SERTLEŞTİRME #3 — CSP şimdilik RAPOR modunda
-// (Content-Security-Policy-Report-Only): hiçbir şey BLOKLANMAZ, ihlaller
-// tarayıcı konsoluna düşer. Canlıda temiz çıktıktan sonra enforce'a alınacak
-// (başlık adını Content-Security-Policy yapmak yeterli).
+// GÜVENLİK SERTLEŞTİRME #3 — CSP artık ENFORCE modunda (Content-Security-Policy).
+// Report-Only turunda canlıda 13 sayfa gezildi ve ihlal envanteri BOŞ çıktı
+// (tespit mekanizması kasıtlı harici görselle doğrulandı) → politika bloklamaya
+// alındı. Direktif STRING'i Report-Only ile BİREBİR aynıdır; yalnız başlık adı
+// değişti (yeni blok riski yok).
 //
-// 'unsafe-inline' GEREKÇESİ: Next.js App Router hydration bootstrap'i inline
-// <script> üretir ve nonce tabanlı CSP, nonce'un proxy'de üretilip her isteğe
-// işlenmesini gerektirir (statik headers() ile mümkün değil; ayrı bir refactor).
-// Bu turda amaç önce GÖZLEM (Report-Only) — nonce'a geçiş enforce aşamasında
-// değerlendirilecek. style-src 'unsafe-inline': next/font + inline stiller.
-// worker-src blob: html5-qrcode tarayıcı worker'ı için.
-const CSP_REPORT_ONLY = [
+// 'unsafe-inline' KORUNDU (KALDIRMA): Next.js App Router hydration bootstrap'i
+// inline <script> üretir; nonce tabanlı CSP, nonce'un proxy'de üretilip her isteğe
+// işlenmesini gerektirir (statik headers() ile mümkün değil — ayrı refactor).
+// Şimdi kaldırılırsa site kırılır. style-src 'unsafe-inline': next/font + inline
+// stiller. worker-src blob: html5-qrcode tarayıcı worker'ı için.
+//
+// ⚠️ DEPLOY SONRASI: izin listesinde OLMAYAN yeni bir kaynak artık BLOKLANIR —
+// canlıda tam bir tur (tüm sayfalar + QR check-in + push) gerekiyor.
+const CSP = [
   "default-src 'self'",
   `connect-src 'self' ${SUPABASE_URL} ${SUPABASE_WSS} https://fcm.googleapis.com https://vercel.live`,
   "script-src 'self' 'unsafe-inline'",
@@ -48,8 +51,8 @@ const SECURITY_HEADERS = [
   { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=()" },
   // HSTS — Vercel genelde ekler; yine de açıkça bildirilir (zararsız, idempotent).
   { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
-  // CSP — RAPOR modunda (yukarıdaki blok yorumuna bak; enforce ETME).
-  { key: "Content-Security-Policy-Report-Only", value: CSP_REPORT_ONLY },
+  // CSP — ENFORCE modunda (yukarıdaki blok yorumuna bak; 'unsafe-inline' korunur).
+  { key: "Content-Security-Policy", value: CSP },
 ];
 
 const nextConfig: NextConfig = {

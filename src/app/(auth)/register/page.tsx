@@ -232,7 +232,7 @@ export default function RegisterPage() {
                 </div>
               </div>
               {showNameMismatch && (
-                <p className="-mt-2 text-xs text-destructive">
+                <p role="alert" className="-mt-2 text-xs text-destructive">
                   {t("register.nameMismatch")}
                 </p>
               )}
@@ -253,7 +253,7 @@ export default function RegisterPage() {
                   required
                 />
                 {!emailValid && (
-                  <p className="text-xs text-destructive">
+                  <p role="alert" className="text-xs text-destructive">
                     {t("register.domainError")}
                   </p>
                 )}

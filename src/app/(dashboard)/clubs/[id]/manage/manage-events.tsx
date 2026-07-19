@@ -321,7 +321,7 @@ export function ManageEvents({
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="font-medium">{ev.title}</h4>
+                      <h3 className="font-medium">{ev.title}</h3>
                       <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium tracking-wide uppercase ${meta.cls}`}>
                         {t(`status.${ev.status}`)}
                       </span>
@@ -413,6 +413,7 @@ export function ManageEvents({
                           onChange={(e) => setNote(e.target.value)}
                           rows={2}
                           placeholder={t("changesPlaceholder")}
+                          aria-label={t("changesPlaceholder")}
                           disabled={busy}
                           className="resize-none"
                         />

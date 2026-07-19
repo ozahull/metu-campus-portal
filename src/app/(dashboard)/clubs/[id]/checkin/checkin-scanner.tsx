@@ -325,6 +325,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
               if (e.key === "Enter") void verifyManual();
             }}
             placeholder={t("manualPlaceholder")}
+            aria-label={t("manualPlaceholder")}
             disabled={processing}
             inputMode="text"
             autoCapitalize="characters"
@@ -358,6 +359,7 @@ export function CheckinScanner({ approved }: { approved: ApprovedTicket[] }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("searchPlaceholder")}
+            aria-label={t("searchPlaceholder")}
             className="h-11 pl-9"
           />
         </div>

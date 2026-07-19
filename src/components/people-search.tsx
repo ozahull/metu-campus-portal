@@ -261,6 +261,7 @@ function SearchInput({
             : undefined
         }
         autoFocus={autoFocus}
+        aria-label={t("placeholder")}
         autoComplete="off"
         spellCheck={false}
         value={search.query}

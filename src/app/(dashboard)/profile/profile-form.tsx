@@ -108,7 +108,7 @@ export function ProfileForm({
               <Label htmlFor="full-name">{t("nameCard.label")}</Label>
               <Input id="full-name" value={name} onChange={(e) => setName(e.target.value)} disabled={nameBusy} aria-invalid={nameMismatch} required />
               {nameMismatch && (
-                <p className="text-xs text-destructive">
+                <p role="alert" className="text-xs text-destructive">
                   {t("toasts.nameMismatch")}
                 </p>
               )}

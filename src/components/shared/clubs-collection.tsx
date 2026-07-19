@@ -54,6 +54,7 @@ export function ClubsCollection({
           <Input
             type="search"
             placeholder={t("searchPlaceholder")}
+            aria-label={t("searchPlaceholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="h-11 rounded-full pl-11 text-base"

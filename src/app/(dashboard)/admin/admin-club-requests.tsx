@@ -152,7 +152,7 @@ function RequestRow({
           <p className="text-[0.7rem] font-medium tracking-wide text-muted-foreground uppercase">
             {t("requesterLabel")}: {req.requester_name}
           </p>
-          <h4 className="font-medium">{req.name}</h4>
+          <h3 className="font-medium">{req.name}</h3>
           <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5 tabular-nums">
               <Clock className="size-3.5" />
@@ -238,6 +238,11 @@ function RequestRow({
             onChange={(e) => setNote(e.target.value)}
             rows={2}
             placeholder={
+              mode === "reject"
+                ? t("rejectPlaceholder")
+                : t("changesPlaceholder")
+            }
+            aria-label={
               mode === "reject"
                 ? t("rejectPlaceholder")
                 : t("changesPlaceholder")

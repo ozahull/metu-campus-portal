@@ -32,7 +32,7 @@ export function ManageTickets({ groups }: { groups: EventTicketGroup[] }) {
           key={g.eventId}
           className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4"
         >
-          <h4 className="min-w-0 truncate font-medium">{g.title}</h4>
+          <h3 className="min-w-0 truncate font-medium">{g.title}</h3>
           <div className="flex items-center gap-4 text-xs text-muted-foreground tabular-nums">
             <span className="inline-flex items-center gap-1.5">
               <Ticket className="size-3.5" />

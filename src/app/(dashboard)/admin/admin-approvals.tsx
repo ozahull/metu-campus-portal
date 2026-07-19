@@ -128,7 +128,7 @@ function PendingRow({ ev, userId }: { ev: PendingEvent; userId: string }) {
           <p className="text-[0.7rem] font-medium tracking-wide text-muted-foreground uppercase">
             {ev.club_name ?? "—"}
           </p>
-          <h4 className="font-medium">{ev.title}</h4>
+          <h3 className="font-medium">{ev.title}</h3>
           <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5 tabular-nums">
               <Clock className="size-3.5" />
@@ -201,6 +201,7 @@ function PendingRow({ ev, userId }: { ev: PendingEvent; userId: string }) {
             onChange={(e) => setNote(e.target.value)}
             rows={2}
             placeholder={t("changesPlaceholder")}
+            aria-label={t("changesPlaceholder")}
             disabled={busy}
             className="resize-none"
           />

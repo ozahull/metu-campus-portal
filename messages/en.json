@@ -761,7 +761,7 @@
       "title": "Add New Club",
       "subtitle": "Admin panel · Create a club",
       "nameLabel": "Club Name",
-      "namePlaceholder": "e.g. Computer Science Society",
+      "namePlaceholder": "e.g. Computer Science Club",
       "descLabel": "Club Description",
       "descPlaceholder": "Briefly describe the club's purpose and activities…",
       "submit": "Add Club",

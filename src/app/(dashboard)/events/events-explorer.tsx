@@ -23,8 +23,10 @@ export type EventRow = {
   attending: boolean;
 };
 
+// text-base mobil: iOS Safari 16px altındaki form kontrolüne odakta kalıcı
+// zoom yapar — küçük görünüm yalnız md+ (ui/input deseni).
 const selectClass =
-  "h-11 rounded-full border border-border bg-card px-4 text-sm text-foreground outline-none transition-colors focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring [&>option]:bg-card";
+  "h-11 rounded-full border border-border bg-card px-4 text-base text-foreground outline-none transition-colors focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring [&>option]:bg-card md:text-sm";
 
 /** Kategori filtresi pill chip'i — seçili dolu primary, diğerleri outline. */
 function chipCls(active: boolean): string {

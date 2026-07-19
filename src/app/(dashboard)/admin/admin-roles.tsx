@@ -17,8 +17,10 @@ import {
 } from "@/components/ui/card";
 import { type Option } from "./admin-assignments";
 
+// text-base mobil: iOS Safari 16px altındaki form kontrolüne odakta kalıcı
+// zoom yapar — küçük görünüm yalnız md+ (ui/input deseni).
 const selectClass =
-  "h-9 w-full rounded-lg border border-border bg-card px-3 text-sm text-foreground outline-none transition-colors focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring [&>option]:bg-card";
+  "h-9 w-full rounded-lg border border-border bg-card px-3 text-base text-foreground outline-none transition-colors focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring [&>option]:bg-card md:text-sm";
 
 /**
  * HOCA (ADVISOR) rol atama — yalnız SUPER_ADMIN. Rol yazma yolu profiles'ta

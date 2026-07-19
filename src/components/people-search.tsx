@@ -274,7 +274,9 @@ function SearchInput({
           search.onKeyDown(e, onSelect);
         }}
         placeholder={t("placeholder")}
-        className="h-9 w-full rounded-full border border-input bg-background pl-9 pr-3 text-sm text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+        // text-base mobil: iOS Safari 16px altındaki input'a odakta kalıcı zoom
+        // yapar (ui/input deseni) — görsel küçüklük yalnız md+ (md:text-sm).
+        className="h-9 w-full rounded-full border border-input bg-background pl-9 pr-3 text-base text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 md:text-sm"
       />
     </div>
   );

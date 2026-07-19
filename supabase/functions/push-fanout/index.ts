@@ -119,6 +119,21 @@ function getAppServer(): Promise<webpush.ApplicationServer> {
   return appServerPromise;
 }
 
+// Sabit-zamanlı sır karşılaştırması (#9): SHA-256 özetleri sabit 32 bayttır;
+// XOR biriktiren döngü, farkın konumundan bağımsız aynı sürede biter.
+async function secretsMatch(a: string, b: string): Promise<boolean> {
+  const enc = new TextEncoder();
+  const [ha, hb] = await Promise.all([
+    crypto.subtle.digest("SHA-256", enc.encode(a)),
+    crypto.subtle.digest("SHA-256", enc.encode(b)),
+  ]);
+  const va = new Uint8Array(ha);
+  const vb = new Uint8Array(hb);
+  let diff = 0;
+  for (let i = 0; i < va.length; i++) diff |= va[i] ^ vb[i];
+  return diff === 0;
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
@@ -129,7 +144,11 @@ Deno.serve(async (req) => {
     console.error("[push-fanout] PUSH_WEBHOOK_SECRET tanımsız — fail-closed.");
     return new Response("Misconfigured", { status: 500 });
   }
-  if (req.headers.get("x-webhook-secret") !== secret) {
+  // GÜVENLİK #9: düz !== karşılaştırması teoride timing sızıntısıdır. İki değerin
+  // SHA-256 özeti alınıp sabit uzunlukta XOR döngüsüyle kıyaslanır — süre,
+  // eşleşen önekten bağımsız; uzunluk da özet üzerinden sızmamış olur.
+  const provided = req.headers.get("x-webhook-secret") ?? "";
+  if (!(await secretsMatch(provided, secret))) {
     return new Response("Unauthorized", { status: 401 });
   }
 

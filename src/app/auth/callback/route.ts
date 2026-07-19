@@ -13,10 +13,19 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   // Başarılı doğrulama sonrası gidilecek hedef (örn. şifre sıfırlama akışı).
-  // Açık yönlendirme (open redirect) önlemek için yalnızca site içi yollara izin ver.
+  // Açık yönlendirme (open redirect) önlemek için yalnızca site içi yollara izin
+  // ver. GÜVENLİK #10: '//evil.com' (protokol-göreli) ve '/\evil.com'
+  // (tarayıcıların '//' gibi yorumladığı) tek '/' kontrolünden geçer — bugün
+  // ${origin}${next} öneki istismarı engelliyor ama kod ileride redirect(next)'e
+  // dönerse açılırdı; iki biçim de açıkça reddedilir.
   const nextParam = searchParams.get("next");
   const next =
-    nextParam && nextParam.startsWith("/") ? nextParam : "/dashboard";
+    nextParam &&
+    nextParam.startsWith("/") &&
+    !nextParam.startsWith("//") &&
+    !nextParam.startsWith("/\\")
+      ? nextParam
+      : "/dashboard";
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=invalid_domain`);

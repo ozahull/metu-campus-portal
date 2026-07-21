@@ -7,11 +7,14 @@
 //
 // Strateji (savunmacı, birden çok katman):
 //  1) Kullanıcı kimliği YALNIZCA `id` — e-posta / ad / ip düşürülür.
-//  2) İstek gövdesi/başlıkları/çerezleri: çerez ve Authorization tamamen silinir.
+//  2) İstek: cookies / data (gövde) / query_string ve Authorization/Cookie
+//     başlıkları TAMAMEN SİLİNİR (maskeleme değil). url yalnız hassas
+//     parametreleri maskelenerek kalır (yol + debug için).
 //  3) URL query string'inden hassas parametreler (code, token, ...) çıkarılır.
 //  4) Herhangi bir derinlikte, anahtar adı hassas desene uyan alanın DEĞERİ
 //     maskelenir (e-posta, ad, bio, mesaj gövdesi, bilet token'ı, iban, telefon…).
-//  5) Breadcrumb'lardaki URL'ler ve veriler aynı kurallarla temizlenir.
+//  5) Breadcrumb'ların `data` payload'ı TAMAMEN SİLİNİR (yalnız path'li url
+//     korunur); message/url'deki query string'in TAMAMI atılır (path kalır).
 
 type AnyRecord = Record<string, unknown>;
 
@@ -46,6 +49,20 @@ export function scrubUrl(url: unknown): unknown {
     })
     .join("&");
   return `${base}?${cleaned}`;
+}
+
+/** URL'den TÜM query string'i (ve fragment'i) atar; yalnız yol (path) kalır.
+ *  scrubUrl hassas PARAMETRELERİ maskeler; bu ise breadcrumb'larda query'nin
+ *  TAMAMINI düşürür (KVKK — breadcrumb URL'lerinde token/e-posta/oturum
+ *  fragment'i sızmasın). İlkel olmayan / boş girdi olduğu gibi döner. */
+export function stripUrlQuery(url: unknown): unknown {
+  if (typeof url !== "string" || url.length === 0) return url;
+  const q = url.indexOf("?");
+  const h = url.indexOf("#");
+  let end = url.length;
+  if (q !== -1) end = Math.min(end, q);
+  if (h !== -1) end = Math.min(end, h);
+  return url.slice(0, end);
 }
 
 /** Bir değeri (obje/dizi/ilkel) hassas-anahtar kuralıyla derinlemesine temizler. */
@@ -87,16 +104,26 @@ export interface ScrubbableEvent {
   [k: string]: unknown;
 }
 
-/** Tek bir breadcrumb'ı temizler (fetch/xhr URL'leri + veri alanları). */
+/** Tek bir breadcrumb'ı temizler (KVKK). Serbest `data` payload'ı (fetch gövdesi/
+ *  parametreleri, xhr verisi) PII taşıyabilir → TAMAMEN silinir; yalnız `data.url`
+ *  query'siz (path) korunur. `message` bir URL ise query string'i atılır. */
 export function scrubBreadcrumb<T extends ScrubbableBreadcrumb>(crumb: T): T {
   if (!crumb || typeof crumb !== "object") return crumb;
-  const next = { ...crumb };
-  if (next.data && typeof next.data === "object") {
-    const data = { ...(next.data as AnyRecord) };
-    if ("url" in data) data.url = scrubUrl(data.url);
-    next.data = deepRedact(data) as AnyRecord;
+  const next: ScrubbableBreadcrumb = { ...crumb };
+  if (typeof next.message === "string") {
+    next.message = stripUrlQuery(next.message) as string;
   }
-  return next;
+  if ("data" in next) {
+    const data = next.data;
+    const url =
+      data && typeof data === "object" ? (data as AnyRecord).url : undefined;
+    const strippedUrl = stripUrlQuery(url);
+    delete next.data;
+    if (typeof strippedUrl === "string" && strippedUrl.length > 0) {
+      next.data = { url: strippedUrl };
+    }
+  }
+  return next as T;
 }
 
 /**
@@ -129,20 +156,27 @@ export function scrubEvent<T extends ScrubbableEvent>(event: T): T {
     next.user = id === undefined || id === null ? {} : { id };
   }
 
-  // 2) İstek: çerez/başlık/gövde/query temizliği.
+  // 2) İstek: PII taşıyan kaplar TAMAMEN silinir (maskeleme değil) — cookies,
+  //    data (gövde), query_string ve Authorization/Cookie/Set-Cookie başlıkları.
+  //    url yalnız hassas parametreleri maskelenerek kalır (yol + debug için).
   if (next.request && typeof next.request === "object") {
     const req = { ...(next.request as AnyRecord) };
     delete req.cookies;
+    delete req.data;
+    delete req.query_string;
     if (req.headers && typeof req.headers === "object") {
       const headers: AnyRecord = {};
       for (const [k, v] of Object.entries(req.headers as AnyRecord)) {
+        const lk = k.toLowerCase();
+        if (lk === "authorization" || lk === "cookie" || lk === "set-cookie") {
+          continue; // SİL (maskeleme değil)
+        }
+        // Diğer hassas-adlı başlıklar (varsa) yine de maskelenir.
         headers[k] = SENSITIVE_KEY.test(k) ? REDACTED : v;
       }
       req.headers = headers;
     }
     if ("url" in req) req.url = scrubUrl(req.url);
-    if ("query_string" in req) req.query_string = REDACTED;
-    if ("data" in req) req.data = deepRedact(req.data);
     next.request = req;
   }
 

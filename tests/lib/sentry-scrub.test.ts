@@ -8,6 +8,7 @@ import {
   scrubBreadcrumb,
   scrubEvent,
   scrubUrl,
+  stripUrlQuery,
 } from "@/lib/sentry-scrub";
 
 describe("scrubUrl — hassas query parametreleri", () => {
@@ -79,7 +80,7 @@ describe("scrubEvent — event bütünsel temizlik", () => {
     expect(out.user).toEqual({});
   });
 
-  it("istek: çerez silinir, Cookie/Authorization başlığı maskelenir, query_string düşer", () => {
+  it("istek: cookies/data/query_string + Cookie/Authorization başlığı SİLİNİR; url maskeli, User-Agent kalır", () => {
     const out = scrubEvent({
       request: {
         url: "https://x.app/reset?token=zzz",
@@ -91,17 +92,17 @@ describe("scrubEvent — event bütünsel temizlik", () => {
     });
     const req = out.request as Record<string, unknown>;
     expect(req.cookies).toBeUndefined();
+    expect(req.data).toBeUndefined();
+    expect(req.query_string).toBeUndefined();
     const headers = req.headers as Record<string, unknown>;
-    expect(headers.Cookie).toBe("[Filtered]");
-    expect(headers.Authorization).toBe("[Filtered]");
+    expect(headers.Cookie).toBeUndefined();
+    expect(headers.Authorization).toBeUndefined();
     expect(headers["User-Agent"]).toBe("UA");
+    // url yalnız hassas parametresi maskelenerek kalır (yol + debug için).
     expect(req.url).toBe("https://x.app/reset?token=[Filtered]");
-    expect(req.query_string).toBe("[Filtered]");
-    expect((req.data as Record<string, unknown>).body).toBe("[Filtered]");
-    expect((req.data as Record<string, unknown>).ok).toBe("kalir");
   });
 
-  it("extra ve breadcrumb'lar da temizlenir", () => {
+  it("extra maskeli; breadcrumb data SİLİNİR (yalnız path'li url kalır)", () => {
     const out = scrubEvent({
       extra: { messageBody: "gizli", note: "kalir" },
       breadcrumbs: [
@@ -112,8 +113,9 @@ describe("scrubEvent — event bütünsel temizlik", () => {
     expect((out.extra as Record<string, unknown>).messageBody).toBe("[Filtered]");
     expect((out.extra as Record<string, unknown>).note).toBe("kalir");
     const crumbData = out.breadcrumbs![0].data as Record<string, unknown>;
-    expect(crumbData.url).toBe("https://x.app/cb?code=[Filtered]");
-    expect(crumbData.email).toBe("[Filtered]");
+    // data payload'ı silindi: yalnız query'siz url kaldı, email GİTTİ.
+    expect(crumbData.url).toBe("https://x.app/cb");
+    expect(crumbData.email).toBeUndefined();
   });
 
   it("orijinal event'i mutasyona uğratmaz (kopya döndürür)", () => {
@@ -124,13 +126,102 @@ describe("scrubEvent — event bütünsel temizlik", () => {
 });
 
 describe("scrubBreadcrumb — fetch/xhr izi", () => {
-  it("data.url'deki token'ı ve e-postayı maskeler", () => {
+  it("data payload'ı silinir; yalnız query'siz url kalır (path)", () => {
     const out = scrubBreadcrumb({
       category: "fetch",
       data: { url: "https://x.app/api?token=zzz", email: "a@b.com" },
     });
     const data = out.data as Record<string, unknown>;
-    expect(data.url).toBe("https://x.app/api?token=[Filtered]");
-    expect(data.email).toBe("[Filtered]");
+    expect(data.url).toBe("https://x.app/api");
+    expect(data.email).toBeUndefined();
+  });
+
+  it("message bir URL ise query string atılır (path kalır)", () => {
+    const out = scrubBreadcrumb({
+      category: "navigation",
+      message: "https://x.app/reset?token=zzz",
+    });
+    expect(out.message).toBe("https://x.app/reset");
+  });
+
+  it("url'siz data tamamen düşer", () => {
+    const out = scrubBreadcrumb({
+      category: "xhr",
+      data: { body: "gizli gövde", email: "a@b.com" },
+    });
+    expect(out.data).toBeUndefined();
+  });
+});
+
+describe("stripUrlQuery — query + fragment atılır, path kalır", () => {
+  it("query string'i düşürür", () => {
+    expect(stripUrlQuery("https://x.app/reset?token=zzz&e=a@b.com")).toBe(
+      "https://x.app/reset",
+    );
+  });
+  it("fragment'i düşürür (oturum token'ı fragment'te olabilir)", () => {
+    expect(stripUrlQuery("https://x.app/cb#access_token=zzz")).toBe(
+      "https://x.app/cb",
+    );
+  });
+  it("query'siz URL ve ilkel olmayan girdi olduğu gibi döner", () => {
+    expect(stripUrlQuery("https://x.app/dashboard")).toBe(
+      "https://x.app/dashboard",
+    );
+    expect(stripUrlQuery(undefined)).toBeUndefined();
+    expect(stripUrlQuery(123)).toBe(123);
+  });
+});
+
+// Genişletilmiş PII silme (KVKK) — beforeSend'in 5 hassas kabı MASKELEMEZ, SİLER.
+// Her vaka: o PII'yi taşıyan sahte event → çıktıda sızıntı YOK.
+describe("scrubEvent — genişletilmiş PII silme (KVKK, 5 vaka)", () => {
+  it("1) request.data (gövde) silinir", () => {
+    const out = scrubEvent({
+      request: { data: { body: "gizli mesaj", email: "a@metu.edu.tr" } },
+    });
+    expect((out.request as Record<string, unknown>).data).toBeUndefined();
+  });
+
+  it("2) request.cookies silinir", () => {
+    const out = scrubEvent({
+      request: { cookies: { "sb-access-token": "secret", session: "abc" } },
+    });
+    expect((out.request as Record<string, unknown>).cookies).toBeUndefined();
+  });
+
+  it("3) Authorization başlığı silinir (küçük-büyük harf duyarsız), diğer başlık kalır", () => {
+    const out = scrubEvent({
+      request: {
+        headers: { authorization: "Bearer gizli-token", "x-ok": "kalir" },
+      },
+    });
+    const headers = (out.request as Record<string, unknown>).headers as Record<
+      string,
+      unknown
+    >;
+    expect(headers.authorization).toBeUndefined();
+    expect(headers["x-ok"]).toBe("kalir");
+  });
+
+  it("4) request.query_string silinir", () => {
+    const out = scrubEvent({
+      request: { query_string: "token=zzz&email=a@b.com" },
+    });
+    expect(
+      (out.request as Record<string, unknown>).query_string,
+    ).toBeUndefined();
+  });
+
+  it("5) breadcrumb data payload'ı silinir", () => {
+    const out = scrubEvent({
+      breadcrumbs: [
+        {
+          category: "fetch",
+          data: { requestBody: "gizli", email: "a@b.com", token: "T" },
+        },
+      ],
+    });
+    expect(out.breadcrumbs![0].data).toBeUndefined();
   });
 });

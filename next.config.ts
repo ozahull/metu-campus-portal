@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+
+// Sentry ingest host'u — CSP connect-src'ye eklenir (aşağıda). DSN'in bölgesi
+// (o<org>.ingest.sentry.io / .us. / .de.) baştan bilinmediği için wildcard.
+// Eklenmezse ENFORCE CSP tarayıcıda Sentry isteklerini SESSİZCE bloklar.
+const SENTRY_INGEST = "https://*.sentry.io";
 
 // Supabase host'u CSP connect/img kaynakları için (env varsa oradan; yoksa
 // bilinen proje ref'i). Realtime websocket için wss karşılığı da gerekir.
@@ -26,7 +32,7 @@ const SUPABASE_WSS = SUPABASE_URL.replace(/^https:/, "wss:");
 // canlıda tam bir tur (tüm sayfalar + QR check-in + push) gerekiyor.
 const CSP = [
   "default-src 'self'",
-  `connect-src 'self' ${SUPABASE_URL} ${SUPABASE_WSS} https://fcm.googleapis.com https://vercel.live`,
+  `connect-src 'self' ${SUPABASE_URL} ${SUPABASE_WSS} https://fcm.googleapis.com https://vercel.live ${SENTRY_INGEST}`,
   "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: ${SUPABASE_URL}`,
@@ -81,4 +87,17 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+// Sentry: config'i sarmalar (instrumentation + onRequestError + kaynak haritası
+// yükleme). Kaynak haritaları YALNIZCA SENTRY_AUTH_TOKEN varsa yüklenir; yoksa
+// build sessizce atlar (kırılmaz). Yüklenen .map'ler client bundle'dan silinir
+// (herkese açık kaynak sızıntısı yok). disableLogger/automaticVercelMonitors
+// Turbopack ile çalışmadığından KULLANILMADI (deprecation uyarısı çıkmasın).
+export default withSentryConfig(withNextIntl(nextConfig), {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  sourcemaps: { deleteSourcemapsAfterUpload: true },
+  telemetry: false,
+});

@@ -131,7 +131,8 @@
       "today": "Bugün",
       "yesterday": "Dün"
     },
-    "historyTruncated": "Yalnızca son {count} mesaj gösteriliyor; daha eski mesajlar bu görünümde yüklenmiyor.",
+    "loadOlder": "Daha eski mesajları yükle",
+    "loadOlderError": "Daha eski mesajlar yüklenemedi. Lütfen tekrar deneyin.",
     "sendRateLimit": "Çok hızlı mesaj gönderiyorsunuz. Lütfen kısa bir süre bekleyin."
   },
   "badges": {

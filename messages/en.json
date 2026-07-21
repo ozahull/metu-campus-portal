@@ -131,7 +131,8 @@
       "today": "Today",
       "yesterday": "Yesterday"
     },
-    "historyTruncated": "Only the last {count} messages are shown; older messages are not loaded in this view.",
+    "loadOlder": "Load older messages",
+    "loadOlderError": "Could not load older messages. Please try again.",
     "sendRateLimit": "You are sending messages too quickly. Please wait a moment."
   },
   "badges": {

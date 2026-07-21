@@ -14,14 +14,14 @@ import {
   type ConversationRow,
 } from "@/lib/messaging";
 import { cn } from "@/lib/utils";
-import { MessageThread, type ThreadMessage } from "./message-thread";
+import {
+  MESSAGES_PAGE_SIZE,
+  MESSAGE_COLS,
+  MessageThread,
+  type ThreadMessage,
+} from "./message-thread";
 
 export const dynamic = "force-dynamic";
-
-// D25: 200+ mesajlı kanalda en eskiler sessizce gizlenmesin — limit+1 çekilir,
-// taşma varsa kullanıcıya "yalnızca son N gösteriliyor" bildirilir. (Tam
-// sayfalama bilinçli olarak kapsam dışı; sessiz kayıp kabul edilmez.)
-const MESSAGE_LIMIT = 200;
 
 export async function generateMetadata({
   params,
@@ -81,22 +81,23 @@ export default async function MessageThreadPage({
   }
   const canWrite = rpcGrant(canWriteRaw);
 
-  // Son 200 mesaj. Embed FK (messages.sender_user_id → profiles) 4A'da mevcut;
-  // DESC + limit ile en YENİ 200 alınır, kodda reverse ile kronolojiye döner.
-  // limit+1: 201. satır geldiyse geçmiş kesilmiş demektir → gösterge çıkar.
+  // Son MESSAGES_PAGE_SIZE mesaj (embed FK messages.sender_user_id → profiles,
+  // 4A). DESC+limit ile en YENİ sayfa alınır, reverse ile kronolojiye döner.
+  // +1: taşma varsa daha eskisi VAR demektir → "daha eski yükle" (keyset,
+  // sessiz kesme YOK; eski mesajlar erişilebilir — ölçek Commit 3).
   const { data: msgRaw, error: msgError } = await supabase
     .from("messages")
-    .select("id, sender_user_id, body, created_at, sender:sender_user_id(full_name)")
+    .select(MESSAGE_COLS)
     .eq("conversation_id", id)
     .order("created_at", { ascending: false })
-    .order("id", { ascending: true })
-    .limit(MESSAGE_LIMIT + 1);
+    .order("id", { ascending: false })
+    .limit(MESSAGES_PAGE_SIZE + 1);
   if (msgError) {
     console.error("[messages] mesaj listesi hatası:", msgError);
   }
   const msgRows = (msgRaw ?? []) as ThreadMessage[];
-  const historyTruncated = msgRows.length > MESSAGE_LIMIT;
-  const messages = msgRows.slice(0, MESSAGE_LIMIT).reverse();
+  const hasOlder = msgRows.length > MESSAGES_PAGE_SIZE;
+  const messages = msgRows.slice(0, MESSAGES_PAGE_SIZE).reverse();
 
   const Icon = conversationIcon(row.type);
   const title =
@@ -132,17 +133,12 @@ export default async function MessageThreadPage({
         </div>
       </div>
 
-      {historyTruncated && (
-        <p className="mb-3 rounded-lg border border-dashed border-border bg-muted/40 px-3 py-2 text-center text-xs text-muted-foreground">
-          {t("historyTruncated", { count: MESSAGE_LIMIT })}
-        </p>
-      )}
-
       <MessageThread
         conversationId={id}
         currentUserId={user.id}
         canWrite={canWrite}
         initialMessages={messages}
+        initialHasOlder={hasOlder}
       />
     </PageShell>
   );

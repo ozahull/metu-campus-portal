@@ -9,6 +9,18 @@ import { beforeBreadcrumbScrub, beforeSendScrub } from "@/lib/sentry-scrub";
 
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
+// TANI (sessiz no-op'a karşı): NEXT_PUBLIC_* değişkenleri BUILD zamanında client
+// bundle'a GÖMÜLÜR. DSN build anında yoksa `enabled:false` olur ve SDK hiçbir
+// istek göndermez — canlıda bu "0 istek / waiting for first event" olarak görünür,
+// nedeni belirsizdir. Production bundle'ında görünür uyarı bırak: Vercel Production
+// ortamına DSN eklendikten sonra YENİDEN DEPLOY şarttır (mevcut build gömülü değeri taşır).
+if (!dsn && process.env.NODE_ENV === "production") {
+  console.warn(
+    "[Sentry] NEXT_PUBLIC_SENTRY_DSN bu build'e gömülü DEĞİL — tarayıcı hata izleme DEVRE DIŞI. " +
+      "Vercel Production ortamına DSN ekleyip YENİDEN DEPLOY edin.",
+  );
+}
+
 Sentry.init({
   dsn,
   enabled: Boolean(dsn),

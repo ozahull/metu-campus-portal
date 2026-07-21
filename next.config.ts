@@ -90,13 +90,27 @@ const nextConfig: NextConfig = {
 // Sentry: config'i sarmalar (instrumentation + onRequestError + kaynak haritası
 // yükleme). Kaynak haritaları için ÜÇ değişkenin de BUILD anında olması gerekir:
 // SENTRY_AUTH_TOKEN (gizli) + SENTRY_ORG + SENTRY_PROJECT. Biri eksikse Sentry
-// bundler-plugin yüklemeyi SESSİZCE atlar → stack trace minified kalır. Yüklenen
-// .map'ler client bundle'dan silinir (herkese açık kaynak sızıntısı yok).
+// bundler-plugin yüklemeyi SESSİZCE atlar → stack trace minified kalır (js_no_source /
+// symbolicated:false). Yüklenen .map'ler client bundle'dan silinir
+// (deleteSourcemapsAfterUpload:true → herkese açık kaynak sızıntısı yok).
 //
-// Next 16 + Turbopack: @sentry/nextjs ≥10.x kaynak haritalarını `next build` ile
-// Turbopack `runAfterProductionCompile` hook'u üzerinden OTOMATİK yükler
-// (widenClientFileUpload + sourcemaps yeterli; ek Turbopack config gerekmez).
-// disableLogger/automaticVercelMonitors Turbopack ile çalışmadığından KULLANILMADI.
+// ⚠️ ÖNEMLİ — next.config.ts, .env.local'i OKUMAZ: Next.js önce next.config'i
+// değerlendirir, .env* dosyalarını SONRA yükler. Yani buradaki process.env.SENTRY_*
+// yalnız GERÇEK ortam değişkenlerinden gelir; .env.local'deki SENTRY_ORG/PROJECT/
+// AUTH_TOKEN burada GÖRÜNMEZ. Sonuç: YEREL `next build` kaynak haritası YÜKLEMEZ
+// (bu normal). Vercel bunları panelden gerçek env olarak enjekte eder → orada yüklenir.
+// (Ampirik kanıt 2026-07-21: yerel build'de üçü de "eksik" görünür; token'ı kabuğa
+// export etmeden yükleme olmaz.)
+//
+// Next 16 + Turbopack (10.67 ile AMPİRİK DOĞRULANDI): `next build` (bayraksız) Next
+// 16'da VARSAYILAN Turbopack'tir; parseBundlerArgs `process.env.TURBOPACK='auto'`
+// set eder → Sentry `detectActiveBundler()` doğru "turbopack" der →
+// `maybeEnableTurbopackSourcemaps` productionBrowserSourceMaps'i OTOMATİK açar →
+// Turbopack client .map ÜRETİR (yerel testte 48 client + 209 server .map) →
+// `runAfterProductionCompile` hook'u yükler. Ek Turbopack config / elle
+// productionBrowserSourceMaps GEREKMEZ. "Turbopack map üretmiyor" hipotezi YANLIŞ;
+// tek gerçek kapı BUILD env'inin varlığıdır. disableLogger/automaticVercelMonitors
+// Turbopack ile çalışmadığından KULLANILMADI.
 //
 // Boş string (Vercel'de tanımlı ama değersiz env) → undefined'a normalize edilir
 // ki plugin "org yok" gibi net uyarı verebilsin (org: "" sessizce başarısız olur).

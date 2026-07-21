@@ -5,10 +5,25 @@
 // `beforeSend` / `beforeBreadcrumb` olarak kullanır — tek kaynak, tek davranış.
 // Testi: sentry-scrub.test.ts (npm test).
 //
+// ⚠️ SINIR — SUNUCU-TARAFI (ingest) COĞRAFİ KONUM beforeSend İLE SİLİNEMEZ:
+// event.user.geo (ülke/şehir/bölge) SDK'da DEĞİL, Sentry ingest (Relay) sunucusunda,
+// olayı taşıyan HTTP bağlantısının IP'sinden TÜRETİLİR — ve bu, beforeSend
+// ÇALIŞTIKTAN SONRA olur. Dolayısıyla aşağıda geo'yu düşürüp ip_address'i null
+// yapmamız INGEST'te yeniden eklenen geo'yu ENGELLEMEZ (kanıt: canlı event'te
+// user.geo=Ashburn/Virginia hâlâ görünüyor; bu aslında Vercel fonksiyon IP'sidir).
+// Bu Sentry'nin bilinen davranışıdır (getsentry/sentry#92201): "Store IP Addresses"
+// kapalı olsa bile geo türetilir. TEK GERÇEK ÇÖZÜM KODDA DEĞİL, Sentry panelinde bir
+// sunucu-tarafı kuralıdır → Project Settings ▸ Security & Privacy ▸ Advanced Data
+// Scrubbing ▸ kural: `[Remove] [Anything] from [$user.geo.**]` (istenirse
+// `$user.ip_address` de). Bu kural enrichment'tan SONRA çalışır ve geo'yu gerçekten
+// siler. Aşağıdaki beforeSend katmanı yine de KORUNUR: (a) client (tarayıcı)
+// event'lerinde SDK'nın koyabileceği ip/geo'yu ve (b) IP/geo taşıyan istek
+// başlıklarını temizler — yani savunmanın SDK ayağıdır, panel kuralı ise ingest ayağı.
+//
 // Strateji (savunmacı, birden çok katman):
 //  1) Kullanıcı kimliği YALNIZCA `id` — e-posta / ad / username / geo düşürülür,
-//     ip_address AÇIKÇA null'a çekilir (Sentry sunucusu bağlantı IP'sinden
-//     coğrafi konum türetmesin — KVKK).
+//     ip_address AÇIKÇA null'a çekilir. (SDK ayağı; ingest-türevi geo için yukarıdaki
+//     panel kuralı ŞARTTIR — beforeSend tek başına yetmez.)
 //  2) İstek: cookies / data (gövde) / query_string ve Authorization/Cookie
 //     başlıkları TAMAMEN SİLİNİR (maskeleme değil). Ayrıca IP/coğrafi konum
 //     taşıyan başlıklar (X-Forwarded-For, X-Real-Ip, X-Vercel-Proxied-For ve
@@ -176,10 +191,11 @@ export function scrubEvent<T extends ScrubbableEvent>(event: T): T {
   const next: ScrubbableEvent = { ...event };
 
   // 1) Kullanıcı: yalnızca id kalsın (e-posta/ad/username/geo düşer).
-  //    ip_address AÇIKÇA null: Sentry sunucusu eksik IP'yi bağlantıdan ({{auto}})
-  //    türetip coğrafi konum (geo: ülke/şehir/enlem/boylam) ÇIKARMASIN (KVKK).
-  //    sendDefaultPii:false yetmez — geo IP'den SUNUCU tarafında türetilir.
-  //    geo hiç kopyalanmaz (whitelist), ip_address null'a sabitlenir.
+  //    ip_address AÇIKÇA null'a sabitlenir; geo hiç kopyalanmaz (whitelist).
+  //    NOT: Bu, ingest-tarafında bağlantı IP'sinden TÜRETİLEN geo'yu ENGELLEMEZ
+  //    (bkz. dosya başındaki #92201 uyarısı — o katman panel Advanced Data
+  //    Scrubbing kuralıyla kapatılır). Buradaki temizlik, client SDK'sının event'e
+  //    koyabileceği ip/geo için savunma katmanıdır (sendDefaultPii:false'a ek).
   if (next.user && typeof next.user === "object") {
     const id = (next.user as AnyRecord).id;
     const cleanUser: AnyRecord = { ip_address: null };

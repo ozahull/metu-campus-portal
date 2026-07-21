@@ -53,3 +53,23 @@ create index if not exists events_club_idx
 -- created_at) index'i vardı; gönderen bazlı sayım seq-scan'e düşüyordu.
 create index if not exists messages_sender_created_idx
   on public.messages (sender_user_id, created_at);
+
+-- ============================================================================
+-- 3) notifications — /notifications cursor sayfalama (ffbd122). CANLIDA elle
+--    oluşturulup DOĞRULANDI; db push'ta no-op geçer. Dosyada olmaları
+--    branch/replay/yeniden kurulum parity'si için ŞART.
+--
+--    İSİMLER canlıyla BİREBİR (idx_ öneki) — farklı adla yazarsak "if not exists"
+--    canlıda YENİ (kopya) index yaratırdı; no-op olması için ad da eşleşmeli.
+--
+--    idx_notifications_user_created_id: (user_id, created_at desc, id) — cursor'u
+--    (created_at,id) TAM kapsar (20260714120000'deki *_created_idx id İÇERMEZ →
+--    keyset için bu daha uygun). unread index'i 20260714120000'dekiyle örtüşür;
+--    canlı parity için ad'ıyla korunur (zararsız).
+-- ============================================================================
+create index if not exists idx_notifications_user_created_id
+  on public.notifications (user_id, created_at desc, id);
+
+create index if not exists idx_notifications_user_unread
+  on public.notifications (user_id)
+  where read_at is null;

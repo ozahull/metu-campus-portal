@@ -88,15 +88,54 @@ const nextConfig: NextConfig = {
 };
 
 // Sentry: config'i sarmalar (instrumentation + onRequestError + kaynak haritası
-// yükleme). Kaynak haritaları YALNIZCA SENTRY_AUTH_TOKEN varsa yüklenir; yoksa
-// build sessizce atlar (kırılmaz). Yüklenen .map'ler client bundle'dan silinir
-// (herkese açık kaynak sızıntısı yok). disableLogger/automaticVercelMonitors
-// Turbopack ile çalışmadığından KULLANILMADI (deprecation uyarısı çıkmasın).
+// yükleme). Kaynak haritaları için ÜÇ değişkenin de BUILD anında olması gerekir:
+// SENTRY_AUTH_TOKEN (gizli) + SENTRY_ORG + SENTRY_PROJECT. Biri eksikse Sentry
+// bundler-plugin yüklemeyi SESSİZCE atlar → stack trace minified kalır. Yüklenen
+// .map'ler client bundle'dan silinir (herkese açık kaynak sızıntısı yok).
+//
+// Next 16 + Turbopack: @sentry/nextjs ≥10.x kaynak haritalarını `next build` ile
+// Turbopack `runAfterProductionCompile` hook'u üzerinden OTOMATİK yükler
+// (widenClientFileUpload + sourcemaps yeterli; ek Turbopack config gerekmez).
+// disableLogger/automaticVercelMonitors Turbopack ile çalışmadığından KULLANILMADI.
+//
+// Boş string (Vercel'de tanımlı ama değersiz env) → undefined'a normalize edilir
+// ki plugin "org yok" gibi net uyarı verebilsin (org: "" sessizce başarısız olur).
+const emptyToUndef = (v: string | undefined) =>
+  v && v.trim().length > 0 ? v : undefined;
+
+const sentryOrg = emptyToUndef(process.env.SENTRY_ORG);
+const sentryProject = emptyToUndef(process.env.SENTRY_PROJECT);
+const sentryAuthToken = emptyToUndef(process.env.SENTRY_AUTH_TOKEN);
+
+// TANI (build log'unda görünür): kaynak haritası yüklemesinin ön koşulları var mı?
+// Değer YAZILMAZ — yalnız VAR/YOK. Üçü de yoksa neden yüklenmediği build log'unda
+// tek bakışta belli olur (task: "çıkmıyorsa neden").
+if (process.env.NODE_ENV === "production") {
+  const miss = [
+    !sentryAuthToken && "SENTRY_AUTH_TOKEN",
+    !sentryOrg && "SENTRY_ORG",
+    !sentryProject && "SENTRY_PROJECT",
+  ].filter(Boolean);
+  if (miss.length > 0) {
+    console.warn(
+      `[Sentry] Kaynak haritası yüklemesi ATLANACAK — eksik build env: ${miss.join(", ")}. ` +
+        "Vercel Production ortamına ekleyip YENİDEN DEPLOY edin (stack trace aksi halde minified kalır).",
+    );
+  } else {
+    console.log(
+      "[Sentry] Kaynak haritası yükleme ön koşulları TAM (org+project+authToken) — Turbopack upload çalışacak.",
+    );
+  }
+}
+
 export default withSentryConfig(withNextIntl(nextConfig), {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-  silent: !process.env.CI,
+  org: sentryOrg,
+  project: sentryProject,
+  authToken: sentryAuthToken,
+  // silent=false: Sentry'nin kaynak haritası yükleme adımı build log'unda GÖRÜNSÜN
+  // (eski `!process.env.CI` Vercel'de CI set edilmediğinde tüm çıktıyı gizliyordu →
+  // "build log'unda Sentry satırı yok" tanısı imkânsızdı).
+  silent: false,
   widenClientFileUpload: true,
   sourcemaps: { deleteSourcemapsAfterUpload: true },
   telemetry: false,

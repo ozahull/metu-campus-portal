@@ -5,6 +5,7 @@
 import { describe, expect, it } from "vitest";
 import {
   deepRedact,
+  isIpGeoHeader,
   scrubBreadcrumb,
   scrubEvent,
   scrubUrl,
@@ -63,21 +64,23 @@ describe("deepRedact — hassas anahtarların değeri maskelenir", () => {
 });
 
 describe("scrubEvent — event bütünsel temizlik", () => {
-  it("kullanıcıdan yalnız id kalır; e-posta/username/ip düşer", () => {
+  it("kullanıcıdan yalnız id + null ip kalır; e-posta/username/ip/geo düşer", () => {
     const out = scrubEvent({
       user: {
         id: "uuid-123",
         email: "a@metu.edu.tr",
         username: "ada",
         ip_address: "1.2.3.4",
+        geo: { country_code: "TR", city: "Ankara", subdivision: "06" },
       },
     });
-    expect(out.user).toEqual({ id: "uuid-123" });
+    // ip_address AÇIKÇA null (Sentry sunucusu geo türetmesin); geo düşer.
+    expect(out.user).toEqual({ id: "uuid-123", ip_address: null });
   });
 
-  it("id yoksa kullanıcı boş nesneye iner (PII kalmaz)", () => {
+  it("id yoksa kullanıcı yalnız null ip'e iner (PII kalmaz)", () => {
     const out = scrubEvent({ user: { email: "a@metu.edu.tr" } });
-    expect(out.user).toEqual({});
+    expect(out.user).toEqual({ ip_address: null });
   });
 
   it("istek: cookies/data/query_string + Cookie/Authorization başlığı SİLİNİR; url maskeli, User-Agent kalır", () => {
@@ -223,5 +226,98 @@ describe("scrubEvent — genişletilmiş PII silme (KVKK, 5 vaka)", () => {
       ],
     });
     expect(out.breadcrumbs![0].data).toBeUndefined();
+  });
+});
+
+// IP / coğrafi konum sızıntısı (KVKK) — Sentry, IP'den kullanıcının şehrini,
+// enlem/boylamını (event.user.geo) VE ip_address'ini türetir. Bu blok, hem
+// kullanıcı hem istek-başlığı vektörlerinin tamamen temizlendiğini kilitler.
+describe("isIpGeoHeader — IP/geo taşıyan başlık adları", () => {
+  it("tam adlar eşleşir (x-forwarded-for / x-real-ip / x-vercel-proxied-for)", () => {
+    expect(isIpGeoHeader("x-forwarded-for")).toBe(true);
+    expect(isIpGeoHeader("x-real-ip")).toBe(true);
+    expect(isIpGeoHeader("x-vercel-proxied-for")).toBe(true);
+  });
+  it("x-vercel-ip-* prefix'i (şehir/enlem/boylam/posta kodu/ülke) eşleşir", () => {
+    expect(isIpGeoHeader("x-vercel-ip-city")).toBe(true);
+    expect(isIpGeoHeader("x-vercel-ip-latitude")).toBe(true);
+    expect(isIpGeoHeader("x-vercel-ip-longitude")).toBe(true);
+    expect(isIpGeoHeader("x-vercel-ip-postal-code")).toBe(true);
+    expect(isIpGeoHeader("x-vercel-ip-country")).toBe(true);
+    expect(isIpGeoHeader("x-vercel-ip-country-region")).toBe(true);
+  });
+  it("zararsız başlıklar eşleşmez (user-agent / accept / x-ok)", () => {
+    expect(isIpGeoHeader("user-agent")).toBe(false);
+    expect(isIpGeoHeader("accept")).toBe(false);
+    expect(isIpGeoHeader("x-ok")).toBe(false);
+  });
+});
+
+describe("scrubEvent — IP/coğrafi konum silme (KVKK: Sentry IP'den geo türetmesin)", () => {
+  it("user.geo silinir; ip_address null'a çekilir; yalnız id kalır", () => {
+    const out = scrubEvent({
+      user: {
+        id: "uuid-1",
+        ip_address: "88.240.1.2",
+        geo: { country_code: "TR", city: "Ankara", subdivision: "06" },
+      },
+    });
+    const user = out.user as Record<string, unknown>;
+    expect(user.geo).toBeUndefined();
+    expect(user.ip_address).toBeNull();
+    expect(user.id).toBe("uuid-1");
+  });
+
+  it("id yoksa bile ip_address null kalır (bağlantı IP'sinden geo türetimini engeller)", () => {
+    const out = scrubEvent({
+      user: { ip_address: "88.240.1.2", geo: { city: "Ankara" } },
+    });
+    expect(out.user).toEqual({ ip_address: null });
+  });
+
+  it("IP/geo taşıyan istek başlıkları TAMAMEN silinir; zararsız başlık kalır", () => {
+    const out = scrubEvent({
+      request: {
+        headers: {
+          "X-Forwarded-For": "88.240.1.2, 10.0.0.1",
+          "X-Real-Ip": "88.240.1.2",
+          "X-Vercel-Proxied-For": "88.240.1.2",
+          "X-Vercel-Ip-City": "Ankara",
+          "X-Vercel-Ip-Country": "TR",
+          "X-Vercel-Ip-Latitude": "39.93",
+          "X-Vercel-Ip-Longitude": "32.85",
+          "X-Vercel-Ip-Postal-Code": "06000",
+          "User-Agent": "UA",
+        },
+      },
+    });
+    const headers = (out.request as Record<string, unknown>).headers as Record<
+      string,
+      unknown
+    >;
+    expect(headers["X-Forwarded-For"]).toBeUndefined();
+    expect(headers["X-Real-Ip"]).toBeUndefined();
+    expect(headers["X-Vercel-Proxied-For"]).toBeUndefined();
+    expect(headers["X-Vercel-Ip-City"]).toBeUndefined();
+    expect(headers["X-Vercel-Ip-Country"]).toBeUndefined();
+    expect(headers["X-Vercel-Ip-Latitude"]).toBeUndefined();
+    expect(headers["X-Vercel-Ip-Longitude"]).toBeUndefined();
+    expect(headers["X-Vercel-Ip-Postal-Code"]).toBeUndefined();
+    // Zararsız başlık (debug için) korunur.
+    expect(headers["User-Agent"]).toBe("UA");
+  });
+
+  it("başlık adı büyük/küçük harf duyarsız eşleşir (lowercase varyant da silinir)", () => {
+    const out = scrubEvent({
+      request: {
+        headers: { "x-vercel-ip-timezone": "Europe/Istanbul", "x-ok": "kalir" },
+      },
+    });
+    const headers = (out.request as Record<string, unknown>).headers as Record<
+      string,
+      unknown
+    >;
+    expect(headers["x-vercel-ip-timezone"]).toBeUndefined();
+    expect(headers["x-ok"]).toBe("kalir");
   });
 });

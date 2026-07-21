@@ -6,10 +6,14 @@
 // Testi: sentry-scrub.test.ts (npm test).
 //
 // Strateji (savunmacı, birden çok katman):
-//  1) Kullanıcı kimliği YALNIZCA `id` — e-posta / ad / ip düşürülür.
+//  1) Kullanıcı kimliği YALNIZCA `id` — e-posta / ad / username / geo düşürülür,
+//     ip_address AÇIKÇA null'a çekilir (Sentry sunucusu bağlantı IP'sinden
+//     coğrafi konum türetmesin — KVKK).
 //  2) İstek: cookies / data (gövde) / query_string ve Authorization/Cookie
-//     başlıkları TAMAMEN SİLİNİR (maskeleme değil). url yalnız hassas
-//     parametreleri maskelenerek kalır (yol + debug için).
+//     başlıkları TAMAMEN SİLİNİR (maskeleme değil). Ayrıca IP/coğrafi konum
+//     taşıyan başlıklar (X-Forwarded-For, X-Real-Ip, X-Vercel-Proxied-For ve
+//     tüm X-Vercel-Ip-* — şehir/enlem/boylam/posta kodu/ülke) SİLİNİR. url
+//     yalnız hassas parametreleri maskelenerek kalır (yol + debug için).
 //  3) URL query string'inden hassas parametreler (code, token, ...) çıkarılır.
 //  4) Herhangi bir derinlikte, anahtar adı hassas desene uyan alanın DEĞERİ
 //     maskelenir (e-posta, ad, bio, mesaj gövdesi, bilet token'ı, iban, telefon…).
@@ -29,6 +33,27 @@ const SENSITIVE_QS =
 
 const REDACTED = "[Filtered]";
 const MAX_DEPTH = 6;
+
+// IP / coğrafi konum taşıyan istek başlıkları TAMAMEN silinir (KVKK). Sentry
+// sunucusu bunlardan kullanıcının IP'sini VE şehir/enlem/boylam/ülke bilgisini
+// (event.user.geo) türetir; sendDefaultPii:false bunu durdurmaz. Tam adlar +
+// `x-vercel-ip-*` prefix'i (x-vercel-ip-city / -latitude / -longitude /
+// -postal-code / -country / -country-region / -timezone …). Karşılaştırma
+// başlık adının küçük harfli hâliyle yapılır (case-insensitive).
+const IP_GEO_HEADER_EXACT = new Set([
+  "x-forwarded-for",
+  "x-vercel-proxied-for",
+  "x-real-ip",
+]);
+const IP_GEO_HEADER_PREFIX = "x-vercel-ip-";
+
+/** Başlık adı (küçük harfe indirgenmiş) IP/coğrafi konum taşıyor mu? */
+export function isIpGeoHeader(lowerName: string): boolean {
+  return (
+    IP_GEO_HEADER_EXACT.has(lowerName) ||
+    lowerName.startsWith(IP_GEO_HEADER_PREFIX)
+  );
+}
 
 /** URL'deki hassas query parametrelerini maskeler (yolu korur). */
 export function scrubUrl(url: unknown): unknown {
@@ -150,10 +175,16 @@ export function scrubEvent<T extends ScrubbableEvent>(event: T): T {
   if (!event || typeof event !== "object") return event;
   const next: ScrubbableEvent = { ...event };
 
-  // 1) Kullanıcı: yalnızca id kalsın (e-posta/ad/ip/username düşür).
+  // 1) Kullanıcı: yalnızca id kalsın (e-posta/ad/username/geo düşer).
+  //    ip_address AÇIKÇA null: Sentry sunucusu eksik IP'yi bağlantıdan ({{auto}})
+  //    türetip coğrafi konum (geo: ülke/şehir/enlem/boylam) ÇIKARMASIN (KVKK).
+  //    sendDefaultPii:false yetmez — geo IP'den SUNUCU tarafında türetilir.
+  //    geo hiç kopyalanmaz (whitelist), ip_address null'a sabitlenir.
   if (next.user && typeof next.user === "object") {
     const id = (next.user as AnyRecord).id;
-    next.user = id === undefined || id === null ? {} : { id };
+    const cleanUser: AnyRecord = { ip_address: null };
+    if (id !== undefined && id !== null) cleanUser.id = id;
+    next.user = cleanUser;
   }
 
   // 2) İstek: PII taşıyan kaplar TAMAMEN silinir (maskeleme değil) — cookies,
@@ -168,8 +199,13 @@ export function scrubEvent<T extends ScrubbableEvent>(event: T): T {
       const headers: AnyRecord = {};
       for (const [k, v] of Object.entries(req.headers as AnyRecord)) {
         const lk = k.toLowerCase();
-        if (lk === "authorization" || lk === "cookie" || lk === "set-cookie") {
-          continue; // SİL (maskeleme değil)
+        if (
+          lk === "authorization" ||
+          lk === "cookie" ||
+          lk === "set-cookie" ||
+          isIpGeoHeader(lk)
+        ) {
+          continue; // SİL (maskeleme değil) — kimlik/IP/coğrafi konum sızmasın
         }
         // Diğer hassas-adlı başlıklar (varsa) yine de maskelenir.
         headers[k] = SENSITIVE_KEY.test(k) ? REDACTED : v;

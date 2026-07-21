@@ -45,9 +45,8 @@ export function AdminShell({
   clubStats,
   memberGrowth,
   clubOptions,
-  userOptions,
+  advisorNames,
   clubAdvisors,
-  roleCandidates,
   advisors,
   fairEnabled,
   userId,
@@ -59,9 +58,8 @@ export function AdminShell({
   clubStats: ClubStat[];
   memberGrowth: MemberGrowthPoint[];
   clubOptions: Option[];
-  userOptions: Option[];
+  advisorNames: Record<string, string>;
   clubAdvisors: Record<string, string | null>;
-  roleCandidates: Option[];
   advisors: Option[];
   fairEnabled: boolean;
   userId: string;
@@ -190,10 +188,10 @@ export function AdminShell({
           <div className="space-y-6">
             <AdminAssignments
               clubs={clubOptions}
-              users={userOptions}
+              advisorNames={advisorNames}
               clubAdvisors={clubAdvisors}
             />
-            <AdminRoles candidates={roleCandidates} advisors={advisors} />
+            <AdminRoles advisors={advisors} />
           </div>
         </AdminTabPanel>
 

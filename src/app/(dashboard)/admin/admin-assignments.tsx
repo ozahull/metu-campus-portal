@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { AdminUserPicker, type PickedUser } from "./admin-user-picker";
 
 export type Option = { id: string; label: string };
 
@@ -26,11 +27,14 @@ const selectClass =
 
 export function AdminAssignments({
   clubs,
-  users,
+  advisorNames,
   clubAdvisors,
 }: {
   clubs: Option[];
-  users: Option[];
+  /** Danışman id → isim — YALNIZ atanmış danışmanlar (targeted `.in()` ile
+   *  server'dan; TÜM kullanıcı listesi ARTIK çekilmez — ölçek Commit 2). Read-back
+   *  ve seçili kulübün danışmanını önseçmek için. */
+  advisorNames: Record<string, string>;
   /** Kulüp id → mevcut danışman id (server'dan taze; kaydedilen atamanın
    *  reload sonrası GÖRÜNMESİ için read-back — asıl kök sebep buydu). */
   clubAdvisors: Record<string, string | null>;
@@ -39,19 +43,18 @@ export function AdminAssignments({
   const t = useTranslations("admin.assignments");
 
   const [advClub, setAdvClub] = useState("");
-  const [advUser, setAdvUser] = useState("");
+  const [advUser, setAdvUser] = useState<PickedUser | null>(null);
   const [advBusy, setAdvBusy] = useState(false);
 
-  // id → isim (danışman adını çözmek için).
-  const userNameById = useMemo(
-    () => new Map(users.map((u) => [u.id, u.label])),
-    [users],
-  );
-
-  // Kulüp seçilince mevcut danışmanını önseç (dropdown artık boşa düşmez).
+  // Kulüp seçilince mevcut danışmanını önseç (picker çipi bunu gösterir).
   function onClubChange(clubId: string) {
     setAdvClub(clubId);
-    setAdvUser(clubId ? (clubAdvisors[clubId] ?? "") : "");
+    const current = clubId ? clubAdvisors[clubId] : null;
+    setAdvUser(
+      current
+        ? { id: current, label: advisorNames[current] ?? t("advisorNone") }
+        : null,
+    );
   }
 
   // Halihazırda danışmanı olan kulüpler (read-back listesi).
@@ -62,9 +65,9 @@ export function AdminAssignments({
         .map((c) => ({
           club: c.label,
           advisor:
-            userNameById.get(clubAdvisors[c.id] as string) ?? t("advisorNone"),
+            advisorNames[clubAdvisors[c.id] as string] ?? t("advisorNone"),
         })),
-    [clubs, clubAdvisors, userNameById, t],
+    [clubs, clubAdvisors, advisorNames, t],
   );
 
   async function assignAdvisor(e: React.FormEvent<HTMLFormElement>) {
@@ -75,7 +78,7 @@ export function AdminAssignments({
     }
     setAdvBusy(true);
     const supabase = createClient();
-    const wanted = advUser || null;
+    const wanted = advUser?.id ?? null;
     // .select() ŞART: yazılan satırı geri okuruz. RLS USING (is_super_admin)
     // satırı dışlarsa UPDATE 0 satır etkiler ve PostgREST HATA DÖNDÜRMEZ
     // (error=null). Ayrıca dönen advisor_id'yi İSTENEN değerle karşılaştırırız:
@@ -97,7 +100,7 @@ export function AdminAssignments({
       toast.error(t("toasts.notSaved"));
       return;
     }
-    toast.success(advUser ? t("toasts.assigned") : t("toasts.removed"));
+    toast.success(wanted ? t("toasts.assigned") : t("toasts.removed"));
     await refreshAfterMutation(router);
   }
 
@@ -125,19 +128,19 @@ export function AdminAssignments({
           </div>
           <div className="space-y-2">
             <Label htmlFor="adv-user">{t("advisorLabel")}</Label>
-            <select id="adv-user" className={selectClass} value={advUser} onChange={(e) => setAdvUser(e.target.value)} disabled={advBusy}>
-              <option value="">{t("advisorNone")}</option>
-              {users.map((u) => (
-                <option key={u.id} value={u.id}>{u.label}</option>
-              ))}
-            </select>
+            <AdminUserPicker
+              inputId="adv-user"
+              value={advUser}
+              onChange={setAdvUser}
+              disabled={advBusy}
+            />
           </div>
           {advClub && (
             <p className="text-sm text-muted-foreground sm:col-span-2">
               {t("currentAdvisor")}:{" "}
               <span className="font-medium text-foreground">
                 {clubAdvisors[advClub]
-                  ? (userNameById.get(clubAdvisors[advClub] as string) ??
+                  ? (advisorNames[clubAdvisors[advClub] as string] ??
                     t("advisorNone"))
                   : t("advisorNone")}
               </span>

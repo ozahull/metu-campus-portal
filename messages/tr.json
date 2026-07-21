@@ -797,10 +797,8 @@
       "title": "Danışman Rolü",
       "desc": "Bir kullanıcıya danışman rolü verin veya geri alın. Danışman rolündeki öğretim üyeleri bir kulübe bağlı olmadan da kulüp açma başvurusu yapabilir.",
       "userLabel": "Kullanıcı",
-      "userPlaceholder": "Seçin…",
       "promote": "Danışman Yap",
       "demote": "Danışman Rolünü Kaldır",
-      "noCandidates": "Danışman yapılabilecek kullanıcı yok.",
       "currentTitle": "Mevcut Danışmanlar",
       "noneAssigned": "Henüz danışman yok.",
       "toasts": {
@@ -810,6 +808,14 @@
         "promoted": "Kullanıcı danışman yapıldı",
         "demoted": "Danışman rolü kaldırıldı"
       }
+    },
+    "userPicker": {
+      "searchPlaceholder": "Ada göre ara…",
+      "loading": "Aranıyor…",
+      "noResults": "Sonuç yok.",
+      "loadMore": "Daha fazla",
+      "clear": "Seçimi temizle",
+      "resultsCount": "{count} sonuç"
     },
     "approvals": {
       "queueTitle": "Okul Onay Kuyruğu",

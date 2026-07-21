@@ -17,31 +17,28 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { type Option } from "./admin-assignments";
-
-// text-base mobil: iOS Safari 16px altındaki form kontrolüne odakta kalıcı
-// zoom yapar — küçük görünüm yalnız md+ (ui/input deseni).
-const selectClass =
-  "h-9 w-full rounded-lg border border-border bg-card px-3 text-base text-foreground outline-none transition-colors focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring [&>option]:bg-card md:text-sm";
+import { AdminUserPicker, type PickedUser } from "./admin-user-picker";
 
 /**
  * HOCA (ADVISOR) rol atama — yalnız SUPER_ADMIN. Rol yazma yolu profiles'ta
  * istemciye KAPALI olduğundan (kolon-grant + RLS + prevent_role_escalation),
  * atama set_user_role SECURITY DEFINER RPC'siyle yapılır (is_super_admin()
  * kapılı; yalnız USER↔ADVISOR). Görsel dil: Dil B (surface-admin).
+ *
+ * Ölçek Commit 2: "hoca yapılabilir kullanıcı" listesi (role='USER', 5.000+)
+ * ARTIK topluca çekilmez — AdminUserPicker sunucu tarafında role=USER filtresiyle
+ * arar/sayfalar. Mevcut hocalar (küçük, sınırlı küme) read-back için gelir.
  */
 export function AdminRoles({
-  candidates,
   advisors,
 }: {
-  /** role='USER' — Hoca yapılabilir kullanıcılar. */
-  candidates: Option[];
   /** role='ADVISOR' — mevcut hocalar (rol geri alınabilir). */
   advisors: Option[];
 }) {
   const router = useRouter();
   const t = useTranslations("admin.roles");
 
-  const [userId, setUserId] = useState("");
+  const [picked, setPicked] = useState<PickedUser | null>(null);
   const [promoteBusy, setPromoteBusy] = useState(false);
   const [demoteBusy, setDemoteBusy] = useState<string | null>(null);
 
@@ -68,16 +65,16 @@ export function AdminRoles({
 
   async function promote(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!userId) {
+    if (!picked) {
       toast.error(t("toasts.userRequired"));
       return;
     }
     setPromoteBusy(true);
-    const ok = await setRole(userId, "ADVISOR");
+    const ok = await setRole(picked.id, "ADVISOR");
     setPromoteBusy(false);
     if (ok) {
       toast.success(t("toasts.promoted"));
-      setUserId("");
+      setPicked(null);
       await refreshAfterMutation(router);
     }
   }
@@ -108,24 +105,17 @@ export function AdminRoles({
         >
           <div className="space-y-2">
             <Label htmlFor="role-user">{t("userLabel")}</Label>
-            <select
-              id="role-user"
-              className={selectClass}
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              disabled={promoteBusy || candidates.length === 0}
-            >
-              <option value="">{t("userPlaceholder")}</option>
-              {candidates.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.label}
-                </option>
-              ))}
-            </select>
+            <AdminUserPicker
+              inputId="role-user"
+              value={picked}
+              onChange={setPicked}
+              roleFilter="USER"
+              disabled={promoteBusy}
+            />
           </div>
           <Button
             type="submit"
-            disabled={promoteBusy || candidates.length === 0}
+            disabled={promoteBusy || !picked}
             className="h-9 gap-2 font-medium"
           >
             {promoteBusy ? (
@@ -136,11 +126,6 @@ export function AdminRoles({
             {t("promote")}
           </Button>
         </form>
-        {candidates.length === 0 && (
-          <p className="mt-2 text-sm text-muted-foreground">
-            {t("noCandidates")}
-          </p>
-        )}
 
         {/* Mevcut hocalar (server'dan taze read-back). Atanan hoca burada
             anında görünür — "atama kayboldu" yanılgısını giderir. */}

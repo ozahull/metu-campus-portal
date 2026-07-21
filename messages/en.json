@@ -797,10 +797,8 @@
       "title": "Advisor Role",
       "desc": "Make a user an advisor or revoke the role. Advisors will be able to apply to open a club even without belonging to a club (permissions come in a later stage).",
       "userLabel": "User",
-      "userPlaceholder": "Select…",
       "promote": "Make Advisor",
       "demote": "Remove Advisor Role",
-      "noCandidates": "No user available to make an advisor.",
       "currentTitle": "Current Advisors",
       "noneAssigned": "No advisors yet.",
       "toasts": {
@@ -810,6 +808,14 @@
         "promoted": "User made an advisor",
         "demoted": "Advisor role removed"
       }
+    },
+    "userPicker": {
+      "searchPlaceholder": "Search by name…",
+      "loading": "Searching…",
+      "noResults": "No results.",
+      "loadMore": "Load more",
+      "clear": "Clear selection",
+      "resultsCount": "{count, plural, one {# result} other {# results}}"
     },
     "approvals": {
       "queueTitle": "School Approval Queue",

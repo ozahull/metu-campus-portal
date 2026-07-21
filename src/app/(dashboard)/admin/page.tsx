@@ -59,22 +59,19 @@ export default async function AdminPage() {
     redirect("/dashboard");
   }
 
-  // Atama formları için kulüp ve kullanıcı listeleri (email OKUNMAZ; full_name).
+  // Atama formları için kulüp listesi (bounded — kampüs kulüp sayısı küçük).
   // advisor_id de çekilir: atama formu MEVCUT danışmanı gösterip önseçebilsin
   // (kaydedilen atamanın reload sonrası GÖRÜNMESİ için read-back — bkz. §9 bugfix).
+  //
+  // ÖLÇEK (Commit 2): KULLANICI listesi ARTIK topluca çekilmez. Eskiden 5.000+
+  // profil .limit(500) ile geliyordu → atama dropdown'ları %90 kör + ~2s. Kullanıcı
+  // seçimi AdminUserPicker ile SUNUCU TARAFINDA aranır/sayfalanır; burada yalnız
+  // GEREKLİ isimler (atanmış danışmanlar, başvuranlar) targeted `.in()` ile çözülür.
   const { data: clubsRaw } = await supabase
     .from("clubs")
     .select("id, name, requires_advisor_approval, advisor_id")
     .order("name", { ascending: true })
     .order("id", { ascending: true })
-    .limit(500);
-  const { data: usersRaw } = await supabase
-    .from("profiles")
-    .select("id, full_name, role")
-    .order("full_name", { ascending: true })
-    .order("id", { ascending: true })
-    // Açık tavan (PostgREST zaten 1000'de keser). Kampüs 500 kullanıcıyı aşarsa
-    // bu dropdown'lar aramalı seçiciye taşınmalı (rapor: SENİN KARARIN).
     .limit(500);
 
   const clubOptions: Option[] = (clubsRaw ?? []).map((c) => ({
@@ -86,25 +83,44 @@ export default async function AdminPage() {
   for (const c of clubsRaw ?? []) {
     clubAdvisors[c.id] = c.advisor_id ?? null;
   }
-  const userOptions: Option[] = (usersRaw ?? []).map((u) => ({
-    id: u.id,
-    label: u.full_name ?? t("unnamedUser"),
-  }));
-  // HOCA (ADVISOR) rol atama listeleri — profiles.role tabanlı; clubs.advisor_id
-  // (kulübün akademik danışmanı) kavramından BAĞIMSIZ. role SELECT'te kolon-grant
-  // ile açıktır (email değil). Aday = 'USER' (hoca yapılabilir); hoca = 'ADVISOR'.
-  const roleOf = (r: string | null | undefined) =>
-    r?.toString().trim().toUpperCase();
-  const roleCandidates: Option[] = (usersRaw ?? [])
-    .filter((u) => roleOf(u.role) === "USER")
-    .map((u) => ({ id: u.id, label: u.full_name ?? t("unnamedUser") }));
-  const advisors: Option[] = (usersRaw ?? [])
-    .filter((u) => roleOf(u.role) === "ADVISOR")
-    .map((u) => ({ id: u.id, label: u.full_name ?? t("unnamedUser") }));
   const clubSettings: ClubSetting[] = (clubsRaw ?? []).map((c) => ({
     id: c.id,
     name: c.name,
     requires_advisor_approval: c.requires_advisor_approval,
+  }));
+
+  // Atanmış danışmanların adları — YALNIZ ilgili id'ler (targeted .in). Picker
+  // önseçimi (kulüp seçilince mevcut danışman çipi) + "Mevcut Atamalar" read-back.
+  const advisorIds = Array.from(
+    new Set(
+      (clubsRaw ?? [])
+        .map((c) => c.advisor_id)
+        .filter((v): v is string => Boolean(v)),
+    ),
+  );
+  const advisorNames: Record<string, string> = {};
+  if (advisorIds.length > 0) {
+    const { data: advNameRows } = await supabase
+      .from("profiles")
+      .select("id, full_name")
+      .in("id", advisorIds);
+    for (const r of advNameRows ?? []) {
+      advisorNames[r.id] = r.full_name ?? t("unnamedUser");
+    }
+  }
+
+  // Mevcut hocalar (profiles.role='ADVISOR') — sınırlı, küçük küme (okulun atadığı
+  // öğretim üyeleri; clubs.advisor_id'den BAĞIMSIZ kavram). role SELECT'te
+  // kolon-grant ile açık (email değil). Rol geri alma (demote) read-back'i için.
+  const { data: advisorRows } = await supabase
+    .from("profiles")
+    .select("id, full_name")
+    .eq("role", "ADVISOR")
+    .order("full_name", { ascending: true })
+    .order("id", { ascending: true });
+  const advisors: Option[] = (advisorRows ?? []).map((u) => ({
+    id: u.id,
+    label: u.full_name ?? t("unnamedUser"),
   }));
 
   // Okul onayı bekleyen etkinlikler (tüm kulüpler) + kulüp adı.
@@ -183,13 +199,7 @@ export default async function AdminPage() {
     documents: docsByEvent[e.id] ?? [],
   }));
 
-  // Topluluk açma başvuruları (PENDING) — Aşama 2 Commit C. Başvuran hoca adı
-  // için requested_by → full_name eşlemesi usersRaw'dan (ekstra sorgu YOK).
-  const nameById = new Map<string, string>();
-  for (const u of usersRaw ?? []) {
-    nameById.set(u.id, u.full_name ?? t("unnamedUser"));
-  }
-
+  // Topluluk açma başvuruları (PENDING) — Aşama 2 Commit C.
   const { data: reqRaw } = await supabase
     .from("club_requests")
     .select(
@@ -208,6 +218,20 @@ export default async function AdminPage() {
     created_at: string;
     requested_by: string;
   }[];
+
+  // Başvuran hoca adı: requested_by → full_name, YALNIZ ilgili id'ler (targeted
+  // .in). Tüm kullanıcı listesi ARTIK çekilmiyor (ölçek Commit 2).
+  const nameById = new Map<string, string>();
+  const requesterIds = Array.from(new Set(reqBase.map((r) => r.requested_by)));
+  if (requesterIds.length > 0) {
+    const { data: reqUserRows } = await supabase
+      .from("profiles")
+      .select("id, full_name")
+      .in("id", requesterIds);
+    for (const u of reqUserRows ?? []) {
+      nameById.set(u.id, u.full_name ?? t("unnamedUser"));
+    }
+  }
 
   // Başvuru belgeleri: signed URL ile (public URL ASLA; docsByEvent deseninin
   // kopyası, ayrı club-request-docs bucket). Okul yalnız görüntüler → canDelete=false.
@@ -308,9 +332,8 @@ export default async function AdminPage() {
           clubStats={clubStats}
           memberGrowth={memberGrowth}
           clubOptions={clubOptions}
-          userOptions={userOptions}
+          advisorNames={advisorNames}
           clubAdvisors={clubAdvisors}
-          roleCandidates={roleCandidates}
           advisors={advisors}
           fairEnabled={fairEnabled}
           userId={user.id}

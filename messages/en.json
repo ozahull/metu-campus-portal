@@ -50,6 +50,8 @@
     "groupToday": "Today",
     "groupWeek": "This week",
     "groupOlder": "Older",
+    "loadMore": "Load more",
+    "loadError": "Could not load more. Please try again.",
     "type": {
       "EVENT_APPROVED": "Your event was approved",
       "EVENT_NEW": "New event",

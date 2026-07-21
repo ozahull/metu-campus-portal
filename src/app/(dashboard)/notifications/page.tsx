@@ -4,7 +4,11 @@ import { getTranslations } from "next-intl/server";
 import { Bell } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PageShell } from "@/components/shared/page-shell";
-import { NotificationsView } from "@/components/notifications-view";
+import {
+  NOTIFICATIONS_PAGE_SIZE,
+  NOTIFICATION_COLS,
+  NotificationsView,
+} from "@/components/notifications-view";
 import type { AppNotification } from "@/lib/notification-meta";
 
 export const dynamic = "force-dynamic";
@@ -23,13 +27,29 @@ export default async function NotificationsPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // RLS: yalnızca kendi bildirimleri. Son 100 kayıt yeterli (arşiv değil).
+  // Ölçek (Commit 1): TÜM bildirimleri tek sorguda çekmek yerine cursor tabanlı
+  // ilk sayfa. Aktif kullanıcıda binlerce birikebilir; ilk yük hafif tutulur,
+  // gerisi "daha fazla yükle" ile (bkz. NotificationsView). +1 çekilir: gelen
+  // satır sayfa boyunu aşarsa daha fazlası VAR demektir (offset yok, keyset).
   const { data } = await supabase
     .from("notifications")
-    .select("id, type, title, body, link, read_at, created_at")
+    .select(NOTIFICATION_COLS)
     .order("created_at", { ascending: false })
-    .order("id", { ascending: true })
-    .limit(100);
+    .order("id", { ascending: false })
+    .limit(NOTIFICATIONS_PAGE_SIZE + 1);
+
+  const rows = (data ?? []) as AppNotification[];
+  const hasMore = rows.length > NOTIFICATIONS_PAGE_SIZE;
+  const initialItems = rows.slice(0, NOTIFICATIONS_PAGE_SIZE);
+
+  // Okunmamış sayısı AYRI hafif count sorgusuyla (head=true → satır getirmez).
+  // "Tümünü okundu işaretle" görünürlüğü ve rozet bu otoritatif sayıdan gelir;
+  // yüklenmiş sayfadaki `read_at` durumundan DEĞİL (okunmamış sonraki sayfada
+  // olabilir).
+  const { count } = await supabase
+    .from("notifications")
+    .select("id", { count: "exact", head: true })
+    .is("read_at", null);
 
   return (
     <PageShell>
@@ -40,7 +60,12 @@ export default async function NotificationsPage() {
         <h1 className="text-3xl font-extrabold tracking-tight">{t("title")}</h1>
       </header>
 
-      <NotificationsView initialItems={(data ?? []) as AppNotification[]} />
+      <NotificationsView
+        userId={user.id}
+        initialItems={initialItems}
+        initialHasMore={hasMore}
+        initialUnread={count ?? 0}
+      />
     </PageShell>
   );
 }

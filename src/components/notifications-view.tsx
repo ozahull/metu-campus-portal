@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Bell, CheckCheck } from "lucide-react";
+import { Bell, CheckCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { refreshAfterMutation } from "@/lib/refresh";
@@ -16,6 +16,13 @@ import {
   type AppNotification,
 } from "@/lib/notification-meta";
 import { DAY_MS, startOfAppDay } from "@/lib/datetime";
+
+// Ölçek (Commit 1): sayfa boyutu + ortak kolon listesi. Server ilk sayfayı
+// NOTIFICATIONS_PAGE_SIZE+1 ile çeker; buradaki "daha fazla yükle" aynı boyu
+// keyset (created_at,id) ile sürdürür. Kolonlar tek kaynaktan (server + client
+// aynı seti seçsin).
+export const NOTIFICATIONS_PAGE_SIZE = 30;
+export const NOTIFICATION_COLS = "id, type, title, body, link, read_at, created_at";
 
 type Group = { key: "today" | "week" | "older"; items: AppNotification[] };
 
@@ -43,16 +50,101 @@ function groupByDate(items: AppNotification[]): Group[] {
 }
 
 export function NotificationsView({
+  userId,
   initialItems,
+  initialHasMore,
+  initialUnread,
 }: {
+  userId: string;
   initialItems: AppNotification[];
+  initialHasMore: boolean;
+  initialUnread: number;
 }) {
   const router = useRouter();
   const t = useTranslations("notifications");
   const [items, setItems] = useState<AppNotification[]>(initialItems);
+  const [hasMore, setHasMore] = useState(initialHasMore);
+  const [loadingMore, setLoadingMore] = useState(false);
+  // Okunmamış sayısı AYRI (otoritatif). "Tümünü okundu işaretle" görünürlüğü
+  // buna bağlı — yüklenmiş sayfada okunmamış olmasa bile sonraki sayfada olabilir.
+  const [unread, setUnread] = useState(initialUnread);
 
   const groups = useMemo(() => groupByDate(items), [items]);
-  const hasUnread = items.some((n) => !n.read_at);
+
+  // Realtime: yeni bildirim gelince TÜM listeyi yeniden çekme — yalnız satırı
+  // listenin BAŞINA ekle (en yeni üstte) ve okunmamış sayacını artır. Fallback
+  // polling YOK: bu tam liste görünümü, bell'den bağımsız kanal adı kullanır.
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`notifications-page:${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          const row = payload.new as Partial<AppNotification> & { id?: string };
+          if (!row?.id) return;
+          const incoming: AppNotification = {
+            id: row.id,
+            type: row.type ?? "",
+            title: row.title ?? "",
+            body: row.body ?? null,
+            link: row.link ?? null,
+            read_at: row.read_at ?? null,
+            created_at: row.created_at ?? new Date().toISOString(),
+          };
+          setItems((prev) =>
+            prev.some((x) => x.id === incoming.id)
+              ? prev
+              : [incoming, ...prev],
+          );
+          if (!incoming.read_at) setUnread((u) => u + 1);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [userId]);
+
+  // "Daha fazla yükle" — keyset (created_at DESC, id DESC), OFFSET DEĞİL. Son
+  // öğeyi cursor alır; eşit created_at ilelerinde id ile ayrışır (tek işlemde
+  // toplu eklenen bildirimler aynı created_at'i paylaşabilir). +1 çekip taşmayı
+  // ölçer; sayfa boyu kadarını ekler.
+  const loadMore = useCallback(async () => {
+    if (loadingMore || items.length === 0) return;
+    setLoadingMore(true);
+    const cursor = items[items.length - 1];
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("notifications")
+      .select(NOTIFICATION_COLS)
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
+      .or(
+        `created_at.lt.${cursor.created_at},and(created_at.eq.${cursor.created_at},id.lt.${cursor.id})`,
+      )
+      .limit(NOTIFICATIONS_PAGE_SIZE + 1);
+    setLoadingMore(false);
+    if (error) {
+      toast.error(t("loadError"));
+      return;
+    }
+    const rows = (data ?? []) as AppNotification[];
+    const more = rows.length > NOTIFICATIONS_PAGE_SIZE;
+    const page = rows.slice(0, NOTIFICATIONS_PAGE_SIZE);
+    setItems((prev) => {
+      const seen = new Set(prev.map((x) => x.id));
+      return [...prev, ...page.filter((x) => !seen.has(x.id))];
+    });
+    setHasMore(more);
+  }, [items, loadingMore, t]);
 
   async function activate(n: AppNotification) {
     if (!n.read_at) {
@@ -60,6 +152,7 @@ export function NotificationsView({
       setItems((prev) =>
         prev.map((x) => (x.id === n.id ? { ...x, read_at: nowIso } : x)),
       );
+      setUnread((u) => Math.max(0, u - 1));
       const supabase = createClient();
       const { error } = await supabase
         .from("notifications")
@@ -70,6 +163,7 @@ export function NotificationsView({
         setItems((prev) =>
           prev.map((x) => (x.id === n.id ? { ...x, read_at: null } : x)),
         );
+        setUnread((u) => u + 1);
         toast.error(t("markError"));
       }
     }
@@ -86,9 +180,11 @@ export function NotificationsView({
   async function markAllRead() {
     const nowIso = new Date().toISOString();
     const prevItems = items;
+    const prevUnread = unread;
     setItems((prev) =>
       prev.map((x) => (x.read_at ? x : { ...x, read_at: nowIso })),
     );
+    setUnread(0);
     const supabase = createClient();
     const { error } = await supabase
       .from("notifications")
@@ -96,6 +192,7 @@ export function NotificationsView({
       .is("read_at", null);
     if (error) {
       setItems(prevItems);
+      setUnread(prevUnread);
       toast.error(t("markError"));
       return;
     }
@@ -110,7 +207,7 @@ export function NotificationsView({
 
   return (
     <div className="space-y-6">
-      {hasUnread && (
+      {unread > 0 && (
         <div className="flex justify-end">
           <Button
             variant="ghost"
@@ -144,6 +241,21 @@ export function NotificationsView({
           </ul>
         </section>
       ))}
+
+      {hasMore && (
+        <div className="flex justify-center pt-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="gap-1.5 rounded-full"
+          >
+            {loadingMore && <Loader2 className="size-4 animate-spin" />}
+            {t("loadMore")}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

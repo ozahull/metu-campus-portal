@@ -50,6 +50,8 @@
     "groupToday": "Bugün",
     "groupWeek": "Bu hafta",
     "groupOlder": "Daha eski",
+    "loadMore": "Daha fazla yükle",
+    "loadError": "Daha fazlası yüklenemedi. Lütfen tekrar deneyin.",
     "type": {
       "EVENT_APPROVED": "Etkinliğiniz onaylandı",
       "EVENT_NEW": "Yeni etkinlik",

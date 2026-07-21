@@ -227,56 +227,77 @@ Deno.serve(async (req) => {
     status: number; // push servisinin HTTP durumu (0 = ağ/istisna, yanıt yok)
     body?: string; // hata gövdesi (yalnız başarısızlıkta, kırpılmış)
   };
-  const results = await Promise.all(
-    subs.map(async (sub): Promise<SendOutcome> => {
-      const tail = sub.endpoint.slice(-10);
-      const subscriber = appServer.subscribe({
-        endpoint: sub.endpoint,
-        keys: { p256dh: sub.p256dh, auth: sub.auth },
-      });
-      try {
-        await subscriber.pushTextMessage(message, { ttl: 24 * 60 * 60 });
-        const status = pushStatusByEndpoint.get(sub.endpoint) ?? 0;
-        pushStatusByEndpoint.delete(sub.endpoint);
+  // Tek aboneliğe gönderim. Hata ASLA fırlatılmaz — outcome'a çevrilir
+  // (PushMessageError instanceof yerine duck-typing: export yüzeyi değişse de
+  // response.status okuması kırılmaz).
+  const sendOne = async (
+    sub: { id: string; endpoint: string; p256dh: string; auth: string },
+  ): Promise<SendOutcome> => {
+    const tail = sub.endpoint.slice(-10);
+    const subscriber = appServer.subscribe({
+      endpoint: sub.endpoint,
+      keys: { p256dh: sub.p256dh, auth: sub.auth },
+    });
+    try {
+      await subscriber.pushTextMessage(message, { ttl: 24 * 60 * 60 });
+      const status = pushStatusByEndpoint.get(sub.endpoint) ?? 0;
+      pushStatusByEndpoint.delete(sub.endpoint);
+      console.log(
+        `[push-fanout] gönderildi (status=${status}, endpoint=...${tail})`,
+      );
+      return { endpoint_tail: tail, outcome: "sent", status };
+    } catch (err) {
+      pushStatusByEndpoint.delete(sub.endpoint);
+      const resp = (err as { response?: Response }).response;
+      const status = resp?.status ?? 0;
+      const body = resp
+        ? await resp.text().catch(() => "")
+        : String(err instanceof Error ? err.message : err);
+      // 404/410 (Gone) = abonelik ölmüş → satırı TEMİZLE.
+      if (status === 404 || status === 410) {
+        await admin.from("push_subscriptions").delete().eq("id", sub.id);
         console.log(
-          `[push-fanout] gönderildi (status=${status}, endpoint=...${tail})`,
-        );
-        return { endpoint_tail: tail, outcome: "sent", status };
-      } catch (err) {
-        pushStatusByEndpoint.delete(sub.endpoint);
-        // (PushMessageError instanceof yerine duck-typing: export yüzeyi
-        // değişse de response.status okuması kırılmaz.)
-        const resp = (err as { response?: Response }).response;
-        const status = resp?.status ?? 0;
-        const body = resp
-          ? await resp.text().catch(() => "")
-          : String(err instanceof Error ? err.message : err);
-        // 404/410 (Gone) = abonelik ölmüş → satırı TEMİZLE.
-        if (status === 404 || status === 410) {
-          await admin.from("push_subscriptions").delete().eq("id", sub.id);
-          console.log(
-            `[push-fanout] abonelik ölü, budandı (status=${status}, endpoint=...${tail})`,
-          );
-          return {
-            endpoint_tail: tail,
-            outcome: "pruned",
-            status,
-            body: body.slice(0, 200),
-          };
-        }
-        console.error(
-          `[push-fanout] gönderim hatası (status=${status}, endpoint=...${tail}):`,
-          body.slice(0, 500),
+          `[push-fanout] abonelik ölü, budandı (status=${status}, endpoint=...${tail})`,
         );
         return {
           endpoint_tail: tail,
-          outcome: "failed",
+          outcome: "pruned",
           status,
           body: body.slice(0, 200),
         };
       }
-    }),
-  );
+      console.error(
+        `[push-fanout] gönderim hatası (status=${status}, endpoint=...${tail}):`,
+        body.slice(0, 500),
+      );
+      return {
+        endpoint_tail: tail,
+        outcome: "failed",
+        status,
+        body: body.slice(0, 200),
+      };
+    }
+  };
+
+  // ÖLÇEK (Commit 4): 50'şerlik batch + Promise.allSettled. Büyük gönderimde
+  // (bir kullanıcının çok cihazı / ileride toplu fanout) push servisi ARDIŞIK
+  // 500 istekle boğulmasın; sınırlı eşzamanlılık. allSettled: bir gönderim
+  // beklenmedik şekilde fırlatsa bile batch ve sonraki batch'ler durmaz (sendOne
+  // zaten outcome döndürür — bu ek savunma katmanı).
+  const BATCH_SIZE = 50;
+  const results: SendOutcome[] = [];
+  for (let start = 0; start < subs.length; start += BATCH_SIZE) {
+    const settled = await Promise.allSettled(
+      subs.slice(start, start + BATCH_SIZE).map((sub) => sendOne(sub)),
+    );
+    for (const s of settled) {
+      results.push(
+        s.status === "fulfilled"
+          ? s.value
+          : { endpoint_tail: "?", outcome: "failed", status: 0 },
+      );
+    }
+  }
 
   const summary = { sent: 0, pruned: 0, failed: 0 };
   for (const r of results) summary[r.outcome]++;
